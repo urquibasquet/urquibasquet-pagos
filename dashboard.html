@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Urquibasquet — Dashboard de Pagos</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #111827;
+    --bg3: #1a2235;
+    --orange: #f97316;
+    --orange2: #fb923c;
+    --blue: #3b82f6;
+    --green: #22c55e;
+    --text: #f1f5f9;
+    --muted: #64748b;
+    --border: rgba(255,255,255,0.07);
+    --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #0f1729 0%, #1a2540 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-ball {
+    width: 44px;
+    height: 44px;
+    background: var(--orange);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 0 20px rgba(249,115,22,0.4);
+    flex-shrink: 0;
+  }
+
+  .header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 2px;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .header-sub {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(34,197,94,0.1);
+    border: 1px solid rgba(34,197,94,0.25);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--green);
+  }
+
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* ── LAYOUT ── */
+  .main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 24px 60px;
+  }
+
+  /* ── HERO STAT ── */
+  .hero {
+    background: linear-gradient(135deg, var(--orange) 0%, #ea580c 100%);
+    border-radius: 20px;
+    padding: 32px 40px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(249,115,22,0.3);
+  }
+
+  .hero::before {
+    content: '🏀';
+    position: absolute;
+    right: -20px;
+    top: -20px;
+    font-size: 160px;
+    opacity: 0.08;
+    transform: rotate(15deg);
+  }
+
+  .hero-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 8px;
+  }
+
+  .hero-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 96px;
+    line-height: 1;
+    color: white;
+    letter-spacing: 2px;
+  }
+
+  .hero-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 4px;
+  }
+
+  .hero-month {
+    text-align: right;
+  }
+
+  .hero-month-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 4px;
+  }
+
+  .hero-month-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: white;
+    letter-spacing: 2px;
+  }
+
+  /* ── GRID ── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--bg2);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+  }
+
+  .card-header {
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1.5px;
+    color: var(--text);
+  }
+
+  .card-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-orange { background: rgba(249,115,22,0.15); color: var(--orange2); }
+  .badge-blue { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .badge-green { background: rgba(34,197,94,0.15); color: var(--green); }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    padding: 10px 22px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--bg3);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+  tbody td {
+    padding: 13px 22px;
+    font-size: 13.5px;
+    color: var(--text);
+  }
+
+  .td-name { font-weight: 600; }
+
+  .td-monto {
+    font-weight: 700;
+    color: var(--green);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .td-fecha { color: var(--muted); font-size: 12.5px; }
+
+  /* Ranking */
+  .rank-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--muted);
+    width: 32px;
+    text-align: center;
+  }
+
+  .rank-1 { color: #fbbf24; }
+  .rank-2 { color: #94a3b8; }
+  .rank-3 { color: #cd7c3a; }
+
+  .rank-bar-wrap {
+    width: 100%;
+    height: 4px;
+    background: var(--bg3);
+    border-radius: 4px;
+    margin-top: 4px;
+  }
+
+  .rank-bar {
+    height: 4px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--orange), var(--orange2));
+    transition: width 0.8s ease;
+  }
+
+  .rank-pagos {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Monthly totals */
+  .month-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  .month-row:last-child { border-bottom: none; }
+  .month-row:hover { background: rgba(255,255,255,0.03); }
+  .month-row.current { background: rgba(249,115,22,0.06); }
+
+  .month-name {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .month-current-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--orange);
+    background: rgba(249,115,22,0.12);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 10px;
+  }
+
+  .month-count {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .month-total {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: var(--orange2);
+    letter-spacing: 1px;
+  }
+
+  /* Loading / empty */
+  .loading {
+    padding: 40px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-bottom: 10px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty { color: var(--muted); font-style: italic; font-size: 13px; }
+
+  /* Last update */
+  .last-update {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 32px;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 700px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .hero { flex-direction: column; gap: 16px; text-align: center; padding: 24px; }
+    .hero-month { text-align: center; }
+    .hero-number { font-size: 72px; }
+    .header { padding: 14px 16px; }
+    .main { padding: 16px 12px 40px; }
+    thead th, tbody td { padding: 10px 12px; }
+    .month-row { padding: 12px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-ball">🏀</div>
+    <div>
+      <div class="header h1" style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;">URQUIBASQUET</div>
+      <div class="header-sub">Dashboard de Pagos</div>
+    </div>
+  </div>
+  <div class="live-badge">
+    <div class="live-dot"></div>
+    En vivo
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div>
+      <div class="hero-label">Socios que pagaron este mes</div>
+      <div class="hero-number" id="hero-count">—</div>
+      <div class="hero-sub" id="hero-sub">Cargando datos...</div>
+    </div>
+    <div class="hero-month">
+      <div class="hero-month-label">Mes actual</div>
+      <div class="hero-month-name" id="hero-month">—</div>
+    </div>
+  </div>
+
+  <!-- PAGOS + RANKING -->
+  <div class="grid-2">
+
+    <!-- Últimos pagos -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Últimos Pagos</div>
+        <span class="card-badge badge-green" id="pagos-count-badge">—</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Socio</th>
+              <th>Monto</th>
+              <th>Fecha y hora</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-pagos">
+            <tr><td colspan="3"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Ranking -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Ranking de Socios</div>
+        <span class="card-badge badge-orange">Top 20</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Socio</th>
+              <th>Pagos</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-ranking">
+            <tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TOTALES POR MES -->
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Total Recaudado por Mes</div>
+        <span class="card-badge badge-blue">Histórico</span>
+      </div>
+      <div id="lista-meses">
+        <div class="loading"><div class="spinner"></div><br>Cargando...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="last-update">Actualización automática cada 30 segundos · <span id="last-time">—</span></div>
+
+</div>
+
+<script>
+const SHEET_ID = '1Od2GxIHYZFb78Vws14AkARmze15cU1LASA2805bggps';
+const API_KEY  = 'AIzaSyCnucz7KhvTzkmYkKx7tb9riZDHKYZVcIw';
+
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+               'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function getMesActual() {
+  const d = new Date();
+  return `${MESES[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function formatMonto(v) {
+  const n = parseFloat(String(v).replace(/[^0-9.]/g,''));
+  if (isNaN(n)) return v;
+  return '$' + n.toLocaleString('es-AR', {minimumFractionDigits:0, maximumFractionDigits:0});
+}
+
+function formatFecha(fecha, timestamp) {
+  if (timestamp) {
+    // timestamp_registro tiene formato "DD/MM/YYYY, HH:MM:SS"
+    return timestamp.replace(',', ' ·');
+  }
+  return fecha || '—';
+}
+
+async function fetchHoja(nombre) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(nombre + '!A2:G')}?key=${API_KEY}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.values || [];
+  } catch { return []; }
+}
+
+async function fetchSheetNames() {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    return (data.sheets || []).map(s => s.properties.title);
+  } catch { return []; }
+}
+
+async function cargarDatos() {
+  const mesActual = getMesActual();
+  document.getElementById('hero-month').textContent = mesActual;
+
+  // Obtener todas las hojas
+  const hojas = await fetchSheetNames();
+
+  // ── DATOS MES ACTUAL ──
+  const datosMes = await fetchHoja(mesActual);
+
+  // Hero count
+  const uniqueSocios = [...new Set(datosMes.map(r => (r[1]||'').trim().toLowerCase()))].filter(Boolean);
+  document.getElementById('hero-count').textContent = uniqueSocios.length || '0';
+  document.getElementById('hero-sub').textContent = `${datosMes.length} pago${datosMes.length !== 1 ? 's' : ''} registrado${datosMes.length !== 1 ? 's' : ''} en ${mesActual}`;
+  document.getElementById('pagos-count-badge').textContent = `${datosMes.length} pagos`;
+
+  // Tabla últimos pagos (todos, orden inverso)
+  const tPagos = document.getElementById('tabla-pagos');
+  if (datosMes.length === 0) {
+    tPagos.innerHTML = '<tr><td colspan="3" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin pagos este mes aún</td></tr>';
+  } else {
+    const filas = [...datosMes].reverse();
+    tPagos.innerHTML = filas.map(r => `
+      <tr>
+        <td class="td-name">${r[1] || '—'}</td>
+        <td class="td-monto">${formatMonto(r[2])}</td>
+        <td class="td-fecha">${formatFecha(r[0], r[6])}</td>
+      </tr>
+    `).join('');
+  }
+
+  // ── RANKING (todas las hojas) ──
+  const conteo = {};
+  const totales = {};
+
+  for (const hoja of hojas) {
+    const filas = await fetchHoja(hoja);
+    for (const r of filas) {
+      const nombre = (r[1] || '').trim();
+      if (!nombre) continue;
+      const key = nombre.toLowerCase();
+      conteo[key] = (conteo[key] || 0) + 1;
+      const monto = parseFloat(String(r[2]).replace(/[^0-9.]/g,'')) || 0;
+      totales[key] = (totales[key] || 0) + monto;
+      // Guardar nombre con capitalización original
+      if (!conteo[key + '__name']) conteo[key + '__name'] = nombre;
+    }
+  }
+
+  const ranking = Object.keys(conteo)
+    .filter(k => !k.endsWith('__name'))
+    .map(k => ({ nombre: conteo[k + '__name'] || k, pagos: conteo[k], total: totales[k] || 0 }))
+    .sort((a, b) => b.pagos - a.pagos || b.total - a.total)
+    .slice(0, 20);
+
+  const maxPagos = ranking[0]?.pagos || 1;
+  const tRanking = document.getElementById('tabla-ranking');
+
+  if (ranking.length === 0) {
+    tRanking.innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin datos históricos aún</td></tr>';
+  } else {
+    tRanking.innerHTML = ranking.map((s, i) => {
+      const pct = Math.round((s.pagos / maxPagos) * 100);
+      const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+      return `
+        <tr>
+          <td><div class="rank-num ${rankClass}">${i + 1}</div></td>
+          <td>
+            <div class="td-name">${s.nombre}</div>
+            <div class="rank-bar-wrap"><div class="rank-bar" style="width:${pct}%"></div></div>
+          </td>
+          <td><div class="td-name" style="color:var(--orange2)">${s.pagos}</div><div class="rank-pagos">mes${s.pagos !== 1 ? 'es' : ''}</div></td>
+          <td class="td-monto">${formatMonto(s.total)}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // ── TOTALES POR MES ──
+  const totalesMes = [];
+  for (const hoja of hojas) {
+    const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
+    const totalMes = filas.reduce((acc, r) => acc + (parseFloat(String(r[2]).replace(/[^0-9.]/g,'')) || 0), 0);
+    totalesMes.push({ nombre: hoja, total: totalMes, count: filas.length, actual: hoja === mesActual });
+  }
+
+  // Ordenar: mes actual primero, luego por nombre descendente
+  totalesMes.sort((a, b) => {
+    if (a.actual) return -1;
+    if (b.actual) return 1;
+    return b.nombre.localeCompare(a.nombre);
+  });
+
+  const listaMeses = document.getElementById('lista-meses');
+  if (totalesMes.length === 0) {
+    listaMeses.innerHTML = '<div class="loading empty">Sin datos</div>';
+  } else {
+    listaMeses.innerHTML = totalesMes.map(m => `
+      <div class="month-row ${m.actual ? 'current' : ''}">
+        <div>
+          <div class="month-name">
+            ${m.nombre}
+            ${m.actual ? '<span class="month-current-tag">Actual</span>' : ''}
+          </div>
+          <div class="month-count">${m.count} pago${m.count !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="month-total">${formatMonto(m.total)}</div>
+      </div>
+    `).join('');
+  }
+
+  // Timestamp
+  const ahora = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  document.getElementById('last-time').textContent = `Última actualización: ${ahora}`;
+}
+
+cargarDatos();
+setInterval(cargarDatos, 30000);
+</script>
+</body>
+</html>
