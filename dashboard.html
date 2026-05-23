@@ -22,7 +22,7 @@
     --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 16px; }
 
   .header {
     background: linear-gradient(135deg, #0f1729 0%, #1a2540 100%);
@@ -77,16 +77,16 @@
 
   .table-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; }
-  thead th { padding: 10px 22px; text-align: left; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); background: var(--bg3); }
+  thead th { padding: 10px 22px; text-align: left; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); background: var(--bg3); }
   tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: rgba(255,255,255,0.03); }
-  tbody td { padding: 13px 22px; font-size: 13.5px; color: var(--text); }
+  tbody td { padding: 13px 22px; font-size: 14px; color: var(--text); }
   .td-name { font-weight: 600; }
   .td-nro { font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--blue); }
   .td-monto { font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
   .td-monto-alerta { font-weight: 700; color: #f87171; font-variant-numeric: tabular-nums; }
-  .td-fecha { color: var(--muted); font-size: 12.5px; }
+  .td-fecha { color: var(--muted); font-size: 14px; }
   .td-boletos { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--orange2); }
   .alerta-badge { font-size: 10px; font-weight: 700; background: rgba(220,38,38,0.15); color: #f87171; padding: 2px 7px; border-radius: 8px; margin-left: 6px; }
 
@@ -94,7 +94,7 @@
   .rank-1 { color: #fbbf24; } .rank-2 { color: #94a3b8; } .rank-3 { color: #cd7c3a; }
   .rank-bar-wrap { width: 100%; height: 4px; background: var(--bg3); border-radius: 4px; margin-top: 4px; }
   .rank-bar { height: 4px; border-radius: 4px; background: linear-gradient(90deg, #1B3A6B, #3b82f6); transition: width 0.8s ease; }
-  .rank-pagos { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .rank-pagos { font-size: 13px; color: var(--muted); margin-top: 2px; }
 
   .month-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; border-bottom: 1px solid var(--border); transition: background 0.15s; }
   .month-row:last-child { border-bottom: none; }
@@ -109,16 +109,8 @@
   .alerta-box.visible { display: block; }
 
   /* SORTEO */
-  .sorteo-desc { padding: 12px 22px; font-size: 12px; color: var(--muted); border-bottom: 1px solid var(--border); line-height: 1.6; }
+  .sorteo-desc { padding: 14px 22px; font-size: 14px; color: var(--muted); border-bottom: 1px solid var(--border); line-height: 1.8; }
   .sorteo-desc span { color: var(--orange2); font-weight: 600; }
-  .btn-sorteo { background: linear-gradient(135deg, var(--orange), #ea580c); color: white; border: none; border-radius: 10px; padding: 10px 20px; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1px; cursor: pointer; transition: opacity 0.2s, transform 0.1s; }
-  .btn-sorteo:hover { opacity: 0.9; transform: scale(1.02); }
-  .btn-sorteo:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-  .ganador-box { margin: 16px; border-radius: 12px; padding: 20px; background: linear-gradient(135deg, rgba(249,115,22,0.15), rgba(251,146,60,0.1)); border: 1px solid rgba(249,115,22,0.3); text-align: center; display: none; }
-  .ganador-box.visible { display: block; }
-  .ganador-titulo { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--orange2); margin-bottom: 8px; }
-  .ganador-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: white; letter-spacing: 2px; margin-bottom: 4px; }
-  .ganador-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
   /* GRAFICOS */
   .graficos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
@@ -134,11 +126,10 @@
   .leyenda-item.dominante .leyenda-valor { font-size: 18px; color: var(--orange2); }
   @media (max-width: 700px) { .graficos-grid { grid-template-columns: 1fr; } }
 
-
   .loading { padding: 40px; text-align: center; color: var(--muted); font-size: 13px; }
   .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; margin-bottom: 10px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .last-update { text-align: center; font-size: 11px; color: var(--muted); margin-top: 32px; }
+  .last-update { text-align: center; font-size: 13px; color: var(--muted); margin-top: 32px; }
 
   @media (max-width: 700px) {
     .grid-2 { grid-template-columns: 1fr; }
@@ -222,7 +213,6 @@
     <div id="lista-meses"><div class="loading"><div class="spinner"></div><br>Cargando...</div></div>
   </div>
 
-
   <!-- GRAFICOS -->
   <div class="graficos-grid">
     <div class="grafico-card">
@@ -250,22 +240,23 @@
   <!-- SORTEO -->
   <div class="card" style="margin-bottom:20px">
     <div class="card-header">
-      <div class="card-title">Sorteo — Viaje a Chapadmalal</div>
-      <button class="btn-sorteo" id="btn-sorteo" onclick="realizarSorteo()">🎲 REALIZAR SORTEO</button>
+      <div class="card-title">Viaje a Chapadmalal — Top 20</div>
     </div>
     <div class="sorteo-desc">
-      Los <span>primeros 20 socios con la cuota al día</span> participan del sorteo. Los puntos determinan las chances:
-      <span>1 pto</span> por cada mes pagado · <span>+2 ptos</span> si pagó este mes antes del día 10 · <span>+1 pto</span> si nunca se atrasó.
-      Más puntos = más boletos = más chances de ganar.
-    </div>
-    <div class="ganador-box" id="ganador-box">
-      <div class="ganador-titulo">🏆 Ganador del sorteo</div>
-      <div class="ganador-nombre" id="ganador-nombre">—</div>
-      <div class="ganador-sub" id="ganador-sub">—</div>
+      🎯 <span>¿Cómo funciona el sistema de puntos?</span><br>
+      Cada mes que pagás la cuota sumás puntos. Más puntos = más arriba en el ranking = más chances de ir al viaje.<br>
+      <span>+1 pto</span> por cada mes que pagaste la cuota &nbsp;·&nbsp;
+      <span>+2 ptos</span> si pagás antes del día 10 del mes &nbsp;·&nbsp;
+      <span>+1 pto</span> si nunca te atrasaste<br><br>
+      Los <span>primeros 20 socios con la cuota al día</span> al <span>30 de noviembre</span> se ganan el viaje + 1 acompañante.<br><br>
+      📅 Fecha de cierre del ranking: <span>30 de noviembre</span><br>
+      ✈️ Confirmación de viaje: <span>8 de diciembre</span><br>
+      📋 El ganador deberá presentar <span>nombre, apellido y documento</span> del socio y su acompañante.<br>
+      🏕️ La semana reservada en el camping se confirmará <span>15 días antes del cierre</span>.
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Socio</th><th>Meses pagados</th><th>Puntos / Boletos</th></tr></thead>
+        <thead><tr><th>#</th><th>Socio</th><th>Meses pagados</th><th>Puntos</th></tr></thead>
         <tbody id="tabla-sorteo"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
       </table>
     </div>
@@ -279,7 +270,6 @@ const SHEET_ID = '1Od2GxIHYZFb78Vws14AkARmze15cU1LASA2805bggps';
 const API_KEY  = 'AIzaSyCnucz7KhvTzkmYkKx7tb9riZDHKYZVcIw';
 const MONTO_CUOTA = 5000;
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-let participantesSorteo = [];
 
 function getMesActual() {
   const d = new Date();
@@ -328,7 +318,6 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
     }
   }
 
-  // Verificar pago antes del dia 10 este mes
   for (const r of datosMes) {
     const tel = String(r[4]||'').replace(/\D/g,'');
     if (!tel || !historial[tel]) continue;
@@ -342,31 +331,19 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
     .map(([tel, d]) => {
       let puntos = d.meses.size;
       if (d.pagoTemprano) puntos += 2;
-      puntos += 1; // sin atrasos (base)
+      puntos += 1;
       const socio = mapaSocios[tel];
-      return {
-        tel, puntos,
-        nombre: nombrePorTel[tel]||'',
-        nro: socio ? socio.nro : '',
-        meses: d.meses.size,
-        pagoTemprano: d.pagoTemprano
-      };
+      return { tel, puntos, nombre: nombrePorTel[tel]||'', nro: socio ? socio.nro : '', meses: d.meses.size, pagoTemprano: d.pagoTemprano };
     })
     .sort((a,b) => b.puntos - a.puntos)
     .slice(0, 20);
 
-  participantesSorteo = lista;
-
   const tSorteo = document.getElementById('tabla-sorteo');
-  const btn = document.getElementById('btn-sorteo');
-
   if (lista.length === 0) {
     tSorteo.innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin participantes aun — esperando socios con cuota al dia</td></tr>';
-    btn.disabled = true;
     return;
   }
 
-  btn.disabled = false;
   tSorteo.innerHTML = lista.map((s,i) => {
     const rc = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
     return `<tr>
@@ -374,45 +351,15 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
       <td>
         ${s.nro ? `<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>` : ''}
         <div class="td-name">${s.nombre}</div>
-        ${s.pagoTemprano ? '<div style="font-size:10px;color:var(--green);margin-top:2px">⚡ Pagó antes del día 10</div>' : ''}
+        ${s.pagoTemprano ? '<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ Pagó antes del día 10</div>' : ''}
       </td>
       <td><div class="td-name" style="color:var(--blue)">${s.meses}</div></td>
-      <td><div class="td-boletos">${s.puntos} 🎟</div></td>
+      <td><div class="td-boletos">${s.puntos} 🎯</div></td>
     </tr>`;
   }).join('');
 }
 
-function realizarSorteo() {
-  if (participantesSorteo.length === 0) return;
-  const btn = document.getElementById('btn-sorteo');
-  btn.disabled = true;
-  btn.textContent = '🎲 Sorteando...';
-
-  let contador = 0;
-  const intervalo = setInterval(() => {
-    const rand = participantesSorteo[Math.floor(Math.random() * participantesSorteo.length)];
-    document.getElementById('ganador-nombre').textContent = rand.nombre;
-    document.getElementById('ganador-box').classList.add('visible');
-    contador++;
-    if (contador >= 25) {
-      clearInterval(intervalo);
-      const boletos = [];
-      for (const p of participantesSorteo) {
-        for (let i = 0; i < p.puntos; i++) boletos.push(p);
-      }
-      const ganador = boletos[Math.floor(Math.random() * boletos.length)];
-      document.getElementById('ganador-nombre').textContent = ganador.nombre;
-      document.getElementById('ganador-sub').textContent =
-        (ganador.nro ? `Socio #${ganador.nro} · ` : '') +
-        `${ganador.puntos} boletos · ${ganador.meses} meses pagados`;
-      btn.textContent = '🎲 REALIZAR SORTEO';
-      btn.disabled = false;
-    }
-  }, 100);
-}
-
-
-// ─── GRAFICOS ─────────────────────────────────────────────────────
+// GRAFICOS
 const COLORES = ['#f97316','#3b82f6','#22c55e','#a855f7','#f59e0b','#ec4899','#14b8a6','#ef4444'];
 
 function dibujarTorta(canvasId, datos) {
@@ -453,7 +400,6 @@ function calcularEdad(fechaNac) {
   const partes = fechaNac.split('/');
   let fecha;
   if (partes.length === 3) {
-    // DD/MM/YYYY o MM/DD/YYYY
     fecha = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
   } else {
     fecha = new Date(fechaNac);
@@ -467,7 +413,6 @@ function calcularEdad(fechaNac) {
 }
 
 function procesarGraficos(socios) {
-  // Edades
   const rangos = { 'Menor de 18': 0, '18-25': 0, '26-35': 0, '36-45': 0, '46+': 0 };
   for (const s of socios) {
     const edad = calcularEdad(s[4]);
@@ -478,25 +423,17 @@ function procesarGraficos(socios) {
     else if (edad <= 45) rangos['36-45']++;
     else rangos['46+']++;
   }
-  const datosEdades = Object.entries(rangos)
-    .filter(([,v]) => v > 0)
-    .map(([label, valor]) => ({ label, valor }))
-    .sort((a,b) => b.valor - a.valor);
-
+  const datosEdades = Object.entries(rangos).filter(([,v]) => v > 0).map(([label, valor]) => ({ label, valor })).sort((a,b) => b.valor - a.valor);
   dibujarTorta('chart-edades', datosEdades);
   renderLeyenda('leyenda-edades', datosEdades);
 
-  // Origen
   const origenes = {};
   for (const s of socios) {
     const origen = (s[7] || 'No especificado').trim();
     if (!origen) continue;
     origenes[origen] = (origenes[origen] || 0) + 1;
   }
-  const datosOrigen = Object.entries(origenes)
-    .map(([label, valor]) => ({ label, valor }))
-    .sort((a,b) => b.valor - a.valor);
-
+  const datosOrigen = Object.entries(origenes).map(([label, valor]) => ({ label, valor })).sort((a,b) => b.valor - a.valor);
   dibujarTorta('chart-origen', datosOrigen);
   renderLeyenda('leyenda-origen', datosOrigen);
 }
