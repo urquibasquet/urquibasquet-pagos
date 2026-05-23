@@ -164,17 +164,32 @@
     }
     .hero > div:not(.hero-center) {
       display: flex;
+      flex-direction: row;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
       background: rgba(255,255,255,0.06);
       border-radius: 12px;
-      padding: 10px 16px;
+      padding: 14px 16px;
       margin-bottom: 8px;
-      text-align: left;
     }
-    .hero-number { font-size: 48px; line-height: 1; }
-    .hero-label { font-size: 10px; margin-bottom: 2px; }
-    .hero-sub { font-size: 11px; }
+    .hero > div:not(.hero-center) .hero-number {
+      font-size: 64px;
+      line-height: 1;
+      flex-shrink: 0;
+      color: white;
+    }
+    .hero > div:not(.hero-center) .hero-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .hero > div:not(.hero-center) .hero-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+    }
     .hero-right { text-align: left; }
     .header { padding: 12px 16px; }
     .main { padding: 16px 12px 40px; }
