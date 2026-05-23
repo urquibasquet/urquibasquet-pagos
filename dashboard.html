@@ -142,14 +142,47 @@
 
   @media (max-width: 700px) {
     .grid-2 { grid-template-columns: 1fr; }
-    .hero { grid-template-columns: 1fr; text-align: center; padding: 24px; gap: 16px; }
-    .hero-right { text-align: center; }
-    .hero-number { font-size: 64px; }
+    .hero {
+      grid-template-columns: 1fr;
+      padding: 20px 16px;
+      gap: 0;
+    }
+    .hero-center {
+      order: -1;
+      margin-bottom: 12px;
+    }
+    .hero-month-name { font-size: 28px; }
+    .hero-month-label { font-size: 10px; }
+    .hero-left-mobile, .hero-right-mobile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 10px 16px;
+      margin-bottom: 8px;
+    }
+    .hero > div:not(.hero-center) {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 10px 16px;
+      margin-bottom: 8px;
+      text-align: left;
+    }
+    .hero-number { font-size: 48px; line-height: 1; }
+    .hero-label { font-size: 10px; margin-bottom: 2px; }
+    .hero-sub { font-size: 11px; }
+    .hero-right { text-align: left; }
     .header { padding: 12px 16px; }
     .main { padding: 16px 12px 40px; }
     thead th, tbody td { padding: 10px 12px; }
     .month-row { padding: 12px 14px; }
     .card-header { padding: 14px 16px 12px; }
+    .tabs-nav { overflow-x: auto; padding-bottom: 2px; }
+    .tab-btn { font-size: 13px; padding: 10px 14px; white-space: nowrap; }
   }
 </style>
 </head>
