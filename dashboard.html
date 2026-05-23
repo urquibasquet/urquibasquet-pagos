@@ -41,7 +41,6 @@
 
   .main { max-width: 1280px; margin: 0 auto; padding: 28px 24px 60px; }
 
-  /* HERO */
   .hero {
     background: linear-gradient(135deg, #1B3A6B 0%, #152d54 100%);
     border-radius: 20px; padding: 32px 40px; margin-bottom: 24px;
@@ -69,7 +68,7 @@
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
 
   .card { background: var(--bg2); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--card-shadow); }
-  .card-header { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-header { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
   .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1.5px; color: var(--text); }
   .card-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
   .badge-orange { background: rgba(249,115,22,0.15); color: var(--orange2); }
@@ -88,6 +87,7 @@
   .td-monto { font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
   .td-monto-alerta { font-weight: 700; color: #f87171; font-variant-numeric: tabular-nums; }
   .td-fecha { color: var(--muted); font-size: 12.5px; }
+  .td-boletos { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--orange2); }
   .alerta-badge { font-size: 10px; font-weight: 700; background: rgba(220,38,38,0.15); color: #f87171; padding: 2px 7px; border-radius: 8px; margin-left: 6px; }
 
   .rank-num { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--muted); width: 32px; text-align: center; }
@@ -107,6 +107,18 @@
 
   .alerta-box { background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); border-radius: 12px; padding: 12px 18px; margin: 0 16px 12px; font-size: 13px; color: #f87171; display: none; }
   .alerta-box.visible { display: block; }
+
+  /* SORTEO */
+  .sorteo-desc { padding: 12px 22px; font-size: 12px; color: var(--muted); border-bottom: 1px solid var(--border); line-height: 1.6; }
+  .sorteo-desc span { color: var(--orange2); font-weight: 600; }
+  .btn-sorteo { background: linear-gradient(135deg, var(--orange), #ea580c); color: white; border: none; border-radius: 10px; padding: 10px 20px; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1px; cursor: pointer; transition: opacity 0.2s, transform 0.1s; }
+  .btn-sorteo:hover { opacity: 0.9; transform: scale(1.02); }
+  .btn-sorteo:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .ganador-box { margin: 16px; border-radius: 12px; padding: 20px; background: linear-gradient(135deg, rgba(249,115,22,0.15), rgba(251,146,60,0.1)); border: 1px solid rgba(249,115,22,0.3); text-align: center; display: none; }
+  .ganador-box.visible { display: block; }
+  .ganador-titulo { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--orange2); margin-bottom: 8px; }
+  .ganador-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: white; letter-spacing: 2px; margin-bottom: 4px; }
+  .ganador-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
   .loading { padding: 40px; text-align: center; color: var(--muted); font-size: 13px; }
   .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; margin-bottom: 10px; }
@@ -159,7 +171,6 @@
   </div>
 
   <div class="grid-2">
-
     <div class="card">
       <div class="card-header">
         <div class="card-title">Últimos Pagos</div>
@@ -186,7 +197,6 @@
         </table>
       </div>
     </div>
-
   </div>
 
   <div class="card" style="margin-bottom:20px">
@@ -197,6 +207,30 @@
     <div id="lista-meses"><div class="loading"><div class="spinner"></div><br>Cargando...</div></div>
   </div>
 
+  <!-- SORTEO -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-header">
+      <div class="card-title">Sorteo — Viaje a Chapadmalal</div>
+      <button class="btn-sorteo" id="btn-sorteo" onclick="realizarSorteo()">🎲 REALIZAR SORTEO</button>
+    </div>
+    <div class="sorteo-desc">
+      Los <span>primeros 20 socios con la cuota al día</span> participan del sorteo. Los puntos determinan las chances:
+      <span>1 pto</span> por cada mes pagado · <span>+2 ptos</span> si pagó este mes antes del día 10 · <span>+1 pto</span> si nunca se atrasó.
+      Más puntos = más boletos = más chances de ganar.
+    </div>
+    <div class="ganador-box" id="ganador-box">
+      <div class="ganador-titulo">🏆 Ganador del sorteo</div>
+      <div class="ganador-nombre" id="ganador-nombre">—</div>
+      <div class="ganador-sub" id="ganador-sub">—</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Socio</th><th>Meses pagados</th><th>Puntos / Boletos</th></tr></thead>
+        <tbody id="tabla-sorteo"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="last-update">Actualización automática cada 30 segundos · <span id="last-time">—</span></div>
 </div>
 
@@ -205,6 +239,7 @@ const SHEET_ID = '1Od2GxIHYZFb78Vws14AkARmze15cU1LASA2805bggps';
 const API_KEY  = 'AIzaSyCnucz7KhvTzkmYkKx7tb9riZDHKYZVcIw';
 const MONTO_CUOTA = 5000;
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+let participantesSorteo = [];
 
 function getMesActual() {
   const d = new Date();
@@ -236,35 +271,129 @@ async function fetchSheetNames() {
   } catch { return []; }
 }
 
+async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
+  const telefonosEsteMes = new Set(datosMes.map(r => String(r[4]||'').replace(/\D/g,'')));
+  const historial = {};
+  const nombrePorTel = {};
+
+  for (const hoja of hojas) {
+    if (hoja === 'Socios' || hoja === 'Respuestas de formulario') continue;
+    const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
+    for (const r of filas) {
+      const tel = String(r[4]||'').replace(/\D/g,'');
+      if (!tel) continue;
+      if (!historial[tel]) historial[tel] = { meses: new Set(), pagoTemprano: false };
+      historial[tel].meses.add(hoja);
+      if (!nombrePorTel[tel]) nombrePorTel[tel] = r[1]||'';
+    }
+  }
+
+  // Verificar pago antes del dia 10 este mes
+  for (const r of datosMes) {
+    const tel = String(r[4]||'').replace(/\D/g,'');
+    if (!tel || !historial[tel]) continue;
+    const ts = r[6]||r[0]||'';
+    const match = ts.match(/(\d+)\/(\d+)\/(\d+)/);
+    if (match && parseInt(match[1]) <= 10) historial[tel].pagoTemprano = true;
+  }
+
+  const lista = Object.entries(historial)
+    .filter(([tel]) => telefonosEsteMes.has(tel))
+    .map(([tel, d]) => {
+      let puntos = d.meses.size;
+      if (d.pagoTemprano) puntos += 2;
+      puntos += 1; // sin atrasos (base)
+      const socio = mapaSocios[tel];
+      return {
+        tel, puntos,
+        nombre: nombrePorTel[tel]||'',
+        nro: socio ? socio.nro : '',
+        meses: d.meses.size,
+        pagoTemprano: d.pagoTemprano
+      };
+    })
+    .sort((a,b) => b.puntos - a.puntos)
+    .slice(0, 20);
+
+  participantesSorteo = lista;
+
+  const tSorteo = document.getElementById('tabla-sorteo');
+  const btn = document.getElementById('btn-sorteo');
+
+  if (lista.length === 0) {
+    tSorteo.innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin participantes aun — esperando socios con cuota al dia</td></tr>';
+    btn.disabled = true;
+    return;
+  }
+
+  btn.disabled = false;
+  tSorteo.innerHTML = lista.map((s,i) => {
+    const rc = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+    return `<tr>
+      <td><div class="rank-num ${rc}">${i+1}</div></td>
+      <td>
+        ${s.nro ? `<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>` : ''}
+        <div class="td-name">${s.nombre}</div>
+        ${s.pagoTemprano ? '<div style="font-size:10px;color:var(--green);margin-top:2px">⚡ Pagó antes del día 10</div>' : ''}
+      </td>
+      <td><div class="td-name" style="color:var(--blue)">${s.meses}</div></td>
+      <td><div class="td-boletos">${s.puntos} 🎟</div></td>
+    </tr>`;
+  }).join('');
+}
+
+function realizarSorteo() {
+  if (participantesSorteo.length === 0) return;
+  const btn = document.getElementById('btn-sorteo');
+  btn.disabled = true;
+  btn.textContent = '🎲 Sorteando...';
+
+  let contador = 0;
+  const intervalo = setInterval(() => {
+    const rand = participantesSorteo[Math.floor(Math.random() * participantesSorteo.length)];
+    document.getElementById('ganador-nombre').textContent = rand.nombre;
+    document.getElementById('ganador-box').classList.add('visible');
+    contador++;
+    if (contador >= 25) {
+      clearInterval(intervalo);
+      const boletos = [];
+      for (const p of participantesSorteo) {
+        for (let i = 0; i < p.puntos; i++) boletos.push(p);
+      }
+      const ganador = boletos[Math.floor(Math.random() * boletos.length)];
+      document.getElementById('ganador-nombre').textContent = ganador.nombre;
+      document.getElementById('ganador-sub').textContent =
+        (ganador.nro ? `Socio #${ganador.nro} · ` : '') +
+        `${ganador.puntos} boletos · ${ganador.meses} meses pagados`;
+      btn.textContent = '🎲 REALIZAR SORTEO';
+      btn.disabled = false;
+    }
+  }, 100);
+}
+
 async function cargarDatos() {
   const mesActual = getMesActual();
   document.getElementById('hero-month').textContent = mesActual;
 
   const hojas = await fetchSheetNames();
   const datosMes = await fetchHoja(mesActual);
-
-  // Socios registrados
   const socios = await fetchHoja('Socios');
   document.getElementById('hero-socios').textContent = socios.length || '0';
 
-  // Mapa whatsapp -> nro_socio
   const mapaSocios = {};
   for (const s of socios) {
-    const wa = String(s[5] || '').replace(/\D/g,'');
+    const wa = String(s[5]||'').replace(/\D/g,'');
     if (wa) mapaSocios[wa] = { nro: s[0], nombre: `${s[3]} ${s[2]}` };
   }
 
-  // Hero pagos
   const uniqueSocios = [...new Set(datosMes.map(r => (r[1]||'').trim().toLowerCase()))].filter(Boolean);
   document.getElementById('hero-count').textContent = uniqueSocios.length || '0';
   document.getElementById('hero-sub').textContent = `${datosMes.length} pago${datosMes.length!==1?'s':''} en ${mesActual}`;
   document.getElementById('pagos-count-badge').textContent = `${datosMes.length} pagos`;
 
-  // Alerta monto
   const hayAlertas = datosMes.some(r => parseInt(r[2]) !== MONTO_CUOTA);
   document.getElementById('alerta-monto').classList.toggle('visible', hayAlertas);
 
-  // Tabla pagos
   const tPagos = document.getElementById('tabla-pagos');
   if (datosMes.length === 0) {
     tPagos.innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin pagos este mes aun</td></tr>';
@@ -272,8 +401,8 @@ async function cargarDatos() {
     tPagos.innerHTML = [...datosMes].reverse().map(r => {
       const monto = parseInt(r[2]);
       const esAlerta = monto !== MONTO_CUOTA;
-      const fecha = r[6] ? r[6].replace(',', ' ·') : (r[0] || '—');
-      const tel = String(r[4] || '').replace(/\D/g,'');
+      const fecha = r[6] ? r[6].replace(',', ' ·') : (r[0]||'—');
+      const tel = String(r[4]||'').replace(/\D/g,'');
       const socio = mapaSocios[tel];
       const nroDisplay = socio ? `<div class="td-nro">#${socio.nro}</div>` : '<div class="td-nro" style="color:#334155">—</div>';
       return `<tr>
@@ -285,7 +414,6 @@ async function cargarDatos() {
     }).join('');
   }
 
-  // Ranking
   const conteo = {}, totales = {}, nombres = {}, nros = {};
   for (const hoja of hojas) {
     if (hoja === 'Socios' || hoja === 'Respuestas de formulario') continue;
@@ -312,7 +440,6 @@ async function cargarDatos() {
 
   const maxPagos = ranking[0]?.pagos || 1;
   const tRanking = document.getElementById('tabla-ranking');
-
   if (ranking.length === 0) {
     tRanking.innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin datos aun</td></tr>';
   } else {
@@ -329,7 +456,6 @@ async function cargarDatos() {
     }).join('');
   }
 
-  // Totales por mes
   const totalesMes = [];
   for (const hoja of hojas) {
     if (hoja === 'Socios' || hoja === 'Respuestas de formulario') continue;
@@ -350,6 +476,8 @@ async function cargarDatos() {
         </div>
         <div class="month-total">${formatMonto(m.total)}</div>
       </div>`).join('');
+
+  await calcularSorteo(hojas, mesActual, datosMes, mapaSocios);
 
   const ahora = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   document.getElementById('last-time').textContent = `Ultima actualizacion: ${ahora}`;
