@@ -317,6 +317,14 @@
     <div class="card" style="margin-bottom:20px">
       <div class="card-header">
         <div class="card-title">Viaje a Chapadmalal — Top 20</div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <span id="dias-restantes" style="font-size:13px;color:var(--muted);"></span>
+          <button id="btn-notificar" disabled title="Este botón se habilitará el 30 de Noviembre de 2026" style="background:linear-gradient(135deg,var(--orange),#ea580c);color:white;border:none;border-radius:10px;padding:10px 18px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:not-allowed;opacity:0.4;">
+            🔔 NOTIFICAR GANADORES
+          </button>
+          <span style="display:none">placeholder</span
+          </button>
+        </div>
       </div>
       <div class="sorteo-desc">
         🎯 <span>¿Cómo funciona el sistema de puntos?</span><br>
@@ -325,9 +333,9 @@
         <span>+2 ptos</span> si pagás antes del día 10 del mes &nbsp;·&nbsp;
         <span>+1 pto</span> si nunca te atrasaste<br><br>
         Los <span>primeros 20 socios con la cuota al día</span> al <span>30 de noviembre</span> se ganan el viaje <span>+ 1 acompañante</span>.<br><br>
-        🏕️ La fecha del viaje se confirmará el<span> 23 de noviembre</span>.<br>  
-        📅 Fecha de cierre del ranking: <span>30 de noviembre</span> (hasta esta fecha tiene tiempo el socio de ponerse al dia)<br>
-        ✈️ Confirmación de viaje: <span>8 de diciembre</span> (este es el ultimo dia en que los socios que cumplen con las condiciones de viajar tienen para confirmar si van o no)<br>        
+        🏕️ La fecha del viaje se confirmará el <span>23 de noviembre</span>.<br>
+        📅 Fecha de cierre del ranking: <span>30 de noviembre</span> (hasta esta fecha tiene tiempo el socio de ponerse al día)<br>
+        ✈️ Confirmación de viaje: <span>8 de diciembre</span> (este es el último día en que los socios que cumplen con las condiciones de viajar tienen para confirmar si van o no)
       </div>
       <div class="table-wrap">
         <table>
@@ -532,6 +540,32 @@ function procesarGraficos(socios) {
   renderLeyenda('leyenda-origen', datosOrigen);
 }
 
+
+
+// ─── COUNTDOWN NOTIFICAR ─────────────────────────────────────────
+function actualizarCountdown() {
+  const cierre = new Date(2026, 10, 30); // 30 de noviembre 2026
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+  cierre.setHours(0,0,0,0);
+  const diff = Math.ceil((cierre - hoy) / (1000 * 60 * 60 * 24));
+  const el = document.getElementById('dias-restantes');
+  const btn = document.getElementById('btn-notificar');
+  if (!el || !btn) return;
+  if (diff > 0) {
+    el.textContent = `Faltan ${diff} día${diff !== 1 ? 's' : ''} para notificar a los socios ganadores`;
+    btn.disabled = true;
+    btn.style.opacity = '0.4';
+    btn.style.cursor = 'not-allowed';
+  } else {
+    el.textContent = '¡Ya podés notificar a los ganadores!';
+    el.style.color = 'var(--green)';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.style.cursor = 'pointer';
+  }
+}
+actualizarCountdown();
 
 function showTab(name) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
