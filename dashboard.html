@@ -547,12 +547,11 @@ async function cargarDatos() {
 
   await calcularSorteo(hojas, mesActual, datosMes, mapaSocios);
 
-  const ahora = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const ahora = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
   document.getElementById('last-time').textContent = `Ultima actualizacion: ${ahora}`;
 }
 
 cargarDatos();
 setInterval(cargarDatos, 30000);
 </script>
-</body>
-</html>
+</b
