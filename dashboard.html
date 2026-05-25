@@ -246,6 +246,7 @@
     <button class="tab-btn" onclick="showTab('socios')">👥 Datos de los Socios</button>
     <button class="tab-btn" onclick="showTab('camping')">🏕️ Viaje al Camping</button>
     <button class="tab-btn" onclick="showTab('balance')">📊 Balance</button>
+    <button class="tab-btn" onclick="showTab('nuevos')">👋 Saludar Nuevos Socios</button>
   </div>
 
   <!-- TAB 1: PAGOS -->
@@ -360,6 +361,26 @@
           Ver cómo contabilizar los pagos realizados por el Urquibasquet + balance total.<br>
           <span style="font-size: 12px; color: #475569; margin-top: 8px; display: block;">Esta sección está planificada para una versión futura del sistema.</span>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: SALUDAR NUEVOS SOCIOS -->
+  <div class="tab-panel" id="tab-nuevos">
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <div class="card-title">Saludar Nuevos Socios</div>
+        <span class="card-badge badge-green" id="nuevos-count-badge">—</span>
+      </div>
+      <div style="padding:12px 22px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);">
+        Estos socios se registraron pero todavía no recibieron el mensaje de bienvenida. 
+        Hacé clic en <strong style="color:var(--text)">Saludar</strong> para abrirles WhatsApp Web con el mensaje listo. Una vez que lo enviés, el socio desaparece de esta lista.
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Socio</th><th>Fecha de registro</th><th>Acción</th></tr></thead>
+          <tbody id="tabla-nuevos"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -567,6 +588,95 @@ function actualizarCountdown() {
 }
 actualizarCountdown();
 
+
+// ─── NUEVOS SOCIOS ────────────────────────────────────────────────
+async function marcarSaludado(rowIndex, sheetId, apiKey) {
+  // Marca la columna J del socio como 'si' via fetch a sheets API
+  // Necesita OAuth - usamos enfoque alternativo: localStorage
+  const saludados = JSON.parse(localStorage.getItem('saludados_urqui') || '[]');
+  saludados.push(rowIndex);
+  localStorage.setItem('saludados_urqui', JSON.stringify(saludados));
+}
+
+function getSaludados() {
+  try { return JSON.parse(localStorage.getItem('saludados_urqui') || '[]'); } catch { return []; }
+}
+
+async function cargarNuevosSocios(socios) {
+  const saludados = getSaludados();
+  const MONTO = 5000;
+  
+  const nuevos = socios
+    .map((s, i) => ({ ...s, rowIndex: i + 2, nro: s[0], apellido: s[2], nombre: s[3], tel: s[5], fechaReg: s[8], saludado: s[9] }))
+    .filter(s => s.saludado !== 'si' && !saludados.includes(s.rowIndex));
+
+  const badge = document.getElementById('nuevos-count-badge');
+  if (badge) badge.textContent = `${nuevos.length} pendiente${nuevos.length !== 1 ? 's' : ''}`;
+
+  const tbody = document.getElementById('tabla-nuevos');
+  if (!tbody) return;
+
+  if (nuevos.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin socios nuevos pendientes de saludo 🎉</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = nuevos.map(s => {
+    const telLimpio = String(s.tel).replace(/\D/g,'');
+    const telWA = telLimpio.startsWith('54') ? telLimpio : '54' + telLimpio;
+    const nombreCompleto = `${s.nombre} ${s.apellido}`;
+    const nroSocio = s.nro || '—';
+    const msg = encodeURIComponent(
+      `Hola ${s.nombre}! 🏀\n\n` +
+      `*Gracias por asociarte al Urquibasquet.*\n` +
+      `Te damos la bienvenida desde esta comunidad!\n\n` +
+      `Tu número de socio es: *#${nroSocio}*\n\n` +
+      `Para realizar tu primera cuota societaria te compartimos los datos:\n\n` +
+      `*Datos para la transferencia:*\n` +
+      `👤 Asoc Civil Urquibasquet\n` +
+      `🔢 CUIT/CUIL: 30-71913330-0\n` +
+      `🏦 Banco Credicoop\n` +
+      `📋 Alias: elurqui.basquet\n` +
+      `💰 Monto de la cuota: $5.000\n\n` +
+      `Cada mes te vamos a avisar por acá cuando se acerque la fecha de pago. Vamos Urquibasquet! 🔥`
+    );
+    const waUrl = `https://wa.me/${telWA}?text=${msg}`;
+    return `<tr id="row-${s.rowIndex}">
+      <td><div class="td-nro">#${nroSocio}</div></td>
+      <td><div class="td-name">${nombreCompleto}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${s.fechaReg || 'Sin fecha'}</div></td>
+      <td class="td-fecha">${s.fechaReg || '—'}</td>
+      <td>
+        <a href="${waUrl}" target="_blank" onclick="saludarSocio(${s.rowIndex})"
+          style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;border-radius:8px;padding:8px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;text-decoration:none;">
+          💬 SALUDAR
+        </a>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function saludarSocio(rowIndex) {
+  const saludados = getSaludados();
+  if (!saludados.includes(rowIndex)) {
+    saludados.push(rowIndex);
+    localStorage.setItem('saludados_urqui', JSON.stringify(saludados));
+  }
+  setTimeout(() => {
+    const row = document.getElementById('row-' + rowIndex);
+    if (row) {
+      row.style.opacity = '0';
+      row.style.transition = 'opacity 0.5s';
+      setTimeout(() => row.remove(), 500);
+    }
+    // Update badge
+    const badge = document.getElementById('nuevos-count-badge');
+    if (badge) {
+      const current = parseInt(badge.textContent) - 1;
+      badge.textContent = `${current} pendiente${current !== 1 ? 's' : ''}`;
+    }
+  }, 500);
+}
+
 function showTab(name) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -583,6 +693,7 @@ async function cargarDatos() {
   const socios = await fetchHoja('Socios');
   document.getElementById('hero-socios').textContent = socios.length || '0';
   procesarGraficos(socios);
+  cargarNuevosSocios(socios);
 
   const mapaSocios = {};
   for (const s of socios) {
