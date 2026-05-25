@@ -618,17 +618,10 @@ async function marcarSaludado(rowIndex, sheetId, apiKey) {
   localStorage.setItem('saludados_urqui', JSON.stringify(saludados));
 }
 
-function getSaludados() {
-  try { return JSON.parse(localStorage.getItem('saludados_urqui') || '[]'); } catch { return []; }
-}
-
 async function cargarNuevosSocios(socios) {
-  const saludados = getSaludados();
-  const MONTO = 5000;
-  
   const nuevos = socios
     .map((s, i) => ({ ...s, rowIndex: i + 2, nro: s[0], apellido: s[2], nombre: s[3], tel: s[5], fechaReg: s[8], saludado: s[9] }))
-    .filter(s => s.saludado !== 'si' && !saludados.includes(s.rowIndex));
+    .filter(s => s.saludado !== 'si');
 
   const badge = document.getElementById('nuevos-count-badge');
   if (badge) badge.textContent = `${nuevos.length} pendiente${nuevos.length !== 1 ? 's' : ''}`;
@@ -676,25 +669,27 @@ async function cargarNuevosSocios(socios) {
 }
 
 function saludarSocio(rowIndex) {
-  const saludados = getSaludados();
-  if (!saludados.includes(rowIndex)) {
-    saludados.push(rowIndex);
-    localStorage.setItem('saludados_urqui', JSON.stringify(saludados));
-  }
-  setTimeout(() => {
+  // Llamar a la API local para marcar saludado en Sheets
+  fetch('http://localhost:3001/saludar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rowIndex })
+  }).then(() => {
     const row = document.getElementById('row-' + rowIndex);
     if (row) {
       row.style.opacity = '0';
       row.style.transition = 'opacity 0.5s';
       setTimeout(() => row.remove(), 500);
     }
-    // Update badge
     const badge = document.getElementById('nuevos-count-badge');
     if (badge) {
       const current = parseInt(badge.textContent) - 1;
       badge.textContent = `${current} pendiente${current !== 1 ? 's' : ''}`;
     }
-  }, 500);
+  }).catch(e => {
+    console.error('Error marcando saludado:', e);
+    alert('No se pudo conectar con el bot local. Asegurate de que el bot este corriendo.');
+  });
 }
 
 function showTab(name) {
