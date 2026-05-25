@@ -126,6 +126,15 @@
   .leyenda-item.dominante .leyenda-valor { font-size: 18px; color: var(--orange2); }
   @media (max-width: 700px) { .graficos-grid { grid-template-columns: 1fr; } }
 
+  /* CITAS */
+  .citas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 20px 22px; }
+  .cita-card { background: var(--bg3); border-radius: 12px; padding: 16px 18px; border-left: 3px solid var(--orange); }
+  .cita-nombre { font-size: 13px; font-weight: 700; color: var(--orange2); margin-bottom: 8px; }
+  .cita-texto { font-size: 13px; color: var(--muted); line-height: 1.6; font-style: italic; }
+  .cita-texto::before { content: '"'; font-size: 20px; color: var(--orange); line-height: 0; vertical-align: -6px; margin-right: 2px; }
+  .cita-texto::after { content: '"'; font-size: 20px; color: var(--orange); line-height: 0; vertical-align: -6px; margin-left: 2px; }
+  @media (max-width: 700px) { .citas-grid { grid-template-columns: 1fr; } }
+
   .loading { padding: 40px; text-align: center; color: var(--muted); font-size: 13px; }
   .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; margin-bottom: 10px; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -310,6 +319,17 @@
           <div class="grafico-leyenda" id="leyenda-origen"><div class="loading" style="padding:10px;font-size:12px">Cargando...</div></div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- TAB 2 cont: CITAS -->
+  <div class="card" style="margin-bottom:20px" id="card-citas" style="display:none">
+    <div class="card-header">
+      <div class="card-title">Mensajes de la Comunidad</div>
+      <span class="card-badge badge-orange" id="citas-count">—</span>
+    </div>
+    <div class="citas-grid" id="citas-container">
+      <div class="loading"><div class="spinner"></div><br>Cargando...</div>
     </div>
   </div>
 
@@ -684,6 +704,34 @@ function showTab(name) {
   event.target.classList.add('active');
 }
 
+
+// CITAS
+function cargarCitas(socios) {
+  // columna K = indice 10
+  const conMensaje = socios.filter(s => s[10] && s[10].trim().length > 2);
+  const card = document.getElementById('card-citas');
+  const container = document.getElementById('citas-container');
+  const badge = document.getElementById('citas-count');
+  if (!container) return;
+
+  if (conMensaje.length === 0) {
+    if (card) card.style.display = 'none';
+    return;
+  }
+
+  if (card) card.style.display = '';
+  if (badge) badge.textContent = `${conMensaje.length} mensaje${conMensaje.length !== 1 ? "s" : ""}`;
+
+  container.innerHTML = conMensaje.map(s => {
+    const nombre = `${s[3] || ''} ${s[2] || ''}`.trim();
+    const msg = (s[10] || '').trim();
+    return `<div class="cita-card">
+      <div class="cita-nombre">${nombre}</div>
+      <div class="cita-texto">${msg}</div>
+    </div>`;
+  }).join('');
+}
+
 async function cargarDatos() {
   const mesActual = getMesActual();
   document.getElementById('hero-month').textContent = mesActual;
@@ -694,6 +742,7 @@ async function cargarDatos() {
   document.getElementById('hero-socios').textContent = socios.length || '0';
   procesarGraficos(socios);
   cargarNuevosSocios(socios);
+  cargarCitas(socios);
 
   const mapaSocios = {};
   for (const s of socios) {
