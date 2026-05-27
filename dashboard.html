@@ -476,12 +476,32 @@ async function cargarNuevosSocios(socios) {
       <td><div class="td-nro">#${nroSocio}</div></td>
       <td><div class="td-name">${nombreCompleto}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${s.fechaReg || 'Sin fecha'}</div></td>
       <td class="td-fecha">${s.fechaReg || '—'}</td>
-      <td><a href="https://wa.me/${telWA}?text=${msg}" target="_blank" onclick="saludarSocio(${s.rowIndex})" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;border-radius:8px;padding:8px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;text-decoration:none;">💬 SALUDAR</a></td>
+      <td><a href="https://wa.me/${telWA}?text=${msg}" target="_blank" onclick="saludarSocio(${s.rowIndex})" class="btn-saludar" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;border-radius:8px;padding:8px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;text-decoration:none;">💬 SALUDAR</a></td>
     </tr>`;
   }).join('');
 }
 
+function estaEnHorarioCliente() {
+  const ahora = new Date();
+  const hora = ahora.getHours();
+  const dia = ahora.getDay();
+  return dia >= 1 && dia <= 5 && hora >= 9 && hora < 16;
+}
+
+function actualizarBotonesSaludar() {
+  const enHorario = estaEnHorarioCliente();
+  document.querySelectorAll('.btn-saludar').forEach(btn => {
+    btn.style.opacity = enHorario ? '1' : '0.4';
+    btn.style.pointerEvents = enHorario ? 'auto' : 'none';
+    btn.title = enHorario ? '' : 'El saludo solo está disponible de lunes a viernes de 9:00 a 16:00 hs';
+  });
+}
+
 function saludarSocio(rowIndex) {
+  if (!estaEnHorarioCliente()) {
+    alert('El saludo solo está disponible de lunes a viernes de 9:00 a 16:00 hs');
+    return;
+  }
   fetch('http://localhost:3001/saludar', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -548,6 +568,7 @@ async function cargarDatos() {
   procesarGraficos(socios);
   cargarCitas(socios);
   cargarNuevosSocios(socios);
+  actualizarBotonesSaludar();
   const mapaSocios = {};
   for (const s of socios) {
     const wa = String(s[5]||'').replace(/\D/g,'');
