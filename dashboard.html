@@ -256,7 +256,7 @@
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>#</th><th>Socio</th><th>Meses pagados</th><th>Puntos</th></tr></thead>
+          <thead><tr><th>#</th><th>Socio</th><th>Meses pagados</th><th>Puntos</th><th>Punto extra</th></tr></thead>
           <tbody id="tabla-sorteo"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
         </table>
       </div>
@@ -523,7 +523,10 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
       if (d.pagoTemprano) puntos += 2;
       puntos += 1;
       const socio = mapaSocios[tel];
-      return { tel, puntos, nombre: nombrePorTel[tel]||'', nro: socio ? socio.nro : '', meses: d.meses.size, pagoTemprano: d.pagoTemprano };
+      // Verificar si pago todos los meses desde el inicio sin saltarse ninguno
+      const mesesEsperados = hojas.filter(h => h !== 'Socios' && h !== 'Respuestas de formulario');
+      const puedePuntoExtra = mesesEsperados.length > 0 && mesesEsperados.every(m => d.meses.has(m));
+      return { tel, puntos, nombre: nombrePorTel[tel]||'', nro: socio ? socio.nro : '', meses: d.meses.size, pagoTemprano: d.pagoTemprano, puedePuntoExtra };
     })
     .sort((a,b) => b.puntos - a.puntos).slice(0, 20);
   const tSorteo = document.getElementById('tabla-sorteo');
@@ -533,7 +536,7 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
   }
   tSorteo.innerHTML = lista.map((s,i) => {
     const rc = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
-    return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${s.pagoTemprano?'<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ Pagó antes del día 10</div>':''}</td><td><div class="td-name" style="color:var(--blue)">${s.meses}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td></tr>`;
+    return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${s.pagoTemprano?'<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ Pagó antes del día 10</div>':''}</td><td><div class="td-name" style="color:var(--blue)">${s.meses}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td><td style="text-align:center;font-size:20px">${s.puedePuntoExtra ? '<span style="color:var(--green)">✅</span>' : '<span style="color:#ef4444">❌</span>'}</td></tr>`;
   }).join('');
 }
 
