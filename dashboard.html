@@ -247,8 +247,7 @@
         🎯 <span>¿Cómo funciona el sistema de puntos?</span><br>
         Cada mes que pagás la cuota sumás puntos. Más puntos = más arriba en el ranking = más chances de ir al viaje.<br>
         <span>+1 pto</span> por cada mes que pagaste la cuota &nbsp;·&nbsp;
-        <span>+2 ptos</span> si pagás antes del día 10 del mes &nbsp;·&nbsp;
-        <span>+1 pto</span> si nunca te atrasaste<br><br>
+        <span>+2 ptos</span> si pagás antes del día 10 del mes<br><br>
         Los <span>primeros 20 socios con la cuota al día</span> al <span>30 de noviembre</span> se ganan el viaje <span>+ 1 acompañante</span>.<br><br>
         🏕️ La fecha del viaje se confirmará el <span>23 de noviembre</span>.<br>
         📅 Fecha de cierre del ranking: <span>30 de noviembre</span> (hasta esta fecha tiene tiempo el socio de ponerse al día)<br>
@@ -256,7 +255,7 @@
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>#</th><th>Socio</th><th>Meses pagados</th><th>Puntos</th><th>Punto extra</th></tr></thead>
+          <thead><tr><th>#</th><th>Socio</th><th>Meses pagados</th><th>Puntos</th></tr></thead>
           <tbody id="tabla-sorteo"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
         </table>
       </div>
@@ -521,7 +520,6 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
     .map(([tel, d]) => {
       let puntos = d.meses.size;
       if (d.pagoTemprano) puntos += 2;
-      puntos += 1;
       const socio = mapaSocios[tel];
       // Verificar si pago todos los meses desde el inicio sin saltarse ninguno
       const mesesEsperados = hojas.filter(h => h !== 'Socios' && h !== 'Respuestas de formulario');
@@ -536,7 +534,7 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
   }
   tSorteo.innerHTML = lista.map((s,i) => {
     const rc = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
-    return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${s.pagoTemprano?'<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ Pagó antes del día 10</div>':''}</td><td><div class="td-name" style="color:var(--blue)">${s.meses}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td><td style="text-align:center;font-size:20px">${s.puedePuntoExtra ? '<span style="color:var(--green)">✅</span>' : '<span style="color:#ef4444">❌</span>'}</td></tr>`;
+    return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${s.pagoTemprano?'<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ Pagó antes del día 10</div>':''}</td><td><div class="td-name" style="color:var(--blue)">${s.meses}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td></tr>`;
   }).join('');
 }
 
