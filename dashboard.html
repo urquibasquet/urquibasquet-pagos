@@ -538,7 +538,7 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
   const telefonosEsteMes = new Set(datosMes.map(r => String(r[4]||'').replace(/\D/g,'')));
   const historial = {}, nombrePorTel = {};
   for (const hoja of hojas) {
-    if (hoja === 'Socios' || hoja === 'Respuestas de formulario' || hoja === 'Errores') continue;
+    if (hoja === 'Socios' || hoja === 'Respuestas de formulario' || hoja === 'Errores' || hoja === 'Errores') continue;
     const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
     for (const r of filas) {
       const tel = String(r[4]||'').replace(/\D/g,'');
@@ -642,7 +642,7 @@ async function cargarDatos() {
   }
   const conteo = {}, totales = {}, nombres = {}, nros = {};
   for (const hoja of hojas) {
-    if (hoja === 'Socios' || hoja === 'Respuestas de formulario') continue;
+    if (hoja === 'Socios' || hoja === 'Respuestas de formulario' || hoja === 'Errores') continue;
     const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
     for (const r of filas) {
       const nombre = (r[1]||'').trim();
@@ -669,7 +669,7 @@ async function cargarDatos() {
   }
   const totalesMes = [];
   for (const hoja of hojas) {
-    if (hoja === 'Socios' || hoja === 'Respuestas de formulario') continue;
+    if (hoja === 'Socios' || hoja === 'Respuestas de formulario' || hoja === 'Errores') continue;
     const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
     const total = filas.reduce((acc,r) => acc+(parseInt(r[2])||0), 0);
     totalesMes.push({ nombre: hoja, total, count: filas.length, actual: hoja === mesActual });
