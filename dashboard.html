@@ -538,7 +538,7 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
   const telefonosEsteMes = new Set(datosMes.map(r => String(r[4]||'').replace(/\D/g,'')));
   const historial = {}, nombrePorTel = {};
   for (const hoja of hojas) {
-    if (hoja === 'Socios' || hoja === 'Respuestas de formulario' || hoja === 'Errores' || hoja === 'Errores') continue;
+    if (hoja === 'Socios' || hoja === 'Respuestas de formulario') continue;
     const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
     for (const r of filas) {
       const tel = String(r[4]||'').replace(/\D/g,'');
@@ -551,8 +551,8 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
   for (const r of datosMes) {
     const tel = String(r[4]||'').replace(/\D/g,'');
     if (!tel || !historial[tel]) continue;
-    const ts = r[6]||r[0]||'';
-    const match = ts.match(/(\d+)\/(\d+)\/(\d+)/);
+    const fechaPago = r[0]||'';
+    const match = fechaPago.match(/(\d+)\/(\d+)\/(\d+)/);
     if (match && parseInt(match[1]) <= 10) historial[tel].pagoTemprano = true;
   }
   const lista = Object.entries(historial)
@@ -562,7 +562,7 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
       if (d.pagoTemprano) puntos += 2;
       const socio = mapaSocios[tel];
       // Verificar si pago todos los meses desde el inicio sin saltarse ninguno
-      const mesesEsperados = hojas.filter(h => h !== 'Socios' && h !== 'Respuestas de formulario');
+      const mesesEsperados = hojas.filter(h => h !== 'Socios' && h !== 'Respuestas de formulario' && h !== 'Errores');
       const puedePuntoExtra = mesesEsperados.length > 0 && mesesEsperados.every(m => d.meses.has(m));
       return { tel, puntos, nombre: nombrePorTel[tel]||'', nro: socio ? socio.nro : '', meses: d.meses.size, pagoTemprano: d.pagoTemprano, puedePuntoExtra };
     })
@@ -633,7 +633,7 @@ async function cargarDatos() {
     tPagos.innerHTML = [...datosMes].reverse().map(r => {
       const monto = parseInt(r[2]);
       const esAlerta = monto !== MONTO_CUOTA;
-      const fecha = r[6] ? r[6].replace(',', ' ·') : (r[0]||'—');
+      const fecha = r[0] ? r[0] + (r[6] ? ' · ' + r[6].split(',')[1]?.trim() : '') : '—';
       const tel = String(r[4]||'').replace(/\D/g,'');
       const socio = mapaSocios[tel];
       const nroDisplay = socio ? `<div class="td-nro">#${socio.nro}</div>` : '<div class="td-nro" style="color:#334155">—</div>';
@@ -642,7 +642,7 @@ async function cargarDatos() {
   }
   const conteo = {}, totales = {}, nombres = {}, nros = {};
   for (const hoja of hojas) {
-    if (hoja === 'Socios' || hoja === 'Respuestas de formulario' || hoja === 'Errores') continue;
+    if (hoja === 'Socios' || hoja === 'Respuestas de formulario') continue;
     const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
     for (const r of filas) {
       const nombre = (r[1]||'').trim();
@@ -669,7 +669,7 @@ async function cargarDatos() {
   }
   const totalesMes = [];
   for (const hoja of hojas) {
-    if (hoja === 'Socios' || hoja === 'Respuestas de formulario' || hoja === 'Errores') continue;
+    if (hoja === 'Socios' || hoja === 'Respuestas de formulario') continue;
     const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
     const total = filas.reduce((acc,r) => acc+(parseInt(r[2])||0), 0);
     totalesMes.push({ nombre: hoja, total, count: filas.length, actual: hoja === mesActual });
