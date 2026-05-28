@@ -156,6 +156,7 @@
     <button class="tab-btn" onclick="showTab('camping',this)">🏕️ Viaje al Camping</button>
     <button class="tab-btn" onclick="showTab('balance',this)">📊 Balance</button>
     <button class="tab-btn" onclick="showTab('nuevos',this)">👋 Saludar Nuevos Socios</button>
+    <button class="tab-btn" id="btn-tab-errores" onclick="showTab('errores',this)">⚠️ Errores</button>
   </div>
 
   <!-- TAB 1: PAGOS -->
@@ -295,6 +296,25 @@
         <table>
           <thead><tr><th>#</th><th>Socio</th><th>Fecha de registro</th><th>Acción</th></tr></thead>
           <tbody id="tabla-nuevos"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: ERRORES -->
+  <div class="tab-panel" id="tab-errores">
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <div class="card-title">Comprobantes sin identificar</div>
+        <span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171" id="errores-count-badge">—</span>
+      </div>
+      <div style="padding:12px 22px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);">
+        Estos comprobantes llegaron pero el bot no pudo identificar al socio. Resolvelos manualmente poniendo el LID en la columna L de la hoja Socios y marcando como <strong style="color:var(--text)">si</strong> en la columna resuelto.
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fecha</th><th>LID</th><th>Nombre en comprobante</th><th>Resuelto</th></tr></thead>
+          <tbody id="tabla-errores"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -558,6 +578,31 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
   }).join('');
 }
 
+
+async function cargarErrores() {
+  const errores = await fetchHoja('Errores');
+  const pendientes = errores.filter(r => (r[3]||'').toLowerCase() !== 'si');
+  const badge = document.getElementById('errores-count-badge');
+  const tabBtn = document.getElementById('btn-tab-errores');
+  const tbody = document.getElementById('tabla-errores');
+  if (!tbody) return;
+
+  if (badge) badge.textContent = pendientes.length > 0 ? `${pendientes.length} pendiente${pendientes.length !== 1 ? 's' : ''}` : 'Sin errores';
+  if (tabBtn) tabBtn.textContent = pendientes.length > 0 ? `⚠️ Errores (${pendientes.length})` : '⚠️ Errores';
+
+  if (pendientes.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin errores pendientes ✅</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = [...pendientes].reverse().map(r => `<tr>
+    <td class="td-fecha">${r[0]||'—'}</td>
+    <td style="font-size:12px;color:var(--muted);word-break:break-all">${r[1]||'—'}</td>
+    <td class="td-name">${r[2]||'(sin nombre)'}</td>
+    <td><span style="font-size:11px;font-weight:700;background:rgba(239,68,68,0.15);color:#f87171;padding:3px 8px;border-radius:8px">PENDIENTE</span></td>
+  </tr>`).join('');
+}
+
 async function cargarDatos() {
   const mesActual = getMesActual();
   document.getElementById('hero-month').textContent = mesActual;
@@ -569,6 +614,7 @@ async function cargarDatos() {
   cargarCitas(socios);
   cargarNuevosSocios(socios);
   actualizarBotonesSaludar();
+  cargarErrores();
   const mapaSocios = {};
   for (const s of socios) {
     const wa = String(s[5]||'').replace(/\D/g,'');
