@@ -538,7 +538,7 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
   const telefonosEsteMes = new Set(datosMes.map(r => String(r[4]||'').replace(/\D/g,'')));
   const historial = {}, nombrePorTel = {};
   for (const hoja of hojas) {
-    if (hoja === 'Socios' || hoja === 'Respuestas de formulario') continue;
+    if (hoja === 'Socios' || hoja === 'Respuestas de formulario' || hoja === 'Errores') continue;
     const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
     for (const r of filas) {
       const tel = String(r[4]||'').replace(/\D/g,'');
