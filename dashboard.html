@@ -474,7 +474,7 @@ function cargarCitas(socios) {
 
 async function cargarNuevosSocios(socios) {
   const nuevos = socios
-    .map((s, i) => ({ rowIndex: i + 2, nro: s[0], apellido: s[2], nombre: s[3], tel: s[5], fechaReg: s[8], saludado: s[9] }))
+    .map((s, i) => ({ rowIndex: i + 2, nro: s[0], apellido: s[2], nombre: s[3], tel: s[5], fechaReg: s[8], saludado: s[9], lid: s[11], puedeEnviar: !!(s[5] || s[11]) }))
     .filter(s => s.saludado !== 'si');
   const badge = document.getElementById('nuevos-count-badge');
   if (badge) badge.textContent = `${nuevos.length} pendiente${nuevos.length !== 1 ? 's' : ''}`;
@@ -490,13 +490,16 @@ async function cargarNuevosSocios(socios) {
     const nombreCompleto = `${s.nombre} ${s.apellido}`;
     const nroSocio = s.nro || '—';
     const msg = encodeURIComponent(
-      `Hola ${s.nombre}! \n\n*Gracias por asociarte al Urquibasquet.*\nTe damos la bienvenida desde esta comunidad!\n\nTu numero de socio es: *#${nroSocio}*\n\nPara realizar tu primera cuota societaria te compartimos los datos:\n\n*Datos para la transferencia:*\nAsoc Civil Urquibasquet\nCUIT/CUIL: 30-71913330-0\nBanco Credicoop\nAlias: elurqui.basquet\nMonto de la cuota: $5.000\n\nCada mes te vamos a avisar por aca cuando se acerque la fecha de pago.\n¡Vamos Urquibasquet! `
+      `Hola ${s.nombre}! 🏀\n\n*Gracias por asociarte al Urquibasquet.*\nTe damos la bienvenida desde esta comunidad!\n\nTu número de socio es: *#${nroSocio}*\n\nPara realizar tu primera cuota societaria te compartimos los datos:\n\n*Datos para la transferencia:*\n👤 Asoc Civil Urquibasquet\n🔢 CUIT/CUIL: 30-71913330-0\n🏦 Banco Credicoop\n📋 Alias: elurqui.basquet\n💰 Monto de la cuota: $5.000\n\nCada mes te vamos a avisar por acá cuando se acerque la fecha de pago. Vamos Urquibasquet! 🔥`
     );
     return `<tr id="row-${s.rowIndex}">
       <td><div class="td-nro">#${nroSocio}</div></td>
       <td><div class="td-name">${nombreCompleto}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${s.fechaReg || 'Sin fecha'}</div></td>
       <td class="td-fecha">${s.fechaReg || '—'}</td>
-      <td><a href="https://wa.me/${telWA}?text=${msg}" target="_blank" onclick="saludarSocio(${s.rowIndex})" class="btn-saludar" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;border-radius:8px;padding:8px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;text-decoration:none;">💬 SALUDAR</a></td>
+      <td>${s.puedeEnviar
+        ? `<button onclick="saludarSocio(${s.rowIndex})" class="btn-saludar" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;border-radius:8px;padding:8px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">💬 SALUDAR</button>`
+        : `<span style="font-size:12px;color:var(--muted);font-style:italic">Esperando que escriba...</span>`
+      }</td>
     </tr>`;
   }).join('');
 }
