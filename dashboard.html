@@ -520,21 +520,39 @@ function actualizarBotonesSaludar() {
   });
 }
 
+function mostrarToast(msg, color) {
+  let toast = document.getElementById('toast-saludo');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast-saludo';
+    toast.style.cssText = 'position:fixed;bottom:30px;right:30px;padding:14px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.background = color || '#22c55e';
+  toast.style.color = 'white';
+  toast.style.opacity = '1';
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+}
+
 function saludarSocio(rowIndex) {
   if (!estaEnHorarioCliente()) {
-    alert('El saludo solo está disponible de lunes a viernes de 9:00 a 16:00 hs');
+    mostrarToast('Solo disponible de lunes a viernes de 9:00 a 16:00 hs', '#ef4444');
     return;
   }
   fetch('http://localhost:3001/saludar', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ rowIndex })
-  }).then(() => {
+  }).then(r => {
+    if (!r.ok) throw new Error('Error');
+    mostrarToast('✅ Saludo enviado correctamente');
     const row = document.getElementById('row-' + rowIndex);
     if (row) { row.style.opacity = '0'; row.style.transition = 'opacity 0.5s'; setTimeout(() => row.remove(), 500); }
     const badge = document.getElementById('nuevos-count-badge');
     if (badge) { const c = parseInt(badge.textContent) - 1; badge.textContent = `${c} pendiente${c !== 1 ? 's' : ''}`; }
-  }).catch(() => alert('No se pudo conectar con el bot local. Asegurate de que el bot este corriendo.'));
+  }).catch(() => mostrarToast('No se pudo conectar con el bot. Asegurate de que este corriendo.', '#ef4444'));
 }
 
 async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
