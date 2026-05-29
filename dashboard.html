@@ -490,7 +490,7 @@ async function cargarNuevosSocios(socios) {
     const nombreCompleto = `${s.nombre} ${s.apellido}`;
     const nroSocio = s.nro || '—';
     const msg = encodeURIComponent(
-      `Hola ${s.nombre}! 🏀\n\n*Gracias por asociarte al Urquibasquet.*\nTe damos la bienvenida desde esta comunidad!\n\nTu número de socio es: *#${nroSocio}*\n\nPara realizar tu primera cuota societaria te compartimos los datos:\n\n*Datos para la transferencia:*\n👤 Asoc Civil Urquibasquet\n🔢 CUIT/CUIL: 30-71913330-0\n🏦 Banco Credicoop\n📋 Alias: elurqui.basquet\n💰 Monto de la cuota: $5.000\n\nCada mes te vamos a avisar por acá cuando se acerque la fecha de pago. Vamos Urquibasquet! 🔥`
+      `Hola ${s.nombre}! 🏀\n\n*Gracias por asociarte al Urquibasquet.*\nTe damos la bienvenida desde esta comunidad!\n\nTu numero de socio es: *#${nroSocio}*\n\nPara realizar tu primera cuota societaria te compartimos los datos:\n\n*Datos para la transferencia:*\nAsoc Civil Urquibasquet\nCUIT/CUIL: 30-71913330-0\nBanco Credicoop\nAlias: elurqui.basquet\nMonto de la cuota: $5.000\n\nCada mes te vamos a avisar por aca cuando se acerque la fecha de pago. Vamos Urquibasquet! 🔥`
     );
     return `<tr id="row-${s.rowIndex}">
       <td><div class="td-nro">#${nroSocio}</div></td>
