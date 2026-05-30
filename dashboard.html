@@ -108,6 +108,16 @@
   .legend-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); }
   .legend-dot-bar { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
 
+  /* SUB-TABS BALANCE */
+  .subtabs-nav { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid var(--border); overflow-x: auto; padding-bottom: 2px; }
+  .subtab-btn { background: none; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; padding: 10px 16px; font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 1px; color: var(--muted); cursor: pointer; transition: color 0.2s, border-color 0.2s; white-space: nowrap; }
+  .subtab-btn:hover { color: var(--text); }
+  .subtab-btn.active { color: var(--orange2); border-bottom-color: var(--orange2); }
+  .subtab-panel { display: none; }
+  .subtab-panel.active { display: block; }
+  .mini-bar { height: 16px; border-radius: 8px; overflow: hidden; display: flex; margin-bottom: 10px; }
+  .mini-bar-segment { height: 100%; }
+
   @media (max-width: 700px) {
     .grid-2 { grid-template-columns: 1fr; }
     .graficos-grid { grid-template-columns: 1fr; }
@@ -654,96 +664,154 @@ async function cargarErrores() {
 }
 
 
-async function cargarBalance(hojas, mesActual, datosMes) {
-  // INGRESOS
-  const totalesMes = [];
-  let totalIngresos = 0;
-  for (const hoja of hojas) {
-    if (hoja === 'Socios' || hoja === 'Respuestas de formulario' || hoja === 'Errores' || hoja === 'Egresos') continue;
-    const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
-    const total = filas.reduce((acc,r) => acc+(parseInt(r[2])||0), 0);
-    totalesMes.push({ nombre: hoja, total, count: filas.length });
-    totalIngresos += total;
-  }
-  totalesMes.sort((a,b) => b.nombre.localeCompare(a.nombre));
+const COLORES_CATEGORIAS_BAL = ['#f97316','#06b6d4','#a855f7','#f59e0b','#ec4899','#14b8a6','#ef4444','#84cc16'];
 
-  const tIngresos = document.getElementById('tabla-ingresos');
-  const badgeIngresos = document.getElementById('total-ingresos');
-  if (badgeIngresos) badgeIngresos.textContent = formatMonto(totalIngresos);
-  if (tIngresos) {
-    tIngresos.innerHTML = totalesMes.length === 0
-      ? '<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b">Sin datos</td></tr>'
-      : totalesMes.map(m => `<tr><td class="td-name">${m.nombre}</td><td style="color:var(--muted)">${m.count} pago${m.count!==1?'s':''}</td><td class="td-monto">${formatMonto(m.total)}</td></tr>`).join('');
-  }
-
-  // EGRESOS
-  const egresos = await fetchHoja('Egresos');
-  let totalEgresos = 0;
-  const tEgresos = document.getElementById('tabla-egresos');
-  const badgeEgresos = document.getElementById('total-egresos');
-  if (tEgresos) {
-    if (egresos.length === 0) {
-      tEgresos.innerHTML = '<tr><td colspan="4" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin egresos registrados</td></tr>';
-    } else {
-      tEgresos.innerHTML = egresos.map(r => {
-        const monto = parseInt(r[2])||0;
-        totalEgresos += monto;
-        return `<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td style="font-weight:700;color:#ef4444">${formatMonto(monto)}</td></tr>`;
-      }).join('');
-    }
-  }
-  if (badgeEgresos) badgeEgresos.textContent = formatMonto(totalEgresos);
-
-  // BALANCE
-  const resultado = totalIngresos - totalEgresos;
-  const elBI = document.getElementById('balance-ingresos');
-  const elBE = document.getElementById('balance-egresos');
-  const elBR = document.getElementById('balance-resultado');
-  if (elBI) elBI.textContent = formatMonto(totalIngresos);
-  if (elBE) elBE.textContent = formatMonto(totalEgresos);
-  if (elBR) {
-    elBR.textContent = formatMonto(Math.abs(resultado));
-    elBR.style.color = resultado >= 0 ? 'var(--green)' : '#ef4444';
-  }
-
-  // STACKED BAR
-  const COLORES_CATEGORIAS = ['#f97316','#06b6d4','#a855f7','#f59e0b','#ec4899','#14b8a6','#ef4444','#84cc16'];
-  const categorias = {};
-  egresos.forEach(r => {
-    const cat = (r[3]||'Sin categoría').trim();
-    categorias[cat] = (categorias[cat]||0) + (parseInt(r[2])||0);
+function renderMiniBar(containerId, legendId, ingreso, egresoCats, totalBar) {
+  const bar = document.getElementById(containerId);
+  const legend = document.getElementById(legendId);
+  if (!bar) return;
+  const tBar = totalBar || 1;
+  const pctI = Math.round((ingreso / tBar) * 100);
+  const gap = Math.max(0, 100 - Math.round((ingreso + Object.values(egresoCats).reduce((a,b)=>a+b,0)) / tBar * 100));
+  let barHTML = `<div class="mini-bar-segment" style="width:${pctI}%;background:#22c55e"></div>`;
+  if (gap > 0) barHTML += `<div class="mini-bar-segment" style="width:${gap}%;background:rgba(255,255,255,0.05)"></div>`;
+  Object.entries(egresoCats).forEach(([cat,monto],i) => {
+    const pct = Math.round((monto/tBar)*100);
+    barHTML += `<div class="mini-bar-segment" style="width:${pct}%;background:${COLORES_CATEGORIAS_BAL[i%COLORES_CATEGORIAS_BAL.length]}"></div>`;
   });
-  const total = totalIngresos || 1;
-  const bar = document.getElementById('stacked-bar');
-  const legend = document.getElementById('stacked-legend');
-  if (bar && legend) {
-    // Bar: verde ingresos a la izquierda, categorias egresos a la derecha
-    const egresosSegments = Object.entries(categorias).map(([cat, monto], i) => ({
-      label: cat, monto, color: COLORES_CATEGORIAS[i % COLORES_CATEGORIAS.length]
-    }));
-    const totalBar = Math.max(totalIngresos, totalEgresos) || 1;
-    const pctIngresos = Math.round((totalIngresos / totalBar) * 100);
-    const pctEgresos = Math.round((totalEgresos / totalBar) * 100);
-    const gap = 100 - pctIngresos - pctEgresos;
-
-    // Build bar: ingresos verde | gap | egresos por categoria
-    let barHTML = `<div class="stacked-bar-segment" style="width:${pctIngresos}%;background:#22c55e" title="Ingresos: ${formatMonto(totalIngresos)}"></div>`;
-    if (gap > 0) barHTML += `<div class="stacked-bar-segment" style="width:${gap}%;background:transparent"></div>`;
-    egresosSegments.forEach(s => {
-      const pct = Math.round((s.monto / totalBar) * 100);
-      barHTML += `<div class="stacked-bar-segment" style="width:${pct}%;background:${s.color}" title="${s.label}: ${formatMonto(s.monto)}"></div>`;
-    });
-    bar.innerHTML = barHTML;
-
-    // Legend: solo categorias de egresos, alineadas a la derecha
-    legend.style.justifyContent = 'flex-end';
-    legend.innerHTML = egresosSegments.map(s =>
-      `<div class="legend-item"><div class="legend-dot-bar" style="background:${s.color}"></div>${s.label}: <strong style="color:var(--text)">${formatMonto(s.monto)}</strong></div>`
+  bar.innerHTML = barHTML;
+  if (legend) {
+    const right = Object.entries(egresoCats).map(([cat,monto],i) =>
+      `<div class="legend-item"><div class="legend-dot-bar" style="background:${COLORES_CATEGORIAS_BAL[i%COLORES_CATEGORIAS_BAL.length]}"></div>${cat}: <strong style="color:var(--text)">${formatMonto(monto)}</strong></div>`
     ).join('');
+    legend.style.justifyContent = 'space-between';
+    legend.innerHTML = `<div class="legend-item"><div class="legend-dot-bar" style="background:#22c55e"></div>Ingresos: <strong style="color:var(--text)">${formatMonto(ingreso)}</strong></div><div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end">${right}</div>`;
+  }
+}
+
+async function cargarBalance(hojas, mesActual, datosMes) {
+  const mesesHojas = hojas.filter(h => h !== 'Socios' && h !== 'Respuestas de formulario' && h !== 'Errores' && h !== 'Egresos');
+  const todosEgresos = await fetchHoja('Egresos');
+  let totalIngresosGlobal = 0, totalEgresosGlobal = 0;
+  const egresosGlobalCats = {};
+  const datosPorMes = {};
+
+  // Cargar todos los meses
+  for (const hoja of mesesHojas) {
+    const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
+    const ingreso = filas.reduce((acc,r) => acc+(parseInt(r[2])||0), 0);
+    totalIngresosGlobal += ingreso;
+    datosPorMes[hoja] = { filas, ingreso };
   }
 
-  // Guardar para exportar
-  window._balanceData = { totalesMes, egresos, totalIngresos, totalEgresos, resultado };
+  // Calcular egresos globales por categoria
+  todosEgresos.forEach(r => {
+    const cat = (r[3]||'Sin categoría').trim();
+    const monto = parseInt(r[2])||0;
+    totalEgresosGlobal += monto;
+    egresosGlobalCats[cat] = (egresosGlobalCats[cat]||0) + monto;
+  });
+
+  // BUILD SUB-TABS
+  const subtabsNav = document.getElementById('balance-subtabs');
+  const subtabsContent = document.getElementById('balance-mes-content');
+  if (!subtabsNav || !subtabsContent) return;
+
+  subtabsNav.innerHTML = mesesHojas.map((h,i) =>
+    `<button class="subtab-btn ${i===0?'active':''}" onclick="showSubtab('${h}',this)">${h}</button>`
+  ).join('');
+
+  subtabsContent.innerHTML = mesesHojas.map((hoja, i) => {
+    const { filas, ingreso } = datosPorMes[hoja];
+    // Egresos de este mes (por fecha)
+    const egMes = todosEgresos.filter(r => {
+      const f = r[0]||'';
+      const partes = f.split('/');
+      if (partes.length === 3) {
+        const mes = parseInt(partes[1])-1;
+        const anio = parseInt(partes[2]);
+        const MESES_ARR = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+        return `${MESES_ARR[mes]} ${anio}` === hoja;
+      }
+      return false;
+    });
+    const egresoMes = egMes.reduce((a,r) => a+(parseInt(r[2])||0), 0);
+    const egCats = {};
+    egMes.forEach(r => { const c=(r[3]||'Sin categoría').trim(); egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0); });
+    const resultado = ingreso - egresoMes;
+    const totalBar = Math.max(ingreso, egresoMes) || 1;
+    const barId = `minibar-${hoja.replace(/\s/g,'_')}`;
+    const legId = `minileg-${hoja.replace(/\s/g,'_')}`;
+
+    const ingresosRows = filas.length === 0
+      ? '<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin pagos</td></tr>'
+      : filas.map(r => `<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td class="td-monto">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
+
+    const egresosRows = egMes.length === 0
+      ? '<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin egresos</td></tr>'
+      : egMes.map(r => `<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td style="font-weight:700;color:#ef4444">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
+
+    return `<div class="subtab-panel ${i===0?'active':''}" id="subtab-${hoja.replace(/\s/g,'_')}">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><div class="card-title">Ingresos — ${hoja}</div><span class="card-badge badge-green">${formatMonto(ingreso)}</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Socio</th><th>Monto</th></tr></thead><tbody>${ingresosRows}</tbody></table></div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><div class="card-title">Egresos — ${hoja}</div><span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171">${formatMonto(egresoMes)}</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Descripción</th><th>Monto</th></tr></thead><tbody>${egresosRows}</tbody></table></div>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><div class="card-title">Balance ${hoja}</div></div>
+        <div style="padding:16px 28px 0">
+          <div class="mini-bar" id="${barId}"></div>
+          <div class="stacked-bar-legend" id="${legId}" style="margin-bottom:12px"></div>
+        </div>
+        <div style="padding:0 28px 20px">
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Resultado del mes</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${resultado>=0?'var(--green)':'#ef4444'}">${resultado>=0?'+':''}${formatMonto(Math.abs(resultado))}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Render mini bars after DOM is updated
+  mesesHojas.forEach(hoja => {
+    const { ingreso } = datosPorMes[hoja];
+    const egMes = todosEgresos.filter(r => {
+      const f = r[0]||''; const partes = f.split('/');
+      if (partes.length === 3) {
+        const mes = parseInt(partes[1])-1; const anio = parseInt(partes[2]);
+        const MESES_ARR = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+        return `${MESES_ARR[mes]} ${anio}` === hoja;
+      }
+      return false;
+    });
+    const egresoMes = egMes.reduce((a,r) => a+(parseInt(r[2])||0), 0);
+    const egCats = {};
+    egMes.forEach(r => { const c=(r[3]||'Sin categoría').trim(); egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0); });
+    renderMiniBar(`minibar-${hoja.replace(/\s/g,'_')}`, `minileg-${hoja.replace(/\s/g,'_')}`, ingreso, egCats, Math.max(ingreso, egresoMes)||1);
+  });
+
+  // BALANCE TOTAL GLOBAL
+  const elBI = document.getElementById('balance-ingresos-total');
+  const elBE = document.getElementById('balance-egresos-total');
+  const elBR = document.getElementById('balance-resultado');
+  if (elBI) elBI.textContent = formatMonto(totalIngresosGlobal);
+  if (elBE) elBE.textContent = formatMonto(totalEgresosGlobal);
+  const resultado = totalIngresosGlobal - totalEgresosGlobal;
+  if (elBR) { elBR.textContent = (resultado>=0?'+':'')+formatMonto(Math.abs(resultado)); elBR.style.color = resultado>=0?'var(--green)':'#ef4444'; }
+  renderMiniBar('stacked-bar', 'stacked-legend', totalIngresosGlobal, egresosGlobalCats, Math.max(totalIngresosGlobal, totalEgresosGlobal)||1);
+
+  window._balanceData = { datosPorMes, todosEgresos, totalIngresosGlobal, totalEgresosGlobal, resultado };
+}
+
+function showSubtab(name, btn) {
+  document.querySelectorAll('.subtab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.subtab-btn').forEach(b => b.classList.remove('active'));
+  const id = 'subtab-' + name.replace(/\s/g,'_');
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  if (btn) btn.classList.add('active');
 }
 
 function exportarExcel() {
