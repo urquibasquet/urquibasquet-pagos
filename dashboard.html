@@ -599,9 +599,7 @@ async function cargarBalance(hojas, mesActual, datosMes) {
     const barId=`minibar-${hoja.replace(/\s/g,'_')}`;
     const legId=`minileg-${hoja.replace(/\s/g,'_')}`;
 
-    const ingresosRows=filas.length===0
-      ?'<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin pagos</td></tr>'
-      :filas.map(r=>`<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td class="td-monto">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
+    const ingresosRows=`<tr><td class="td-name">Cuota Societaria</td><td class="td-monto">${formatMonto(ingreso)}</td></tr>`;
 
     const egresosRows=egMes.length===0
       ?'<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin egresos</td></tr>'
@@ -609,8 +607,8 @@ async function cargarBalance(hojas, mesActual, datosMes) {
 
     return `<div class="subtab-panel ${i===0?'active':''}" id="subtab-${hoja.replace(/\s/g,'_')}">
       <div class="card" style="margin-bottom:16px">
-        <div class="card-header"><div class="card-title">Ingresos — ${hoja}</div><span class="card-badge badge-green">${formatMonto(ingreso)}</span></div>
-        <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Socio</th><th>Monto</th></tr></thead><tbody>${ingresosRows}</tbody></table></div>
+        <div class="card-header"><div class="card-title">Ingresos</div><span class="card-badge badge-green">${formatMonto(ingreso)}</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Concepto</th><th>Total</th></tr></thead><tbody>${ingresosRows}</tbody></table></div>
       </div>
       <div class="card" style="margin-bottom:16px">
         <div class="card-header"><div class="card-title">Egresos — ${hoja}</div><span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171">${formatMonto(egresoMes)}</span></div>
