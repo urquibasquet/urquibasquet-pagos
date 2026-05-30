@@ -778,19 +778,7 @@ async function cargarDatos() {
       if (!nros[key]) { const tel = String(r[4]||'').replace(/\D/g,''); const s = mapaSocios[tel]; if (s) nros[key] = s.nro; }
     }
   }
-  const ranking = Object.keys(conteo).map(k => ({ nombre: nombres[k]||k, pagos: conteo[k], total: totales[k], nro: nros[k]||'' })).sort((a,b) => b.pagos-a.pagos || b.total-a.total).slice(0,10);
-  const maxPagos = ranking[0]?.pagos || 1;
-  const tRanking = document.getElementById('tabla-ranking');
-  if (ranking.length === 0) {
-    tRanking.innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin datos aun</td></tr>';
-  } else {
-    tRanking.innerHTML = ranking.map((s,i) => {
-      const pct = Math.round((s.pagos/maxPagos)*100);
-      const rc = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
-      const nroDisplay = s.nro ? `<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>` : '';
-      return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${nroDisplay}<div class="td-name">${s.nombre}</div></td><td><div class="td-name" style="color:var(--blue)">${s.pagos}</div><div class="rank-pagos">mes${s.pagos!==1?'es':''}</div></td><td class="td-monto">${formatMonto(s.total)}</td></tr>`;
-    }).join('');
-  }
+  // ranking removido de la pestaña pagos
   const totalesMes = [];
   for (const hoja of hojas) {
     if (hoja === 'Socios' || hoja === 'Respuestas de formulario') continue;
