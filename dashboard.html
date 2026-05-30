@@ -161,8 +161,7 @@
 
   <!-- TAB 1: PAGOS -->
   <div class="tab-panel active" id="tab-pagos">
-    <div class="grid-2">
-      <div class="card">
+    <div class="card" style="margin-bottom:20px">
         <div class="card-header">
           <div class="card-title">Últimos Pagos</div>
           <span class="card-badge badge-green" id="pagos-count-badge">—</span>
@@ -175,19 +174,6 @@
           </table>
         </div>
       </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Ranking de Socios</div>
-          <span class="card-badge badge-orange">Top 20</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>#</th><th>Socio</th><th>Pagos</th><th>Total</th></tr></thead>
-            <tbody id="tabla-ranking"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
     <div class="card" style="margin-bottom:20px">
       <div class="card-header">
         <div class="card-title">Total Recaudado por Mes</div>
@@ -265,17 +251,51 @@
 
   <!-- TAB 4: BALANCE -->
   <div class="tab-panel" id="tab-balance">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+      <button onclick="exportarExcel()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;">📥 EXPORTAR EXCEL</button>
+    </div>
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Ingresos</div>
+          <span class="card-badge badge-green" id="total-ingresos">—</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Mes</th><th>Pagos</th><th>Total</th></tr></thead>
+            <tbody id="tabla-ingresos"><tr><td colspan="3"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Egresos</div>
+          <span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171" id="total-egresos">—</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Monto</th></tr></thead>
+            <tbody id="tabla-egresos"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
     <div class="card" style="margin-bottom:20px">
       <div class="card-header">
-        <div class="card-title">Pagos Realizados por el Club</div>
-        <span class="card-badge" style="background:rgba(100,116,139,0.15);color:#94a3b8">A futuro</span>
+        <div class="card-title">Balance Total</div>
       </div>
-      <div style="padding: 40px 28px; text-align: center;">
-        <div style="font-size: 48px; margin-bottom: 16px;">🚧</div>
-        <div style="font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--orange2); letter-spacing: 1.5px; margin-bottom: 12px;">PENDIENTE</div>
-        <div style="font-size: 15px; color: var(--muted); line-height: 1.7; max-width: 500px; margin: 0 auto;">
-          Ver cómo contabilizar los pagos realizados por el Urquibasquet + balance total.<br>
-          <span style="font-size: 12px; color: #475569; margin-top: 8px; display: block;">Esta sección está planificada para una versión futura del sistema.</span>
+      <div style="padding:24px 28px;display:flex;gap:40px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total Ingresos</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--green)" id="balance-ingresos">—</div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total Egresos</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#ef4444" id="balance-egresos">—</div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Resultado</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:36px" id="balance-resultado">—</div>
         </div>
       </div>
     </div>
@@ -626,6 +646,87 @@ async function cargarErrores() {
   </tr>`).join('');
 }
 
+
+async function cargarBalance(hojas, mesActual, datosMes) {
+  // INGRESOS
+  const totalesMes = [];
+  let totalIngresos = 0;
+  for (const hoja of hojas) {
+    if (hoja === 'Socios' || hoja === 'Respuestas de formulario' || hoja === 'Errores' || hoja === 'Egresos') continue;
+    const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
+    const total = filas.reduce((acc,r) => acc+(parseInt(r[2])||0), 0);
+    totalesMes.push({ nombre: hoja, total, count: filas.length });
+    totalIngresos += total;
+  }
+  totalesMes.sort((a,b) => b.nombre.localeCompare(a.nombre));
+
+  const tIngresos = document.getElementById('tabla-ingresos');
+  const badgeIngresos = document.getElementById('total-ingresos');
+  if (badgeIngresos) badgeIngresos.textContent = formatMonto(totalIngresos);
+  if (tIngresos) {
+    tIngresos.innerHTML = totalesMes.length === 0
+      ? '<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b">Sin datos</td></tr>'
+      : totalesMes.map(m => `<tr><td class="td-name">${m.nombre}</td><td style="color:var(--muted)">${m.count} pago${m.count!==1?'s':''}</td><td class="td-monto">${formatMonto(m.total)}</td></tr>`).join('');
+  }
+
+  // EGRESOS
+  const egresos = await fetchHoja('Egresos');
+  let totalEgresos = 0;
+  const tEgresos = document.getElementById('tabla-egresos');
+  const badgeEgresos = document.getElementById('total-egresos');
+  if (tEgresos) {
+    if (egresos.length === 0) {
+      tEgresos.innerHTML = '<tr><td colspan="4" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin egresos registrados</td></tr>';
+    } else {
+      tEgresos.innerHTML = egresos.map(r => {
+        const monto = parseInt(r[2])||0;
+        totalEgresos += monto;
+        return `<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td style="color:var(--muted)">${r[3]||'—'}</td><td style="font-weight:700;color:#ef4444">${formatMonto(monto)}</td></tr>`;
+      }).join('');
+    }
+  }
+  if (badgeEgresos) badgeEgresos.textContent = formatMonto(totalEgresos);
+
+  // BALANCE
+  const resultado = totalIngresos - totalEgresos;
+  const elBI = document.getElementById('balance-ingresos');
+  const elBE = document.getElementById('balance-egresos');
+  const elBR = document.getElementById('balance-resultado');
+  if (elBI) elBI.textContent = formatMonto(totalIngresos);
+  if (elBE) elBE.textContent = formatMonto(totalEgresos);
+  if (elBR) {
+    elBR.textContent = formatMonto(Math.abs(resultado));
+    elBR.style.color = resultado >= 0 ? 'var(--green)' : '#ef4444';
+  }
+
+  // Guardar para exportar
+  window._balanceData = { totalesMes, egresos, totalIngresos, totalEgresos, resultado };
+}
+
+function exportarExcel() {
+  const data = window._balanceData;
+  if (!data) { alert('Cargando datos, intentá en unos segundos.'); return; }
+
+  let csv = 'INGRESOS\n';
+  csv += 'Mes,Pagos,Total\n';
+  data.totalesMes.forEach(m => { csv += `${m.nombre},${m.count},${m.total}\n`; });
+  csv += `\nTOTAL INGRESOS,,${data.totalIngresos}\n`;
+
+  csv += '\nEGRESOS\n';
+  csv += 'Fecha,Descripcion,Monto,Categoria\n';
+  data.egresos.forEach(r => { csv += `${r[0]||''},${r[1]||''},${r[2]||''},${r[3]||''}\n`; });
+  csv += `\nTOTAL EGRESOS,,${data.totalEgresos}\n`;
+  csv += `\nRESULTADO,,${data.resultado}\n`;
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'balance_urquibasquet.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 async function cargarDatos() {
   const mesActual = getMesActual();
   document.getElementById('hero-month').textContent = mesActual;
@@ -687,7 +788,7 @@ async function cargarDatos() {
       const pct = Math.round((s.pagos/maxPagos)*100);
       const rc = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
       const nroDisplay = s.nro ? `<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>` : '';
-      return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${nroDisplay}<div class="td-name">${s.nombre}</div><div class="rank-bar-wrap"><div class="rank-bar" style="width:${pct}%"></div></div></td><td><div class="td-name" style="color:var(--blue)">${s.pagos}</div><div class="rank-pagos">mes${s.pagos!==1?'es':''}</div></td><td class="td-monto">${formatMonto(s.total)}</td></tr>`;
+      return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${nroDisplay}<div class="td-name">${s.nombre}</div></td><td><div class="td-name" style="color:var(--blue)">${s.pagos}</div><div class="rank-pagos">mes${s.pagos!==1?'es':''}</div></td><td class="td-monto">${formatMonto(s.total)}</td></tr>`;
     }).join('');
   }
   const totalesMes = [];
@@ -701,6 +802,7 @@ async function cargarDatos() {
   const listaMeses = document.getElementById('lista-meses');
   listaMeses.innerHTML = totalesMes.length === 0 ? '<div class="loading" style="color:#64748b;font-style:italic;">Sin datos</div>' : totalesMes.map(m => `<div class="month-row ${m.actual?'current':''}"><div><div class="month-name">${m.nombre}${m.actual?'<span class="month-current-tag">Actual</span>':''}</div><div class="month-count">${m.count} pago${m.count!==1?'s':''}</div></div><div class="month-total">${formatMonto(m.total)}</div></div>`).join('');
   await calcularSorteo(hojas, mesActual, datosMes, mapaSocios);
+  await cargarBalance(hojas, mesActual, datosMes);
   const ahoraD = new Date();
   const hh24 = ahoraD.getHours(), hh12 = hh24 % 12 || 12, ampm = hh24 >= 12 ? 'PM' : 'AM';
   const mm2 = String(ahoraD.getMinutes()).padStart(2,'0'), ss2 = String(ahoraD.getSeconds()).padStart(2,'0');
