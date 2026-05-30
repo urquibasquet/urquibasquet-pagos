@@ -781,7 +781,7 @@ async function cargarDatos() {
   // ranking removido de la pestaña pagos
   const totalesMes = [];
   for (const hoja of hojas) {
-    if (hoja === 'Socios' || hoja === 'Respuestas de formulario') continue;
+    if (hoja === 'Socios' || hoja === 'Respuestas de formulario' || hoja === 'Errores' || hoja === 'Egresos') continue;
     const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
     const total = filas.reduce((acc,r) => acc+(parseInt(r[2])||0), 0);
     totalesMes.push({ nombre: hoja, total, count: filas.length, actual: hoja === mesActual });
