@@ -100,6 +100,14 @@
   .tab-btn.active { color: var(--orange2); border-bottom-color: var(--orange2); }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
+  /* STACKED BAR */
+  .stacked-bar-wrap { padding: 24px 28px 20px; }
+  .stacked-bar { height: 28px; border-radius: 14px; overflow: hidden; display: flex; width: 100%; margin-bottom: 16px; }
+  .stacked-bar-segment { height: 100%; transition: width 0.8s ease; }
+  .stacked-bar-legend { display: flex; flex-wrap: wrap; gap: 12px 20px; }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); }
+  .legend-dot-bar { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
   @media (max-width: 700px) {
     .grid-2 { grid-template-columns: 1fr; }
     .graficos-grid { grid-template-columns: 1fr; }
@@ -254,6 +262,18 @@
     <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
       <button onclick="exportarExcel()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;">📥 EXPORTAR EXCEL</button>
     </div>
+
+    <!-- STACKED BAR -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <div class="card-title">Distribución</div>
+      </div>
+      <div class="stacked-bar-wrap">
+        <div class="stacked-bar" id="stacked-bar"></div>
+        <div class="stacked-bar-legend" id="stacked-legend"></div>
+      </div>
+    </div>
+
     <div class="grid-2" style="margin-bottom:20px">
       <div class="card">
         <div class="card-header">
@@ -699,6 +719,31 @@ async function cargarBalance(hojas, mesActual, datosMes) {
     elBR.style.color = resultado >= 0 ? 'var(--green)' : '#ef4444';
   }
 
+  // STACKED BAR
+  const COLORES_CATEGORIAS = ['#f97316','#06b6d4','#a855f7','#f59e0b','#ec4899','#14b8a6','#ef4444','#84cc16'];
+  const categorias = {};
+  egresos.forEach(r => {
+    const cat = (r[3]||'Sin categoría').trim();
+    categorias[cat] = (categorias[cat]||0) + (parseInt(r[2])||0);
+  });
+  const total = totalIngresos || 1;
+  const bar = document.getElementById('stacked-bar');
+  const legend = document.getElementById('stacked-legend');
+  if (bar && legend) {
+    const segments = [{ label: 'Ingresos', monto: totalIngresos, color: '#22c55e' }];
+    Object.entries(categorias).forEach(([cat, monto], i) => {
+      segments.push({ label: cat, monto, color: COLORES_CATEGORIAS[i % COLORES_CATEGORIAS.length] });
+    });
+    const totalBar = segments.reduce((a,s) => a + s.monto, 0) || 1;
+    bar.innerHTML = segments.map(s => {
+      const pct = Math.round((s.monto / totalBar) * 100);
+      return `<div class="stacked-bar-segment" style="width:${pct}%;background:${s.color}" title="${s.label}: ${formatMonto(s.monto)}"></div>`;
+    }).join('');
+    legend.innerHTML = segments.map(s =>
+      `<div class="legend-item"><div class="legend-dot-bar" style="background:${s.color}"></div>${s.label}: <strong style="color:var(--text)">${formatMonto(s.monto)}</strong></div>`
+    ).join('');
+  }
+
   // Guardar para exportar
   window._balanceData = { totalesMes, egresos, totalIngresos, totalEgresos, resultado };
 }
@@ -781,7 +826,7 @@ async function cargarDatos() {
   // ranking removido de la pestaña pagos
   const totalesMes = [];
   for (const hoja of hojas) {
-    if (hoja === 'Socios' || hoja === 'Respuestas de formulario' || hoja === 'Errores' || hoja === 'Egresos') continue;
+    if (hoja === 'Socios' || hoja === 'Respuestas de formulario') continue;
     const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
     const total = filas.reduce((acc,r) => acc+(parseInt(r[2])||0), 0);
     totalesMes.push({ nombre: hoja, total, count: filas.length, actual: hoja === mesActual });
