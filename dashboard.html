@@ -263,17 +263,6 @@
       <button onclick="exportarExcel()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;">📥 EXPORTAR EXCEL</button>
     </div>
 
-    <!-- STACKED BAR -->
-    <div class="card" style="margin-bottom:20px">
-      <div class="card-header">
-        <div class="card-title">Distribución</div>
-      </div>
-      <div class="stacked-bar-wrap">
-        <div class="stacked-bar" id="stacked-bar"></div>
-        <div class="stacked-bar-legend" id="stacked-legend"></div>
-      </div>
-    </div>
-
     <div class="grid-2" style="margin-bottom:20px">
       <div class="card">
         <div class="card-header">
@@ -294,7 +283,7 @@
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Monto</th></tr></thead>
+            <thead><tr><th>Fecha</th><th>Descripción</th><th>Monto</th></tr></thead>
             <tbody id="tabla-egresos"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
           </table>
         </div>
@@ -304,7 +293,11 @@
       <div class="card-header">
         <div class="card-title">Balance Total</div>
       </div>
-      <div style="padding:24px 28px;display:flex;gap:40px;flex-wrap:wrap;">
+      <div style="padding:20px 28px 0">
+        <div class="stacked-bar" id="stacked-bar" style="margin-bottom:8px"></div>
+        <div class="stacked-bar-legend" id="stacked-legend" style="margin-bottom:16px"></div>
+      </div>
+      <div style="padding:0 28px 24px;display:flex;gap:40px;flex-wrap:wrap;">
         <div>
           <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total Ingresos</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--green)" id="balance-ingresos">—</div>
@@ -701,7 +694,7 @@ async function cargarBalance(hojas, mesActual, datosMes) {
       tEgresos.innerHTML = egresos.map(r => {
         const monto = parseInt(r[2])||0;
         totalEgresos += monto;
-        return `<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td style="color:var(--muted)">${r[3]||'—'}</td><td style="font-weight:700;color:#ef4444">${formatMonto(monto)}</td></tr>`;
+        return `<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td style="font-weight:700;color:#ef4444">${formatMonto(monto)}</td></tr>`;
       }).join('');
     }
   }
