@@ -496,23 +496,23 @@ async function cargarNuevosSocios(socios) {
       <td><div class="td-nro">#${nroSocio}</div></td>
       <td><div class="td-name">${nombreCompleto}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${s.fechaReg || 'Sin fecha'}</div></td>
       <td class="td-fecha">${s.fechaReg || '—'}</td>
-      <td>${s.puedeEnviar
+      <td>${s.lid
         ? `<button onclick="saludarSocio(${s.rowIndex})" class="btn-saludar" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;border-radius:8px;padding:8px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">💬 SALUDAR</button>`
-        : `<span style="font-size:12px;color:var(--muted);font-style:italic">Esperando que escriba...</span>`
+        : s.tel
+          ? `<button onclick="saludarSocio(${s.rowIndex})" class="btn-saludar" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;border-radius:8px;padding:8px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">💬 SALUDAR</button>`
+          : `<span style="font-size:12px;font-weight:700;color:#ef4444;background:rgba(239,68,68,0.1);padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3)">⚠️ Falta LID</span>`
       }</td>
     </tr>`;
   }).join('');
 }
 
-//function estaEnHorarioCliente() {
- // const ahora = new Date();
- // const hora = ahora.getHours();
-  //const dia = ahora.getDay();
- // return dia >= 1 && dia <= 5 && hora >= 9 && hora < 16;
-//}
 function estaEnHorarioCliente() {
-  return true;
+  const ahora = new Date();
+  const hora = ahora.getHours();
+  const dia = ahora.getDay();
+  return dia >= 1 && dia <= 5 && hora >= 9 && hora < 16;
 }
+
 function actualizarBotonesSaludar() {
   const enHorario = estaEnHorarioCliente();
   document.querySelectorAll('.btn-saludar').forEach(btn => {
@@ -653,7 +653,7 @@ async function cargarDatos() {
   if (datosMes.length === 0) {
     tPagos.innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin pagos este mes aun</td></tr>';
   } else {
-    tPagos.innerHTML = [...datosMes].reverse().map(r => {
+    tPagos.innerHTML = [...datosMes].reverse().slice(0,10).map(r => {
       const monto = parseInt(r[2]);
       const esAlerta = monto !== MONTO_CUOTA;
       const fecha = r[0] ? r[0] + (r[6] ? ' · ' + r[6].split(',')[1]?.trim() : '') : '—';
@@ -677,7 +677,7 @@ async function cargarDatos() {
       if (!nros[key]) { const tel = String(r[4]||'').replace(/\D/g,''); const s = mapaSocios[tel]; if (s) nros[key] = s.nro; }
     }
   }
-  const ranking = Object.keys(conteo).map(k => ({ nombre: nombres[k]||k, pagos: conteo[k], total: totales[k], nro: nros[k]||'' })).sort((a,b) => b.pagos-a.pagos || b.total-a.total).slice(0,20);
+  const ranking = Object.keys(conteo).map(k => ({ nombre: nombres[k]||k, pagos: conteo[k], total: totales[k], nro: nros[k]||'' })).sort((a,b) => b.pagos-a.pagos || b.total-a.total).slice(0,10);
   const maxPagos = ranking[0]?.pagos || 1;
   const tRanking = document.getElementById('tabla-ranking');
   if (ranking.length === 0) {
