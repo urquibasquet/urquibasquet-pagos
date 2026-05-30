@@ -299,17 +299,11 @@
       </div>
       <div style="padding:0 28px 24px;display:flex;gap:40px;flex-wrap:wrap;">
         <div>
-          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total Ingresos</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--green)" id="balance-ingresos">—</div>
-        </div>
-        <div>
-          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total Egresos</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#ef4444" id="balance-egresos">—</div>
-        </div>
-        <div>
           <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Resultado</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:36px" id="balance-resultado">—</div>
         </div>
+        <div id="balance-ingresos" style="display:none">—</div>
+        <div id="balance-egresos" style="display:none">—</div>
       </div>
     </div>
   </div>
@@ -723,16 +717,27 @@ async function cargarBalance(hojas, mesActual, datosMes) {
   const bar = document.getElementById('stacked-bar');
   const legend = document.getElementById('stacked-legend');
   if (bar && legend) {
-    const segments = [{ label: 'Ingresos', monto: totalIngresos, color: '#22c55e' }];
-    Object.entries(categorias).forEach(([cat, monto], i) => {
-      segments.push({ label: cat, monto, color: COLORES_CATEGORIAS[i % COLORES_CATEGORIAS.length] });
-    });
-    const totalBar = segments.reduce((a,s) => a + s.monto, 0) || 1;
-    bar.innerHTML = segments.map(s => {
+    // Bar: verde ingresos a la izquierda, categorias egresos a la derecha
+    const egresosSegments = Object.entries(categorias).map(([cat, monto], i) => ({
+      label: cat, monto, color: COLORES_CATEGORIAS[i % COLORES_CATEGORIAS.length]
+    }));
+    const totalBar = Math.max(totalIngresos, totalEgresos) || 1;
+    const pctIngresos = Math.round((totalIngresos / totalBar) * 100);
+    const pctEgresos = Math.round((totalEgresos / totalBar) * 100);
+    const gap = 100 - pctIngresos - pctEgresos;
+
+    // Build bar: ingresos verde | gap | egresos por categoria
+    let barHTML = `<div class="stacked-bar-segment" style="width:${pctIngresos}%;background:#22c55e" title="Ingresos: ${formatMonto(totalIngresos)}"></div>`;
+    if (gap > 0) barHTML += `<div class="stacked-bar-segment" style="width:${gap}%;background:transparent"></div>`;
+    egresosSegments.forEach(s => {
       const pct = Math.round((s.monto / totalBar) * 100);
-      return `<div class="stacked-bar-segment" style="width:${pct}%;background:${s.color}" title="${s.label}: ${formatMonto(s.monto)}"></div>`;
-    }).join('');
-    legend.innerHTML = segments.map(s =>
+      barHTML += `<div class="stacked-bar-segment" style="width:${pct}%;background:${s.color}" title="${s.label}: ${formatMonto(s.monto)}"></div>`;
+    });
+    bar.innerHTML = barHTML;
+
+    // Legend: solo categorias de egresos, alineadas a la derecha
+    legend.style.justifyContent = 'flex-end';
+    legend.innerHTML = egresosSegments.map(s =>
       `<div class="legend-item"><div class="legend-dot-bar" style="background:${s.color}"></div>${s.label}: <strong style="color:var(--text)">${formatMonto(s.monto)}</strong></div>`
     ).join('');
   }
