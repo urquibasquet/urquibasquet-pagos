@@ -418,7 +418,7 @@ function calcularEdad(fechaNac) {
 
 function procesarGraficos(socios) {
   const rangos = {'Menor de 18':0,'18-25':0,'26-35':0,'36-45':0,'46+':0};
-  for (const s of socios) { const edad=calcularEdad(s[4]); if (edad===null) continue; if (edad<18) rangos['Menor de 18']++; else if (edad<=25) rangos['18-25']++; else if (edad<=35) rangos['26-35']++; else if (edad<=45) rangos['36-45']++; else rangos['46+']++=0||rangos['46+']+1; }
+  for (const s of socios) { const edad=calcularEdad(s[4]); if (edad===null) continue; if (edad<18) rangos['Menor de 18']++; else if (edad<=25) rangos['18-25']++; else if (edad<=35) rangos['26-35']++; else if (edad<=45) rangos['36-45']++; else rangos['46+']++; }
   const datosEdades = Object.entries(rangos).filter(([,v])=>v>0).map(([label,valor])=>({label,valor})).sort((a,b)=>b.valor-a.valor);
   dibujarTorta('chart-edades',datosEdades); renderLeyenda('leyenda-edades',datosEdades);
   const origenes = {};
