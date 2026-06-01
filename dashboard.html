@@ -418,7 +418,7 @@ function calcularEdad(fechaNac) {
 
 function procesarGraficos(socios) {
   const rangos = {'Menor de 18':0,'18-25':0,'26-35':0,'36-45':0,'46+':0};
-  for (const s of socios) { const edad=calcularEdad(s[4]); if (edad===null) continue; if (edad<18) rangos['Menor de 18']++; else if (edad<=25) rangos['18-25']++; else if (edad<=35) rangos['26-35']++; else if (edad<=45) rangos['36-45']++; else rangos['46+']++; }
+  for (const s of socios) { const edad=calcularEdad(s[4]); if (edad===null) continue; if (edad<18) rangos['Menor de 18']++; else if (edad<=25) rangos['18-25']++; else if (edad<=35) rangos['26-35']++; else if (edad<=45) rangos['36-45']++; else rangos['46+']++=0||rangos['46+']+1; }
   const datosEdades = Object.entries(rangos).filter(([,v])=>v>0).map(([label,valor])=>({label,valor})).sort((a,b)=>b.valor-a.valor);
   dibujarTorta('chart-edades',datosEdades); renderLeyenda('leyenda-edades',datosEdades);
   const origenes = {};
@@ -456,14 +456,14 @@ async function cargarNuevosSocios(socios) {
 }
 
 function estaEnHorarioCliente() {
-  const ahora=new Date(); return ahora.getDay()>=1&&ahora.getDay()<=5&&ahora.getHours()>=9&&ahora.getHours()<16;
+  return true;
 }
 
 function actualizarBotonesSaludar() {
   const enHorario=estaEnHorarioCliente();
   document.querySelectorAll('.btn-saludar').forEach(btn=>{
     btn.style.opacity=enHorario?'1':'0.4'; btn.style.pointerEvents=enHorario?'auto':'none';
-    btn.title=enHorario?'':'Solo disponible L-V 9-16hs';
+    btn.title='';
   });
 }
 
@@ -475,7 +475,6 @@ function mostrarToast(msg,color) {
 }
 
 function saludarSocio(rowIndex) {
-  if (!estaEnHorarioCliente()) { mostrarToast('Solo disponible L-V de 9:00 a 16:00 hs','#ef4444'); return; }
   fetch('http://localhost:3001/saludar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rowIndex})})
     .then(r=>{if(!r.ok)throw new Error('Error'); mostrarToast('✅ Saludo enviado correctamente');
       const row=document.getElementById('row-'+rowIndex); if(row){row.style.opacity='0';row.style.transition='opacity 0.5s';setTimeout(()=>row.remove(),500);}
@@ -599,7 +598,9 @@ async function cargarBalance(hojas, mesActual, datosMes) {
     const barId=`minibar-${hoja.replace(/\s/g,'_')}`;
     const legId=`minileg-${hoja.replace(/\s/g,'_')}`;
 
-    const ingresosRows=`<tr><td class="td-name">Cuota Societaria</td><td class="td-monto">${formatMonto(ingreso)}</td></tr>`;
+    const ingresosRows=filas.length===0
+      ?'<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin pagos</td></tr>'
+      :filas.map(r=>`<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td class="td-monto">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
 
     const egresosRows=egMes.length===0
       ?'<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin egresos</td></tr>'
@@ -607,11 +608,11 @@ async function cargarBalance(hojas, mesActual, datosMes) {
 
     return `<div class="subtab-panel ${i===0?'active':''}" id="subtab-${hoja.replace(/\s/g,'_')}">
       <div class="card" style="margin-bottom:16px">
-        <div class="card-header"><div class="card-title">Ingresos</div><span class="card-badge badge-green">${formatMonto(ingreso)}</span></div>
-        <div class="table-wrap"><table><thead><tr><th>Concepto</th><th>Total</th></tr></thead><tbody>${ingresosRows}</tbody></table></div>
+        <div class="card-header"><div class="card-title">Ingresos — ${hoja}</div><span class="card-badge badge-green">${formatMonto(ingreso)}</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Socio</th><th>Monto</th></tr></thead><tbody>${ingresosRows}</tbody></table></div>
       </div>
       <div class="card" style="margin-bottom:16px">
-        <div class="card-header"><div class="card-title">Egresos</div><span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171">${formatMonto(egresoMes)}</span></div>
+        <div class="card-header"><div class="card-title">Egresos — ${hoja}</div><span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171">${formatMonto(egresoMes)}</span></div>
         <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Descripción</th><th>Monto</th></tr></thead><tbody>${egresosRows}</tbody></table></div>
       </div>
       <div class="card" style="margin-bottom:20px">
