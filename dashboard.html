@@ -697,7 +697,8 @@ async function cargarDatos() {
       const fecha=r[0]||(r[6]?r[6].split(',')[0]:'—');
       const tel=String(r[4]||'').replace(/\D/g,''); const socio=mapaSocios[tel];
       const nroDisplay=socio?`<div class="td-nro">#${socio.nro}</div>`:'<div class="td-nro" style="color:#334155">—</div>';
-      return `<tr><td>${nroDisplay}</td><td class="td-name">${r[1]||'—'}${esAlerta?'<span class="alerta-badge">MONTO DIFF</span>':''}</td><td class="${esAlerta?'td-monto-alerta':'td-monto'}">${formatMonto(r[2])}</td><td class="td-fecha">${fecha}</td></tr>`;
+      const esEfectivo = (r[3]||'').toUpperCase() === 'EFECTIVO';
+return `<tr><td>${nroDisplay}</td><td class="td-name">${r[1]||'—'}${esAlerta?'<span class="alerta-badge">MONTO DIFF</span>':''}</td><td class="${esAlerta?'td-monto-alerta':'td-monto'}">${formatMonto(r[2])}${esEfectivo?' <span style="font-size:11px;font-weight:600;color:var(--muted)">(efectivo)</span>':''}</td><td class="td-fecha">${fecha}</td></tr>`;
     }).join('');
   }
 
