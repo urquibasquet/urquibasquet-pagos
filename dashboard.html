@@ -58,7 +58,6 @@
   .alerta-badge { font-size: 10px; font-weight: 700; background: rgba(220,38,38,0.15); color: #f87171; padding: 2px 7px; border-radius: 8px; margin-left: 6px; }
   .rank-num { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--muted); width: 32px; text-align: center; }
   .rank-1 { color: #fbbf24; } .rank-2 { color: #94a3b8; } .rank-3 { color: #cd7c3a; }
-  .rank-pagos { font-size: 13px; color: var(--muted); margin-top: 2px; }
   .month-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; border-bottom: 1px solid var(--border); transition: background 0.15s; }
   .month-row:last-child { border-bottom: none; }
   .month-row:hover { background: rgba(255,255,255,0.03); }
@@ -98,13 +97,10 @@
   .tab-btn.active { color: var(--orange2); border-bottom-color: var(--orange2); }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
-  /* STACKED BAR */
   .stacked-bar { height: 28px; border-radius: 14px; overflow: hidden; display: flex; width: 100%; }
-  .stacked-bar-segment { height: 100%; transition: width 0.8s ease; }
   .stacked-bar-legend { display: flex; flex-wrap: wrap; gap: 12px 20px; }
   .legend-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); }
   .legend-dot-bar { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
-  /* SUB-TABS BALANCE */
   .subtabs-nav { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid var(--border); overflow-x: auto; padding-bottom: 2px; }
   .subtab-btn { background: none; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; padding: 10px 16px; font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 1px; color: var(--muted); cursor: pointer; transition: color 0.2s, border-color 0.2s; white-space: nowrap; }
   .subtab-btn:hover { color: var(--text); }
@@ -162,8 +158,8 @@
     </div>
   </div>
   <div class="tabs-nav">
-     <button class="tab-btn active" onclick="showTab('pagos',this)">💰 Pagos</button>
-    <button class="tab-btn" onclick="showTab('nuevos',this)">👋 Saludar Nuevos Socios</button>
+    <button class="tab-btn active" onclick="showTab('pagos',this)">💰 Pagos</button>
+    <button class="tab-btn" onclick="showTab('nuevos',this)">👥 Socios</button>
     <button class="tab-btn" id="btn-tab-errores" onclick="showTab('errores',this)">⚠️ Errores</button>
     <button class="tab-btn" onclick="showTab('camping',this)">🏕️ Viaje al Camping</button>
     <button class="tab-btn" onclick="showTab('balance',this)">📊 Balance</button>
@@ -194,37 +190,52 @@
     </div>
   </div>
 
-  <!-- TAB 2: DATOS DE SOCIOS -->
-  <div class="tab-panel" id="tab-socios">
-    <div class="graficos-grid">
-      <div class="grafico-card">
-        <div class="card-header">
-          <div class="card-title">Rango de Edades</div>
-          <span class="card-badge badge-blue">Socios</span>
-        </div>
-        <div class="grafico-wrap">
-          <div class="grafico-canvas-wrap"><canvas id="chart-edades" width="120" height="120"></canvas></div>
-          <div class="grafico-leyenda" id="leyenda-edades"><div class="loading" style="padding:10px;font-size:12px">Cargando...</div></div>
-        </div>
+  <!-- TAB 2: SOCIOS -->
+  <div class="tab-panel" id="tab-nuevos">
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <div class="card-title">Saludar Nuevos Socios</div>
+        <span class="card-badge badge-green" id="nuevos-count-badge">—</span>
       </div>
-      <div class="grafico-card">
-        <div class="card-header">
-          <div class="card-title">¿Cómo nos conocieron?</div>
-          <span class="card-badge badge-orange">Socios</span>
-        </div>
-        <div class="grafico-wrap">
-          <div class="grafico-canvas-wrap"><canvas id="chart-origen" width="120" height="120"></canvas></div>
-          <div class="grafico-leyenda" id="leyenda-origen"><div class="loading" style="padding:10px;font-size:12px">Cargando...</div></div>
-        </div>
+      <div style="padding:12px 22px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);">
+        Socios registrados que todavía no recibieron el mensaje de bienvenida.
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Socio</th><th>Fecha de registro</th><th>Acción</th></tr></thead>
+          <tbody id="tabla-nuevos"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
+        </table>
       </div>
     </div>
-    <div class="card" style="margin-bottom:20px" id="card-citas">
+    <div class="card" style="margin-bottom:20px">
       <div class="card-header">
-        <div class="card-title">Mensajes de la Comunidad</div>
-        <span class="card-badge badge-orange" id="citas-count">—</span>
+        <div class="card-title">Se anotaron pero no pagaron</div>
+        <span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171" id="sinpago-count-badge">—</span>
       </div>
-      <div class="citas-grid" id="citas-container">
-        <div class="loading"><div class="spinner"></div><br>Cargando...</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Nombre y Apellido</th><th>LID</th><th>Cuando se anotó</th><th>Debería meses</th></tr></thead>
+          <tbody id="tabla-sinpago"><tr><td colspan="5"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: ERRORES -->
+  <div class="tab-panel" id="tab-errores">
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <div class="card-title">Comprobantes sin identificar</div>
+        <span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171" id="errores-count-badge">—</span>
+      </div>
+      <div style="padding:12px 22px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);">
+        Comprobantes que llegaron pero el bot no pudo identificar al socio. Resolvelos manualmente poniendo el LID en la columna L de Socios y marcando <strong style="color:var(--text)">si</strong> en resuelto.
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fecha</th><th>LID</th><th>Nombre</th><th>Resuelto</th></tr></thead>
+          <tbody id="tabla-errores"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -263,14 +274,10 @@
     <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
       <button onclick="exportarExcel()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;">📥 EXPORTAR CSV</button>
     </div>
-    <!-- SUB-TABS POR MES -->
     <div class="subtabs-nav" id="balance-subtabs"><div class="loading" style="padding:10px">Cargando meses...</div></div>
     <div id="balance-mes-content"></div>
-    <!-- BALANCE TOTAL GLOBAL -->
     <div class="card" style="margin-top:8px;margin-bottom:20px">
-      <div class="card-header">
-        <div class="card-title">Balance Total</div>
-      </div>
+      <div class="card-header"><div class="card-title">Balance Total</div></div>
       <div style="padding:20px 28px 12px">
         <div class="stacked-bar" id="stacked-bar" style="margin-bottom:12px"></div>
         <div class="stacked-bar-legend" id="stacked-legend" style="margin-bottom:16px"></div>
@@ -292,40 +299,37 @@
     </div>
   </div>
 
-  <!-- TAB 5: SALUDAR NUEVOS SOCIOS -->
-  <div class="tab-panel" id="tab-nuevos">
-    <div class="card" style="margin-bottom:20px">
-      <div class="card-header">
-        <div class="card-title">Saludar Nuevos Socios</div>
-        <span class="card-badge badge-green" id="nuevos-count-badge">—</span>
+  <!-- TAB 5: DATOS DE SOCIOS -->
+  <div class="tab-panel" id="tab-socios">
+    <div class="graficos-grid">
+      <div class="grafico-card">
+        <div class="card-header">
+          <div class="card-title">Rango de Edades</div>
+          <span class="card-badge badge-blue">Socios</span>
+        </div>
+        <div class="grafico-wrap">
+          <div class="grafico-canvas-wrap"><canvas id="chart-edades" width="120" height="120"></canvas></div>
+          <div class="grafico-leyenda" id="leyenda-edades"><div class="loading" style="padding:10px;font-size:12px">Cargando...</div></div>
+        </div>
       </div>
-      <div style="padding:12px 22px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);">
-        Socios registrados que todavía no recibieron el mensaje de bienvenida.
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Socio</th><th>Fecha de registro</th><th>Acción</th></tr></thead>
-          <tbody id="tabla-nuevos"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
-        </table>
+      <div class="grafico-card">
+        <div class="card-header">
+          <div class="card-title">¿Cómo nos conocieron?</div>
+          <span class="card-badge badge-orange">Socios</span>
+        </div>
+        <div class="grafico-wrap">
+          <div class="grafico-canvas-wrap"><canvas id="chart-origen" width="120" height="120"></canvas></div>
+          <div class="grafico-leyenda" id="leyenda-origen"><div class="loading" style="padding:10px;font-size:12px">Cargando...</div></div>
+        </div>
       </div>
     </div>
-  </div>
-
-  <!-- TAB: ERRORES -->
-  <div class="tab-panel" id="tab-errores">
-    <div class="card" style="margin-bottom:20px">
+    <div class="card" style="margin-bottom:20px" id="card-citas">
       <div class="card-header">
-        <div class="card-title">Comprobantes sin identificar</div>
-        <span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171" id="errores-count-badge">—</span>
+        <div class="card-title">Mensajes de la Comunidad</div>
+        <span class="card-badge badge-orange" id="citas-count">—</span>
       </div>
-      <div style="padding:12px 22px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);">
-        Comprobantes que llegaron pero el bot no pudo identificar al socio. Resolvelos manualmente poniendo el LID en la columna L de Socios y marcando <strong style="color:var(--text)">si</strong> en resuelto.
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Fecha</th><th>LID</th><th>Nombre</th><th>Resuelto</th></tr></thead>
-          <tbody id="tabla-errores"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
-        </table>
+      <div class="citas-grid" id="citas-container">
+        <div class="loading"><div class="spinner"></div><br>Cargando...</div>
       </div>
     </div>
   </div>
@@ -382,8 +386,8 @@ function actualizarCountdown() {
   const el = document.getElementById('dias-restantes');
   const btn = document.getElementById('btn-notificar');
   if (!el || !btn) return;
-  if (diff > 0) { el.textContent = `Faltan ${diff} día${diff!==1?'s':''} para notificar`; btn.disabled=true; btn.style.opacity='0.4'; btn.style.cursor='not-allowed'; }
-  else { el.textContent='Ya podés notificar!'; el.style.color='var(--green)'; btn.disabled=false; btn.style.opacity='1'; btn.style.cursor='pointer'; }
+  if (diff > 0) { el.textContent = `Faltan ${diff} dia${diff!==1?'s':''} para notificar`; btn.disabled=true; btn.style.opacity='0.4'; btn.style.cursor='not-allowed'; }
+  else { el.textContent='Ya podes notificar!'; el.style.color='var(--green)'; btn.disabled=false; btn.style.opacity='1'; btn.style.cursor='pointer'; }
 }
 actualizarCountdown();
 
@@ -418,7 +422,15 @@ function calcularEdad(fechaNac) {
 
 function procesarGraficos(socios) {
   const rangos = {'Menor de 18':0,'18-25':0,'26-35':0,'36-45':0,'46+':0};
-  for (const s of socios) { const edad=calcularEdad(s[4]); if (edad===null) continue; if (edad<18) rangos['Menor de 18']++; else if (edad<=25) rangos['18-25']++; else if (edad<=35) rangos['26-35']++; else if (edad<=45) rangos['36-45']++; else rangos['46+']++; }
+  for (const s of socios) {
+    const edad = calcularEdad(s[4]);
+    if (edad===null) continue;
+    if (edad<18) rangos['Menor de 18']++;
+    else if (edad<=25) rangos['18-25']++;
+    else if (edad<=35) rangos['26-35']++;
+    else if (edad<=45) rangos['36-45']++;
+    else rangos['46+']++;
+  }
   const datosEdades = Object.entries(rangos).filter(([,v])=>v>0).map(([label,valor])=>({label,valor})).sort((a,b)=>b.valor-a.valor);
   dibujarTorta('chart-edades',datosEdades); renderLeyenda('leyenda-edades',datosEdades);
   const origenes = {};
@@ -455,16 +467,74 @@ async function cargarNuevosSocios(socios) {
   }).join('');
 }
 
-function estaEnHorarioCliente() {
-  return true;
+async function cargarSinPago(socios, hojas) {
+  const INICIO = new Date(2026, 5, 1);
+  const mesesDesdeInicio = [];
+  let cursor = new Date(INICIO);
+  const hoy = new Date();
+  while (cursor <= hoy) {
+    mesesDesdeInicio.push(`${MESES[cursor.getMonth()]} ${cursor.getFullYear()}`);
+    cursor.setMonth(cursor.getMonth() + 1);
+  }
+  const pagosPorMes = {};
+  for (const mes of mesesDesdeInicio) {
+    if (!hojas.includes(mes)) { pagosPorMes[mes] = []; continue; }
+    const filas = await fetchHoja(mes);
+    pagosPorMes[mes] = filas.map(r => String(r[4]||'').replace(/\D/g,''));
+  }
+  const tbody = document.getElementById('tabla-sinpago');
+  const badge = document.getElementById('sinpago-count-badge');
+  if (!tbody) return;
+  const sinPago = [];
+  for (const s of socios) {
+    const nro = s[0]||'—';
+    const nombre = `${s[3]||''} ${s[2]||''}`.trim();
+    const tel = String(s[5]||'').replace(/\D/g,'');
+    const lid = String(s[11]||'').trim();
+    const fechaReg = s[8]||'';
+    let mesDesdeQueDebe = mesesDesdeInicio[0];
+    if (fechaReg) {
+      const partes = fechaReg.split('/');
+      if (partes.length >= 3) {
+        const mesReg = parseInt(partes[1]) - 1;
+        const anioStr = partes[2] ? partes[2].split(',')[0] : '';
+        const anioReg = parseInt(anioStr);
+        if (!isNaN(mesReg) && !isNaN(anioReg)) {
+          const fechaRegDate = new Date(anioReg, mesReg, 1);
+          if (fechaRegDate > INICIO) {
+            mesDesdeQueDebe = `${MESES[mesReg]} ${anioReg}`;
+          }
+        }
+      }
+    }
+    const idxInicio = mesesDesdeInicio.indexOf(mesDesdeQueDebe);
+    const mesesQueDebe = idxInicio >= 0 ? mesesDesdeInicio.slice(idxInicio) : mesesDesdeInicio;
+    const mesesImpagos = mesesQueDebe.filter(mes => {
+      const pagos = pagosPorMes[mes] || [];
+      return tel ? !pagos.includes(tel) : true;
+    });
+    if (mesesImpagos.length > 0 && mesesImpagos.length === mesesQueDebe.length) {
+      sinPago.push({ nro, nombre, lid, fechaReg, mesesImpagos });
+    }
+  }
+  if (badge) badge.textContent = `${sinPago.length} socio${sinPago.length !== 1 ? 's' : ''}`;
+  if (sinPago.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Todos los socios tienen al menos un pago ✅</td></tr>';
+    return;
+  }
+  tbody.innerHTML = sinPago.map(s => `<tr>
+    <td><div class="td-nro">#${s.nro}</div></td>
+    <td class="td-name">${s.nombre}</td>
+    <td style="font-size:12px;color:var(--muted);word-break:break-all">${s.lid||'—'}</td>
+    <td class="td-fecha">${s.fechaReg||'—'}</td>
+    <td style="font-size:12px;font-weight:600;color:#f87171">${s.mesesImpagos.join(', ')}</td>
+  </tr>`).join('');
 }
 
+function estaEnHorarioCliente() { return true; }
+
 function actualizarBotonesSaludar() {
-  const enHorario=estaEnHorarioCliente();
-  document.querySelectorAll('.btn-saludar').forEach(btn=>{
-    btn.style.opacity=enHorario?'1':'0.4'; btn.style.pointerEvents=enHorario?'auto':'none';
-    btn.title='';
-  });
+  document.querySelectorAll('.btn-saludar').forEach(btn=>{ btn.style.opacity='1'; btn.style.pointerEvents='auto'; btn.title=''; });
 }
 
 function mostrarToast(msg,color) {
@@ -502,17 +572,11 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
   }
   const lista = Object.entries(historial)
     .filter(([tel])=>telefonosEsteMes.has(tel))
-    .map(([tel,d])=>{
-      let puntos=d.meses.size; if(d.pagoTemprano) puntos+=2;
-      const socio=mapaSocios[tel];
-      return {tel,puntos,nombre:nombrePorTel[tel]||'',nro:socio?socio.nro:'',meses:d.meses.size,pagoTemprano:d.pagoTemprano};
-    }).sort((a,b)=>b.puntos-a.puntos).slice(0,20);
+    .map(([tel,d])=>{ let puntos=d.meses.size; if(d.pagoTemprano) puntos+=2; const socio=mapaSocios[tel]; return {tel,puntos,nombre:nombrePorTel[tel]||'',nro:socio?socio.nro:'',meses:d.meses.size,pagoTemprano:d.pagoTemprano}; })
+    .sort((a,b)=>b.puntos-a.puntos).slice(0,20);
   const tSorteo=document.getElementById('tabla-sorteo');
   if (lista.length===0) { tSorteo.innerHTML='<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin participantes aun</td></tr>'; return; }
-  tSorteo.innerHTML=lista.map((s,i)=>{
-    const rc=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
-    return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${s.pagoTemprano?'<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ Pagó antes del día 10</div>':''}</td><td><div class="td-name" style="color:var(--blue)">${s.meses}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td></tr>`;
-  }).join('');
+  tSorteo.innerHTML=lista.map((s,i)=>{ const rc=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''; return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${s.pagoTemprano?'<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ Pago antes del dia 10</div>':''}</td><td><div class="td-name" style="color:var(--blue)">${s.meses}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td></tr>`; }).join('');
 }
 
 async function cargarErrores() {
@@ -535,29 +599,17 @@ function renderBar(barId, legId, ingreso, egresoCats, totalBar) {
   const gap=Math.max(0,100-Math.round((ingreso+totalEg)/tBar*100));
   let barHTML=`<div style="width:${pctI}%;background:#22c55e;height:100%"></div>`;
   if (gap>0) barHTML+=`<div style="width:${gap}%;background:rgba(255,255,255,0.05);height:100%"></div>`;
-  Object.entries(egresoCats).forEach(([cat,monto],i)=>{
-    const pct=Math.round((monto/tBar)*100);
-    barHTML+=`<div style="width:${pct}%;background:${COLORES_BAL[i%COLORES_BAL.length]};height:100%"></div>`;
-  });
+  Object.entries(egresoCats).forEach(([cat,monto],i)=>{ const pct=Math.round((monto/tBar)*100); barHTML+=`<div style="width:${pct}%;background:${COLORES_BAL[i%COLORES_BAL.length]};height:100%"></div>`; });
   bar.innerHTML=barHTML;
   if (legend) {
-    const right=Object.entries(egresoCats).map(([cat,monto],i)=>
-      `<div class="legend-item"><div class="legend-dot-bar" style="background:${COLORES_BAL[i%COLORES_BAL.length]}"></div>${cat}: <strong style="color:var(--text)">${formatMonto(monto)}</strong></div>`
-    ).join('');
+    const right=Object.entries(egresoCats).map(([cat,monto],i)=>`<div class="legend-item"><div class="legend-dot-bar" style="background:${COLORES_BAL[i%COLORES_BAL.length]}"></div>${cat}: <strong style="color:var(--text)">${formatMonto(monto)}</strong></div>`).join('');
     legend.style.justifyContent='space-between';
     legend.innerHTML=`<div class="legend-item"><div class="legend-dot-bar" style="background:#22c55e"></div>Ingresos: <strong style="color:var(--text)">${formatMonto(ingreso)}</strong></div><div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end">${right}</div>`;
   }
 }
 
 function egMesFilter(todosEgresos, hoja) {
-  return todosEgresos.filter(r => {
-    const partes=(r[0]||'').split('/');
-    if (partes.length===3) {
-      const mes=parseInt(partes[1])-1; const anio=parseInt(partes[2]);
-      return `${MESES[mes]} ${anio}`===hoja;
-    }
-    return false;
-  });
+  return todosEgresos.filter(r => { const partes=(r[0]||'').split('/'); if (partes.length===3) { const mes=parseInt(partes[1])-1; const anio=parseInt(partes[2]); return `${MESES[mes]} ${anio}`===hoja; } return false; });
 }
 
 async function cargarBalance(hojas, mesActual, datosMes) {
@@ -566,93 +618,46 @@ async function cargarBalance(hojas, mesActual, datosMes) {
   let totalIngresosGlobal=0, totalEgresosGlobal=0;
   const egresosGlobalCats={};
   const datosPorMes={};
-
   for (const hoja of mesesHojas) {
     const filas = hoja===mesActual ? datosMes : await fetchHoja(hoja);
     const ingreso = filas.reduce((acc,r)=>acc+(parseInt(r[2])||0),0);
     totalIngresosGlobal+=ingreso;
     datosPorMes[hoja]={filas,ingreso};
   }
-
-  todosEgresos.forEach(r=>{
-    const cat=(r[3]||'Sin categoría').trim(); const monto=parseInt(r[2])||0;
-    totalEgresosGlobal+=monto;
-    egresosGlobalCats[cat]=(egresosGlobalCats[cat]||0)+monto;
-  });
-
+  todosEgresos.forEach(r=>{ const cat=(r[3]||'Sin categoria').trim(); const monto=parseInt(r[2])||0; totalEgresosGlobal+=monto; egresosGlobalCats[cat]=(egresosGlobalCats[cat]||0)+monto; });
   const subtabsNav=document.getElementById('balance-subtabs');
   const subtabsContent=document.getElementById('balance-mes-content');
   if (!subtabsNav||!subtabsContent) return;
-
-  subtabsNav.innerHTML=mesesHojas.map((h,i)=>
-    `<button class="subtab-btn ${i===0?'active':''}" onclick="showSubtab('${h}',this)">${h}</button>`
-  ).join('');
-
+  subtabsNav.innerHTML=mesesHojas.map((h,i)=>`<button class="subtab-btn ${i===0?'active':''}" onclick="showSubtab('${h}',this)">${h}</button>`).join('');
   subtabsContent.innerHTML=mesesHojas.map((hoja,i)=>{
     const {filas,ingreso}=datosPorMes[hoja];
     const egMes=egMesFilter(todosEgresos,hoja);
     const egresoMes=egMes.reduce((a,r)=>a+(parseInt(r[2])||0),0);
-    const egCats={};
-    egMes.forEach(r=>{const c=(r[3]||'Sin categoría').trim();egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0);});
+    const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0);});
     const resultado=ingreso-egresoMes;
     const barId=`minibar-${hoja.replace(/\s/g,'_')}`;
     const legId=`minileg-${hoja.replace(/\s/g,'_')}`;
-
-    const ingresosRows=filas.length===0
-      ?'<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin pagos</td></tr>'
-      :filas.map(r=>`<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td class="td-monto">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
-
-    const egresosRows=egMes.length===0
-      ?'<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin egresos</td></tr>'
-      :egMes.map(r=>`<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td style="font-weight:700;color:#ef4444">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
-
+    const ingresosRows=filas.length===0?'<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin pagos</td></tr>':filas.map(r=>`<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td class="td-monto">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
+    const egresosRows=egMes.length===0?'<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin egresos</td></tr>':egMes.map(r=>`<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td style="font-weight:700;color:#ef4444">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
     return `<div class="subtab-panel ${i===0?'active':''}" id="subtab-${hoja.replace(/\s/g,'_')}">
-      <div class="card" style="margin-bottom:16px">
-        <div class="card-header"><div class="card-title">Ingresos — ${hoja}</div><span class="card-badge badge-green">${formatMonto(ingreso)}</span></div>
-        <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Socio</th><th>Monto</th></tr></thead><tbody>${ingresosRows}</tbody></table></div>
-      </div>
-      <div class="card" style="margin-bottom:16px">
-        <div class="card-header"><div class="card-title">Egresos — ${hoja}</div><span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171">${formatMonto(egresoMes)}</span></div>
-        <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Descripción</th><th>Monto</th></tr></thead><tbody>${egresosRows}</tbody></table></div>
-      </div>
-      <div class="card" style="margin-bottom:20px">
-        <div class="card-header"><div class="card-title">Balance ${hoja}</div></div>
-        <div style="padding:16px 28px 8px">
-          <div class="mini-bar" id="${barId}" style="margin-bottom:10px"></div>
-          <div class="stacked-bar-legend" id="${legId}" style="margin-bottom:12px"></div>
-        </div>
-        <div style="padding:0 28px 20px">
-          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Resultado del mes</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${resultado>=0?'var(--green)':'#ef4444'}">${resultado>=0?'+':''}${formatMonto(Math.abs(resultado))}</div>
-        </div>
-      </div>
+      <div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Ingresos — ${hoja}</div><span class="card-badge badge-green">${formatMonto(ingreso)}</span></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Socio</th><th>Monto</th></tr></thead><tbody>${ingresosRows}</tbody></table></div></div>
+      <div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Egresos — ${hoja}</div><span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171">${formatMonto(egresoMes)}</span></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Descripcion</th><th>Monto</th></tr></thead><tbody>${egresosRows}</tbody></table></div></div>
+      <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Balance ${hoja}</div></div><div style="padding:16px 28px 8px"><div class="mini-bar" id="${barId}" style="margin-bottom:10px"></div><div class="stacked-bar-legend" id="${legId}" style="margin-bottom:12px"></div></div><div style="padding:0 28px 20px"><div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Resultado del mes</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${resultado>=0?'var(--green)':'#ef4444'}">${resultado>=0?'+':''}${formatMonto(Math.abs(resultado))}</div></div></div>
     </div>`;
   }).join('');
-
-  // Render mini bars
-  mesesHojas.forEach(hoja=>{
-    const {ingreso}=datosPorMes[hoja];
-    const egMes=egMesFilter(todosEgresos,hoja);
-    const egresoMes=egMes.reduce((a,r)=>a+(parseInt(r[2])||0),0);
-    const egCats={};
-    egMes.forEach(r=>{const c=(r[3]||'Sin categoría').trim();egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0);});
-    renderBar(`minibar-${hoja.replace(/\s/g,'_')}`,`minileg-${hoja.replace(/\s/g,'_')}`,ingreso,egCats,Math.max(ingreso,egresoMes)||1);
-  });
-
-  // Balance total
+  mesesHojas.forEach(hoja=>{ const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+(parseInt(r[2])||0),0); const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0);}); renderBar(`minibar-${hoja.replace(/\s/g,'_')}`,`minileg-${hoja.replace(/\s/g,'_')}`,ingreso,egCats,Math.max(ingreso,egresoMes)||1); });
   document.getElementById('balance-ingresos-total').textContent=formatMonto(totalIngresosGlobal);
   document.getElementById('balance-egresos-total').textContent=formatMonto(totalEgresosGlobal);
   const resultado=totalIngresosGlobal-totalEgresosGlobal;
   const elBR=document.getElementById('balance-resultado');
   if (elBR) { elBR.textContent=(resultado>=0?'+':'')+formatMonto(Math.abs(resultado)); elBR.style.color=resultado>=0?'var(--green)':'#ef4444'; }
   renderBar('stacked-bar','stacked-legend',totalIngresosGlobal,egresosGlobalCats,Math.max(totalIngresosGlobal,totalEgresosGlobal)||1);
-
   window._balanceData={mesesHojas,datosPorMes,todosEgresos,totalIngresosGlobal,totalEgresosGlobal,resultado};
 }
 
 function exportarExcel() {
   const data=window._balanceData;
-  if (!data) { alert('Cargando datos, intentá en unos segundos.'); return; }
+  if (!data) { alert('Cargando datos, intenta en unos segundos.'); return; }
   let csv='INGRESOS\nMes,Pagos,Total\n';
   data.mesesHojas.forEach(h=>{ const d=data.datosPorMes[h]; csv+=`${h},${d.filas.length},${d.ingreso}\n`; });
   csv+=`\nTOTAL INGRESOS,,${data.totalIngresosGlobal}\n\nEGRESOS\nFecha,Descripcion,Monto,Categoria\n`;
@@ -676,6 +681,7 @@ async function cargarDatos() {
   cargarNuevosSocios(socios);
   actualizarBotonesSaludar();
   cargarErrores();
+  cargarSinPago(socios, hojas);
 
   const mapaSocios={};
   for (const s of socios) { const wa=String(s[5]||'').replace(/\D/g,''); if (wa) mapaSocios[wa]={nro:s[0],nombre:`${s[3]} ${s[2]}`}; }
@@ -697,12 +703,11 @@ async function cargarDatos() {
       const fecha=r[0]||(r[6]?r[6].split(',')[0]:'—');
       const tel=String(r[4]||'').replace(/\D/g,''); const socio=mapaSocios[tel];
       const nroDisplay=socio?`<div class="td-nro">#${socio.nro}</div>`:'<div class="td-nro" style="color:#334155">—</div>';
-      const esEfectivo = (r[3]||'').toUpperCase() === 'EFECTIVO';
+      const esEfectivo=(r[3]||'').toUpperCase()==='EFECTIVO';
       return `<tr><td>${nroDisplay}</td><td class="td-name">${r[1]||'—'}${esAlerta?'<span class="alerta-badge">MONTO DIFF</span>':''}</td><td class="${esAlerta?'td-monto-alerta':'td-monto'}">${formatMonto(r[2])}${esEfectivo?' <span style="font-size:11px;font-weight:600;color:var(--muted)">(efectivo)</span>':''}</td><td class="td-fecha">${fecha}</td></tr>`;
     }).join('');
   }
 
-  // Total recaudado por mes — excluir hojas no válidas
   const totalesMes=[];
   for (const hoja of hojas) {
     if (HOJAS_EXCLUIDAS.has(hoja)) continue;
