@@ -617,7 +617,7 @@ function matchScore(errorRow, socios) {
     }
     if (!mejorSocio || mejorScore < 1) return SIN_MATCH;
     const nombre = `${mejorSocio[3]||''} ${mejorSocio[2]||''}`.trim();
-    return { html: `🟡 <span style="font-size:12px">Socio #${mejorSocio[0]||''} ${nombre} — anotado como socio pero todavía no pagó</span>`, score: mejorScore };
+    return { html: `🟡 <span style="font-size:12px;font-weight:700;color:#f59e0b">Socio #${mejorSocio[0]||''} ${nombre}</span> <span style="font-size:11px;color:#f59e0b">— anotado como socio pero todavía no pagó</span>`, score: mejorScore };
   }
 
   // Sin nombre: buscar por fecha cercana (±10 min)
@@ -636,7 +636,7 @@ function matchScore(errorRow, socios) {
   }
   if (!mejorSocio) return SIN_MATCH;
   const nombre = `${mejorSocio[3]||''} ${mejorSocio[2]||''}`.trim();
-  return { html: `🟡 <span style="font-size:12px">Socio #${mejorSocio[0]||''} ${nombre} — anotado como socio pero todavía no pagó</span><span style="font-size:11px;color:var(--muted)"> (~${Math.round(mejorDiff)}min)</span>`, score: 1 };
+  return { html: `🟡 <span style="font-size:12px;font-weight:700;color:#f59e0b">Socio #${mejorSocio[0]||''} ${nombre}</span> <span style="font-size:11px;color:#f59e0b">— anotado como socio pero todavía no pagó</span> <span style="font-size:11px;color:var(--muted)">(~${Math.round(mejorDiff)}min)</span>`, score: 1 };
 }
 
 async function cargarErrores() {
