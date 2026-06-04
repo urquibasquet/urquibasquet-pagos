@@ -600,47 +600,43 @@ function parseFechaStr(str) {
 }
 
 function matchScore(errorRow, socios) {
-  const pushname = String(errorRow[2]||'').toLowerCase().trim();
-  const fechaError = parseFechaStr(errorRow[0]);
-  let mejorScore = 0;
-  let mejorSocio = null;
-  let mejorDetalle = '';
+  const nombreError = String(errorRow[2]||'').toLowerCase().trim();
+  const sinNombre = !nombreError || nombreError === '(sin nombre)';
+  const SIN_MATCH = { html: '<span style="color:#ef4444;font-size:12px;font-weight:600">🔴 No se encuentra en Socios</span>', score: 0 };
 
-  for (const s of socios) {
-    const nombreSocio = `${s[3]||''} ${s[2]||''}`.toLowerCase().trim();
-    const palabrasSocio = nombreSocio.split(/\s+/).filter(p=>p.length>2);
-    const palabrasError = pushname.split(/\s+/).filter(p=>p.length>2);
-    let scoreNombre = 0;
-    for (const p of palabrasError) {
-      if (nombreSocio.includes(p)) scoreNombre++;
+  if (!sinNombre) {
+    // Buscar por nombre
+    const palabrasError = nombreError.split(/\s+/).filter(p=>p.length>2);
+    let mejorScore = 0;
+    let mejorSocio = null;
+    for (const s of socios) {
+      const nombreSocio = `${s[3]||''} ${s[2]||''}`.toLowerCase().trim();
+      let score = 0;
+      for (const p of palabrasError) { if (nombreSocio.includes(p)) score++; }
+      if (score > mejorScore) { mejorScore = score; mejorSocio = s; }
     }
-    const matchNombre = palabrasError.length>0 ? scoreNombre/palabrasError.length : 0;
-
-    let scoreFecha = 0;
-    const fechaSocio = parseFechaStr(s[8]);
-    if (fechaError && fechaSocio) {
-      const diffMin = Math.abs(fechaError - fechaSocio) / 60000;
-      if (diffMin <= 5) scoreFecha = 1;
-      else if (diffMin <= 15) scoreFecha = 0.5;
-    }
-
-    let total = 0;
-    let detalle = '';
-    if (matchNombre >= 0.5 && scoreFecha >= 0.5) { total = 3; detalle = '🟢'; }
-    else if (matchNombre >= 0.5) { total = 2; detalle = '🟡'; }
-    else if (scoreFecha >= 0.5) { total = 1; detalle = '🟡'; }
-
-    if (total > mejorScore) {
-      mejorScore = total;
-      mejorSocio = s;
-      mejorDetalle = detalle;
-    }
+    if (!mejorSocio || mejorScore < 1) return SIN_MATCH;
+    const nombre = `${mejorSocio[3]||''} ${mejorSocio[2]||''}`.trim();
+    return { html: `🟡 <span style="font-size:12px">#${mejorSocio[0]||''} ${nombre}</span>`, score: mejorScore };
   }
 
-  if (!mejorSocio || mejorScore === 0) return { html: '🔴 Sin match', score: 0 };
+  // Sin nombre: buscar por fecha cercana (±10 min)
+  const fechaError = parseFechaStr(errorRow[0]);
+  if (!fechaError) return SIN_MATCH;
+  let mejorDiff = Infinity;
+  let mejorSocio = null;
+  for (const s of socios) {
+    const fechaSocio = parseFechaStr(s[8]);
+    if (!fechaSocio) continue;
+    const diffMin = Math.abs(fechaError - fechaSocio) / 60000;
+    if (diffMin <= 10 && diffMin < mejorDiff) {
+      mejorDiff = diffMin;
+      mejorSocio = s;
+    }
+  }
+  if (!mejorSocio) return SIN_MATCH;
   const nombre = `${mejorSocio[3]||''} ${mejorSocio[2]||''}`.trim();
-  const nro = mejorSocio[0]||'';
-  return { html: `${mejorDetalle} <span style="font-size:12px">#${nro} ${nombre}</span>`, score: mejorScore };
+  return { html: `🟡 <span style="font-size:12px">#${mejorSocio[0]||''} ${nombre}</span><span style="font-size:11px;color:var(--muted)"> (~${Math.round(mejorDiff)}min)</span>`, score: 1 };
 }
 
 async function cargarErrores() {
