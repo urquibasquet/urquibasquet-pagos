@@ -642,7 +642,7 @@ function matchScore(errorRow, socios) {
 async function cargarErrores() {
   const errores=await fetchHoja('Errores');
   const socios=await fetchHoja('Socios');
-  const pendientes=errores.filter(r=>(r[3]||'').toLowerCase()!=='si');
+  const pendientes=errores;
   const badge=document.getElementById('errores-count-badge');
   const tabBtn=document.getElementById('btn-tab-errores');
   const tbody=document.getElementById('tabla-errores'); if (!tbody) return;
