@@ -209,7 +209,7 @@
     </div>
     <div class="card" style="margin-bottom:20px">
       <div class="card-header">
-        <div class="card-title">Se anotaron pero no pagaron</div>
+        <div class="card-title">Están debiendo cuotas</div>
         <span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171" id="sinpago-count-badge">—</span>
       </div>
       <div class="table-wrap">
@@ -233,7 +233,7 @@
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Fecha</th><th>LID</th><th>Nombre</th><th>Posible Socio</th></tr></thead>
+          <thead><tr><th>Fecha</th><th>LID</th><th>Nombre</th><th>Posible Socio</th><th>Resuelto</th></tr></thead>
           <tbody id="tabla-errores"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
         </table>
       </div>
@@ -256,7 +256,7 @@
         <span>+1 pto</span> por cada mes que pagaste la cuota &nbsp;·&nbsp;
         <span>+2 ptos</span> si pagás antes del día 10 del mes<br><br>
         Los <span>primeros 20 socios con la cuota al día</span> al <span>30 de noviembre</span> se ganan el viaje <span>+ 1 acompañante</span>.<br><br>
-        🏕️ La fecha del viaje se confirmará el <span>23 de noviembre</span>.<br>
+        🏕️ El viaje es desde el <span>Lunes 11 de Enero</span> (falta ver si 1 semana o 2).<br>
         📅 Fecha de cierre del ranking: <span>30 de noviembre</span><br>
         ✈️ Confirmación de viaje: <span>8 de diciembre</span>
       </div>
@@ -617,7 +617,7 @@ function matchScore(errorRow, socios) {
     }
     if (!mejorSocio || mejorScore < 1) return SIN_MATCH;
     const nombre = `${mejorSocio[3]||''} ${mejorSocio[2]||''}`.trim();
-    return { html: `🟡 <span style="font-size:12px;font-weight:700;color:#f59e0b">Socio #${mejorSocio[0]||''} ${nombre}</span> <span style="font-size:11px;color:#f59e0b">— anotado como socio pero todavía no pagó</span>`, score: mejorScore };
+    return { html: `🟡 <span style="font-size:12px">#${mejorSocio[0]||''} ${nombre}</span>`, score: mejorScore };
   }
 
   // Sin nombre: buscar por fecha cercana (±10 min)
@@ -636,13 +636,13 @@ function matchScore(errorRow, socios) {
   }
   if (!mejorSocio) return SIN_MATCH;
   const nombre = `${mejorSocio[3]||''} ${mejorSocio[2]||''}`.trim();
-  return { html: `🟡 <span style="font-size:12px;font-weight:700;color:#f59e0b">Socio #${mejorSocio[0]||''} ${nombre}</span> <span style="font-size:11px;color:#f59e0b">— anotado como socio pero todavía no pagó</span> <span style="font-size:11px;color:var(--muted)">(~${Math.round(mejorDiff)}min)</span>`, score: 1 };
+  return { html: `🟡 <span style="font-size:12px">#${mejorSocio[0]||''} ${nombre}</span><span style="font-size:11px;color:var(--muted)"> (~${Math.round(mejorDiff)}min)</span>`, score: 1 };
 }
 
 async function cargarErrores() {
   const errores=await fetchHoja('Errores');
   const socios=await fetchHoja('Socios');
-  const pendientes=errores;
+  const pendientes=errores.filter(r=>(r[3]||'').toLowerCase()!=='si');
   const badge=document.getElementById('errores-count-badge');
   const tabBtn=document.getElementById('btn-tab-errores');
   const tbody=document.getElementById('tabla-errores'); if (!tbody) return;
@@ -651,7 +651,7 @@ async function cargarErrores() {
   if (pendientes.length===0) { tbody.innerHTML='<tr><td colspan="5" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin errores pendientes ✅</td></tr>'; return; }
   tbody.innerHTML=[...pendientes].reverse().map(r=>{
     const match = matchScore(r, socios);
-    return `<tr><td class="td-fecha">${r[0]||'—'}</td><td style="font-size:12px;color:var(--muted);word-break:break-all">${r[1]||'—'}</td><td class="td-name">${r[2]||'(sin nombre)'}</td><td style="font-size:13px">${match.html}</td></tr>`;
+    return `<tr><td class="td-fecha">${r[0]||'—'}</td><td style="font-size:12px;color:var(--muted);word-break:break-all">${r[1]||'—'}</td><td class="td-name">${r[2]||'(sin nombre)'}</td><td style="font-size:13px">${match.html}</td><td><span style="font-size:11px;font-weight:700;background:rgba(239,68,68,0.15);color:#f87171;padding:3px 8px;border-radius:8px">PENDIENTE</span></td></tr>`;
   }).join('');
 }
 
