@@ -229,11 +229,11 @@
         <span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171" id="errores-count-badge">—</span>
       </div>
       <div style="padding:12px 22px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);">
-        Comprobantes que llegaron pero el bot no pudo identificar al socio. Resolvelos manualmente poniendo el LID en la columna L de Socios y marcando <strong style="color:var(--text)">si</strong> en resuelto.
+        Comprobantes que llegaron pero el bot no pudo identificar al socio. Ponele un nombre en la columna <strong style="color:var(--text)">posible_socio</strong> del Sheet para que el sistema intente matchear.
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Fecha</th><th>LID</th><th>Nombre</th><th>Posible Socio</th><th>Resuelto</th></tr></thead>
+          <thead><tr><th>Fecha</th><th>LID</th><th>Nombre</th><th>Posible Socio</th></tr></thead>
           <tbody id="tabla-errores"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
         </table>
       </div>
@@ -617,7 +617,7 @@ function matchScore(errorRow, socios) {
     }
     if (!mejorSocio || mejorScore < 1) return SIN_MATCH;
     const nombre = `${mejorSocio[3]||''} ${mejorSocio[2]||''}`.trim();
-    return { html: `🟡 <span style="font-size:12px">#${mejorSocio[0]||''} ${nombre}</span>`, score: mejorScore };
+    return { html: `🟡 <span style="font-size:12px;font-weight:700;color:#f59e0b">Socio #${mejorSocio[0]||''} ${nombre}</span> <span style="font-size:11px;color:#f59e0b">— anotado como socio pero todavía no pagó</span>`, score: mejorScore };
   }
 
   // Sin nombre: buscar por fecha cercana (±10 min)
@@ -636,22 +636,22 @@ function matchScore(errorRow, socios) {
   }
   if (!mejorSocio) return SIN_MATCH;
   const nombre = `${mejorSocio[3]||''} ${mejorSocio[2]||''}`.trim();
-  return { html: `🟡 <span style="font-size:12px">#${mejorSocio[0]||''} ${nombre}</span><span style="font-size:11px;color:var(--muted)"> (~${Math.round(mejorDiff)}min)</span>`, score: 1 };
+  return { html: `🟡 <span style="font-size:12px;font-weight:700;color:#f59e0b">Socio #${mejorSocio[0]||''} ${nombre}</span> <span style="font-size:11px;color:#f59e0b">— anotado como socio pero todavía no pagó</span> <span style="font-size:11px;color:var(--muted)">(~${Math.round(mejorDiff)}min)</span>`, score: 1 };
 }
 
 async function cargarErrores() {
   const errores=await fetchHoja('Errores');
   const socios=await fetchHoja('Socios');
-  const pendientes=errores.filter(r=>(r[3]||'').toLowerCase()!=='si');
+  const pendientes=errores;
   const badge=document.getElementById('errores-count-badge');
   const tabBtn=document.getElementById('btn-tab-errores');
   const tbody=document.getElementById('tabla-errores'); if (!tbody) return;
   if (badge) badge.textContent=pendientes.length>0?`${pendientes.length} pendiente${pendientes.length!==1?'s':''}` :'Sin errores';
   if (tabBtn) tabBtn.textContent=pendientes.length>0?`⚠️ Errores (${pendientes.length})`:'⚠️ Errores';
-  if (pendientes.length===0) { tbody.innerHTML='<tr><td colspan="5" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin errores pendientes ✅</td></tr>'; return; }
+  if (pendientes.length===0) { tbody.innerHTML='<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin errores pendientes ✅</td></tr>'; return; }
   tbody.innerHTML=[...pendientes].reverse().map(r=>{
     const match = matchScore(r, socios);
-    return `<tr><td class="td-fecha">${r[0]||'—'}</td><td style="font-size:12px;color:var(--muted);word-break:break-all">${r[1]||'—'}</td><td class="td-name">${r[2]||'(sin nombre)'}</td><td style="font-size:13px">${match.html}</td><td><span style="font-size:11px;font-weight:700;background:rgba(239,68,68,0.15);color:#f87171;padding:3px 8px;border-radius:8px">PENDIENTE</span></td></tr>`;
+    return `<tr><td class="td-fecha">${r[0]||'—'}</td><td style="font-size:12px;color:var(--muted);word-break:break-all">${r[1]||'—'}</td><td class="td-name">${r[2]||'(sin nombre)'}</td><td style="font-size:13px">${match.html}</td></tr>`;
   }).join('');
 }
 
