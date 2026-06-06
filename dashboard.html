@@ -109,6 +109,20 @@
   .subtab-panel.active { display: block; }
   .mini-bar { height: 16px; border-radius: 8px; overflow: hidden; display: flex; }
   .mini-bar-segment { height: 100%; }
+
+  /* PASSWORD OVERLAY */
+  .password-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,14,26,0.92); backdrop-filter: blur(8px); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+  .password-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 40px 48px; text-align: center; box-shadow: 0 8px 40px rgba(0,0,0,0.6); min-width: 320px; }
+  .password-logo { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; box-shadow: 0 0 20px rgba(30,80,200,0.4); }
+  .password-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; color: var(--text); margin-bottom: 6px; }
+  .password-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+  .password-input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; font-size: 16px; color: var(--text); text-align: center; letter-spacing: 4px; outline: none; transition: border-color 0.2s; }
+  .password-input:focus { border-color: var(--orange2); }
+  .password-input.error { border-color: var(--red); animation: shake 0.3s ease; }
+  .password-btn { margin-top: 16px; width: 100%; background: linear-gradient(135deg, var(--orange), #ea580c); color: white; border: none; border-radius: 10px; padding: 12px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1.5px; cursor: pointer; transition: opacity 0.2s; }
+  .password-btn:hover { opacity: 0.9; }
+  .password-error { font-size: 12px; color: #f87171; margin-top: 10px; min-height: 18px; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
   @media (max-width: 700px) {
     .grid-2 { grid-template-columns: 1fr; }
     .graficos-grid { grid-template-columns: 1fr; }
@@ -130,6 +144,17 @@
 </style>
 </head>
 <body>
+
+<div class="password-overlay" id="password-overlay">
+  <div class="password-box">
+    <img src="https://urquibasquet.github.io/urquibasquet-pagos/Logo_Nuevo_Urqui.png" class="password-logo" alt="Urquibasquet">
+    <div class="password-title">URQUIBASQUET</div>
+    <div class="password-sub">Ingresá la contraseña para continuar</div>
+    <input type="password" class="password-input" id="password-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') verificarPassword()">
+    <button class="password-btn" onclick="verificarPassword()">INGRESAR</button>
+    <div class="password-error" id="password-error"></div>
+  </div>
+</div>
 <div class="header">
   <div class="header-left">
     <img src="https://urquibasquet.github.io/urquibasquet-pagos/Logo_Nuevo_Urqui.png" alt="Urquibasquet" class="logo-img">
@@ -228,7 +253,9 @@
         <div class="card-title">Comprobantes sin identificar</div>
         <span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171" id="errores-count-badge">—</span>
       </div>
-      
+      <div style="padding:12px 22px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);">
+        Comprobantes que llegaron pero el bot no pudo identificar al socio. Ponele un nombre en la columna <strong style="color:var(--text)">posible_socio</strong> del Sheet para que el sistema intente matchear.
+      </div>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Fecha</th><th>LID</th><th>Nombre</th><th>Posible Socio</th></tr></thead>
@@ -359,6 +386,34 @@ async function fetchHoja(nombre) {
 async function fetchSheetNames() {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}`;
   try { const res = await fetch(url); const data = await res.json(); return (data.sheets || []).map(s => s.properties.title); } catch { return []; }
+}
+
+
+const PASSWORD = 'urqui2026';
+const SESSION_KEY = 'urqui_auth';
+
+function verificarPassword() {
+  const input = document.getElementById('password-input');
+  const error = document.getElementById('password-error');
+  if (input.value === PASSWORD) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    document.getElementById('password-overlay').style.display = 'none';
+    cargarDatos();
+  } else {
+    input.classList.add('error');
+    error.textContent = 'Contraseña incorrecta';
+    input.value = '';
+    setTimeout(() => input.classList.remove('error'), 400);
+  }
+}
+
+function initAuth() {
+  if (sessionStorage.getItem(SESSION_KEY) === '1') {
+    document.getElementById('password-overlay').style.display = 'none';
+    cargarDatos();
+  } else {
+    setTimeout(() => document.getElementById('password-input').focus(), 100);
+  }
 }
 
 function showTab(name, btn) {
@@ -790,8 +845,8 @@ async function cargarDatos() {
   document.getElementById('last-time').textContent=`Ultima actualizacion: ${hh12}:${mm2}:${ss2} ${ampm}`;
 }
 
-cargarDatos();
 setInterval(cargarDatos,30000);
+initAuth();
 </script>
 </body>
 </html>
