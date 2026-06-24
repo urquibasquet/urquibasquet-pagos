@@ -34,7 +34,6 @@
   .hero-month-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
   .hero-month-name { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: white; letter-spacing: 2px; }
   .hero-right { text-align: right; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
   .card { background: var(--bg2); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--card-shadow); }
   .card-header { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
   .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1.5px; color: var(--text); }
@@ -108,8 +107,10 @@
   .subtab-panel { display: none; }
   .subtab-panel.active { display: block; }
   .mini-bar { height: 16px; border-radius: 8px; overflow: hidden; display: flex; }
-  .mini-bar-segment { height: 100%; }
-
+  .pag-nav { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 12px; }
+  .pag-btn { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 6px 14px; cursor: pointer; font-size: 13px; }
+  .pag-btn:hover { border-color: var(--orange2); color: var(--orange2); }
+  .pag-info { font-size: 12px; color: var(--muted); }
   /* PASSWORD OVERLAY */
   .password-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,14,26,0.92); backdrop-filter: blur(8px); z-index: 9999; display: flex; align-items: center; justify-content: center; }
   .password-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 40px 48px; text-align: center; box-shadow: 0 8px 40px rgba(0,0,0,0.6); min-width: 320px; }
@@ -124,7 +125,6 @@
   .password-error { font-size: 12px; color: #f87171; margin-top: 10px; min-height: 18px; }
   @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
   @media (max-width: 700px) {
-    .grid-2 { grid-template-columns: 1fr; }
     .graficos-grid { grid-template-columns: 1fr; }
     .citas-grid { grid-template-columns: 1fr; }
     .hero { grid-template-columns: 1fr; padding: 20px 16px; gap: 0; }
@@ -144,7 +144,6 @@
 </style>
 </head>
 <body>
-
 <div class="password-overlay" id="password-overlay">
   <div class="password-box">
     <img src="https://urquibasquet.github.io/urquibasquet-pagos/Logo_Nuevo_Urqui.png" class="password-logo" alt="Urquibasquet">
@@ -308,18 +307,9 @@
         <div class="stacked-bar-legend" id="stacked-legend" style="margin-bottom:16px"></div>
       </div>
       <div style="padding:0 28px 24px;display:flex;gap:40px;flex-wrap:wrap;">
-        <div>
-          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total Ingresos</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--green)" id="balance-ingresos-total">—</div>
-        </div>
-        <div>
-          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total Egresos</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#ef4444" id="balance-egresos-total">—</div>
-        </div>
-        <div>
-          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Resultado</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px" id="balance-resultado">—</div>
-        </div>
+        <div><div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total Ingresos</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--green)" id="balance-ingresos-total">—</div></div>
+        <div><div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total Egresos</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#ef4444" id="balance-egresos-total">—</div></div>
+        <div><div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Resultado</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px" id="balance-resultado">—</div></div>
       </div>
     </div>
   </div>
@@ -328,20 +318,14 @@
   <div class="tab-panel" id="tab-socios">
     <div class="graficos-grid">
       <div class="grafico-card">
-        <div class="card-header">
-          <div class="card-title">Rango de Edades</div>
-          <span class="card-badge badge-blue">Socios</span>
-        </div>
+        <div class="card-header"><div class="card-title">Rango de Edades</div><span class="card-badge badge-blue">Socios</span></div>
         <div class="grafico-wrap">
           <div class="grafico-canvas-wrap"><canvas id="chart-edades" width="120" height="120"></canvas></div>
           <div class="grafico-leyenda" id="leyenda-edades"><div class="loading" style="padding:10px;font-size:12px">Cargando...</div></div>
         </div>
       </div>
       <div class="grafico-card">
-        <div class="card-header">
-          <div class="card-title">¿Cómo nos conocieron?</div>
-          <span class="card-badge badge-orange">Socios</span>
-        </div>
+        <div class="card-header"><div class="card-title">¿Cómo nos conocieron?</div><span class="card-badge badge-orange">Socios</span></div>
         <div class="grafico-wrap">
           <div class="grafico-canvas-wrap"><canvas id="chart-origen" width="120" height="120"></canvas></div>
           <div class="grafico-leyenda" id="leyenda-origen"><div class="loading" style="padding:10px;font-size:12px">Cargando...</div></div>
@@ -349,13 +333,8 @@
       </div>
     </div>
     <div class="card" style="margin-bottom:20px" id="card-citas">
-      <div class="card-header">
-        <div class="card-title">Mensajes de la Comunidad</div>
-        <span class="card-badge badge-orange" id="citas-count">—</span>
-      </div>
-      <div class="citas-grid" id="citas-container">
-        <div class="loading"><div class="spinner"></div><br>Cargando...</div>
-      </div>
+      <div class="card-header"><div class="card-title">Mensajes de la Comunidad</div><span class="card-badge badge-orange" id="citas-count">—</span></div>
+      <div class="citas-grid" id="citas-container"><div class="loading"><div class="spinner"></div><br>Cargando...</div></div>
     </div>
   </div>
 
@@ -369,29 +348,23 @@ const MONTO_CUOTA = 5000;
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const HOJAS_EXCLUIDAS = new Set(['Socios','Respuestas de formulario','Errores','Egresos']);
 const COLORES_BAL = ['#f97316','#06b6d4','#a855f7','#f59e0b','#ec4899','#14b8a6','#ef4444','#84cc16'];
+const POR_PAG_ING = 10;
 
 function getMesActual() { const d = new Date(); return `${MESES[d.getMonth()]} ${d.getFullYear()}`; }
-
-function formatMonto(v) {
-  const n = parseFloat(String(v).replace(/[^0-9.]/g,''));
-  if (isNaN(n)) return v;
-  return '$' + n.toLocaleString('es-AR', {minimumFractionDigits:0, maximumFractionDigits:0});
-}
+function formatMonto(v) { const n = parseFloat(String(v).replace(/[^0-9.]/g,'')); if (isNaN(n)) return v; return '$' + n.toLocaleString('es-AR', {minimumFractionDigits:0, maximumFractionDigits:0}); }
 
 async function fetchHoja(nombre) {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(nombre+'!A2:Z')}?key=${API_KEY}`;
   try { const res = await fetch(url); if (!res.ok) return []; const data = await res.json(); return data.values || []; } catch { return []; }
 }
-
 async function fetchSheetNames() {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}`;
   try { const res = await fetch(url); const data = await res.json(); return (data.sheets || []).map(s => s.properties.title); } catch { return []; }
 }
 
-
+// PASSWORD
 const PASSWORD = 'urqui2026';
 const SESSION_KEY = 'urqui_auth';
-
 function verificarPassword() {
   const input = document.getElementById('password-input');
   const error = document.getElementById('password-error');
@@ -400,20 +373,13 @@ function verificarPassword() {
     document.getElementById('password-overlay').style.display = 'none';
     cargarDatos();
   } else {
-    input.classList.add('error');
-    error.textContent = 'Contraseña incorrecta';
-    input.value = '';
+    input.classList.add('error'); error.textContent = 'Contraseña incorrecta'; input.value = '';
     setTimeout(() => input.classList.remove('error'), 400);
   }
 }
-
 function initAuth() {
-  if (sessionStorage.getItem(SESSION_KEY) === '1') {
-    document.getElementById('password-overlay').style.display = 'none';
-    cargarDatos();
-  } else {
-    setTimeout(() => document.getElementById('password-input').focus(), 100);
-  }
+  if (sessionStorage.getItem(SESSION_KEY) === '1') { document.getElementById('password-overlay').style.display = 'none'; cargarDatos(); }
+  else { setTimeout(() => document.getElementById('password-input').focus(), 100); }
 }
 
 function showTab(name, btn) {
@@ -422,22 +388,18 @@ function showTab(name, btn) {
   document.getElementById('tab-' + name).classList.add('active');
   if (btn) btn.classList.add('active');
 }
-
 function showSubtab(name, btn) {
   document.querySelectorAll('.subtab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.subtab-btn').forEach(b => b.classList.remove('active'));
-  const id = 'subtab-' + name.replace(/\s/g,'_');
-  const el = document.getElementById(id);
+  const el = document.getElementById('subtab-' + name.replace(/\s/g,'_'));
   if (el) el.classList.add('active');
   if (btn) btn.classList.add('active');
 }
 
 function actualizarCountdown() {
-  const cierre = new Date(2026, 10, 30);
-  const hoy = new Date(); hoy.setHours(0,0,0,0); cierre.setHours(0,0,0,0);
+  const cierre = new Date(2026, 10, 30); const hoy = new Date(); hoy.setHours(0,0,0,0); cierre.setHours(0,0,0,0);
   const diff = Math.ceil((cierre - hoy) / (1000*60*60*24));
-  const el = document.getElementById('dias-restantes');
-  const btn = document.getElementById('btn-notificar');
+  const el = document.getElementById('dias-restantes'); const btn = document.getElementById('btn-notificar');
   if (!el || !btn) return;
   if (diff > 0) { el.textContent = `Faltan ${diff} dia${diff!==1?'s':''} para notificar`; btn.disabled=true; btn.style.opacity='0.4'; btn.style.cursor='not-allowed'; }
   else { el.textContent='Ya podes notificar!'; el.style.color='var(--green)'; btn.disabled=false; btn.style.opacity='1'; btn.style.cursor='pointer'; }
@@ -450,18 +412,15 @@ function dibujarTorta(canvasId, datos) {
   const canvas = document.getElementById(canvasId); if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const total = datos.reduce((a,d) => a+d.valor, 0); if (total===0) return;
-  let angulo = -Math.PI/2; const cx=60,cy=60,r=55;
-  ctx.clearRect(0,0,120,120);
+  let angulo = -Math.PI/2; const cx=60,cy=60,r=55; ctx.clearRect(0,0,120,120);
   datos.forEach((d,i) => { const slice=(d.valor/total)*2*Math.PI; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,angulo,angulo+slice); ctx.closePath(); ctx.fillStyle=COLORES[i%COLORES.length]; ctx.fill(); angulo+=slice; });
 }
-
 function renderLeyenda(containerId, datos) {
   const total = datos.reduce((a,d)=>a+d.valor,0);
   if (total===0) { document.getElementById(containerId).innerHTML='<div style="color:#64748b;font-style:italic;font-size:12px">Sin datos aun</div>'; return; }
   const maxVal = Math.max(...datos.map(d=>d.valor));
   document.getElementById(containerId).innerHTML = datos.map((d,i) => `<div class="leyenda-item ${d.valor===maxVal?'dominante':''}"><div class="leyenda-dot" style="background:${COLORES[i%COLORES.length]}"></div><span class="leyenda-label">${d.label}</span><span class="leyenda-valor">${d.valor}</span></div>`).join('');
 }
-
 function calcularEdad(fechaNac) {
   if (!fechaNac) return null;
   const partes = fechaNac.split('/');
@@ -472,18 +431,9 @@ function calcularEdad(fechaNac) {
   if (m<0||(m===0&&hoy.getDate()<fecha.getDate())) edad--;
   return edad;
 }
-
 function procesarGraficos(socios) {
   const rangos = {'Menor de 18':0,'18-25':0,'26-35':0,'36-45':0,'46+':0};
-  for (const s of socios) {
-    const edad = calcularEdad(s[4]);
-    if (edad===null) continue;
-    if (edad<18) rangos['Menor de 18']++;
-    else if (edad<=25) rangos['18-25']++;
-    else if (edad<=35) rangos['26-35']++;
-    else if (edad<=45) rangos['36-45']++;
-    else rangos['46+']++;
-  }
+  for (const s of socios) { const edad=calcularEdad(s[4]); if (edad===null) continue; if (edad<18) rangos['Menor de 18']++; else if (edad<=25) rangos['18-25']++; else if (edad<=35) rangos['26-35']++; else if (edad<=45) rangos['36-45']++; else rangos['46+']++; }
   const datosEdades = Object.entries(rangos).filter(([,v])=>v>0).map(([label,valor])=>({label,valor})).sort((a,b)=>b.valor-a.valor);
   dibujarTorta('chart-edades',datosEdades); renderLeyenda('leyenda-edades',datosEdades);
   const origenes = {};
@@ -491,7 +441,6 @@ function procesarGraficos(socios) {
   const datosOrigen = Object.entries(origenes).map(([label,valor])=>({label,valor})).sort((a,b)=>b.valor-a.valor);
   dibujarTorta('chart-origen',datosOrigen); renderLeyenda('leyenda-origen',datosOrigen);
 }
-
 function cargarCitas(socios) {
   const conMensaje = socios.filter(s=>s[10]&&s[10].trim().length>2);
   const card=document.getElementById('card-citas'); const container=document.getElementById('citas-container'); const badge=document.getElementById('citas-count');
@@ -501,7 +450,6 @@ function cargarCitas(socios) {
   if (badge) badge.textContent=`${conMensaje.length} mensaje${conMensaje.length!==1?'s':''}`;
   container.innerHTML = conMensaje.map(s=>`<div class="cita-card"><div class="cita-nombre">${(s[3]||'')} ${(s[2]||'')}</div><div class="cita-texto">${(s[10]||'').trim()}</div></div>`).join('');
 }
-
 async function cargarNuevosSocios(socios) {
   const nuevos = socios.map((s,i)=>({rowIndex:i+2,nro:s[0],apellido:s[2],nombre:s[3],tel:s[5],fechaReg:s[8],saludado:s[9],lid:s[11]})).filter(s=>s.saludado!=='si');
   const badge=document.getElementById('nuevos-count-badge');
@@ -509,94 +457,37 @@ async function cargarNuevosSocios(socios) {
   const tbody=document.getElementById('tabla-nuevos'); if (!tbody) return;
   if (nuevos.length===0) { tbody.innerHTML='<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin socios nuevos pendientes 🎉</td></tr>'; return; }
   tbody.innerHTML = nuevos.map(s => {
-    const nombreCompleto=`${s.nombre||''} ${s.apellido||''}`.trim();
-    const nroSocio=s.nro||'—';
-    const boton = s.lid
-      ? `<button onclick="saludarSocio(${s.rowIndex})" class="btn-saludar" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;border-radius:8px;padding:8px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">💬 SALUDAR</button>`
-      : s.tel
-        ? `<button onclick="saludarSocio(${s.rowIndex})" class="btn-saludar" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;border-radius:8px;padding:8px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">💬 SALUDAR</button>`
-        : `<span style="font-size:12px;font-weight:700;color:#ef4444;background:rgba(239,68,68,0.1);padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3)">⚠️ Falta LID</span>`;
+    const nombreCompleto=`${s.nombre||''} ${s.apellido||''}`.trim(); const nroSocio=s.nro||'—';
+    const boton = (s.lid || s.tel) ? `<button onclick="saludarSocio(${s.rowIndex})" class="btn-saludar" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;border-radius:8px;padding:8px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">💬 SALUDAR</button>` : `<span style="font-size:12px;font-weight:700;color:#ef4444;background:rgba(239,68,68,0.1);padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3)">⚠️ Falta LID</span>`;
     return `<tr id="row-${s.rowIndex}"><td><div class="td-nro">#${nroSocio}</div></td><td><div class="td-name">${nombreCompleto}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${s.fechaReg||'Sin fecha'}</div></td><td class="td-fecha">${s.fechaReg||'—'}</td><td>${boton}</td></tr>`;
   }).join('');
 }
-
 async function cargarSinPago(socios, hojas) {
-  const INICIO = new Date(2026, 5, 1);
-  const mesesDesdeInicio = [];
-  let cursor = new Date(INICIO);
-  const hoy = new Date();
-  while (cursor <= hoy) {
-    mesesDesdeInicio.push(`${MESES[cursor.getMonth()]} ${cursor.getFullYear()}`);
-    cursor.setMonth(cursor.getMonth() + 1);
-  }
+  const INICIO = new Date(2026, 5, 1); const mesesDesdeInicio = []; let cursor = new Date(INICIO); const hoy = new Date();
+  while (cursor <= hoy) { mesesDesdeInicio.push(`${MESES[cursor.getMonth()]} ${cursor.getFullYear()}`); cursor.setMonth(cursor.getMonth() + 1); }
   const pagosPorMes = {};
-  for (const mes of mesesDesdeInicio) {
-    if (!hojas.includes(mes)) { pagosPorMes[mes] = []; continue; }
-    const filas = await fetchHoja(mes);
-    pagosPorMes[mes] = filas.map(r => String(r[4]||'').replace(/\D/g,''));
-  }
-  const tbody = document.getElementById('tabla-sinpago');
-  const badge = document.getElementById('sinpago-count-badge');
-  if (!tbody) return;
+  for (const mes of mesesDesdeInicio) { if (!hojas.includes(mes)) { pagosPorMes[mes] = []; continue; } const filas = await fetchHoja(mes); pagosPorMes[mes] = filas.map(r => String(r[4]||'').replace(/\D/g,'')); }
+  const tbody = document.getElementById('tabla-sinpago'); const badge = document.getElementById('sinpago-count-badge'); if (!tbody) return;
   const sinPago = [];
   for (const s of socios) {
-    const nro = s[0]||'—';
-    const nombre = `${s[3]||''} ${s[2]||''}`.trim();
-    const tel = String(s[5]||'').replace(/\D/g,'');
-    const lid = String(s[11]||'').trim();
-    const fechaReg = s[8]||'';
+    const nro=s[0]||'—'; const nombre=`${s[3]||''} ${s[2]||''}`.trim(); const tel=String(s[5]||'').replace(/\D/g,''); const lid=String(s[11]||'').trim(); const fechaReg=s[8]||'';
     let mesDesdeQueDebe = mesesDesdeInicio[0];
-    if (fechaReg) {
-      const partes = fechaReg.split('/');
-      if (partes.length >= 3) {
-        const mesReg = parseInt(partes[1]) - 1;
-        const anioStr = partes[2] ? partes[2].split(',')[0] : '';
-        const anioReg = parseInt(anioStr);
-        if (!isNaN(mesReg) && !isNaN(anioReg)) {
-          const fechaRegDate = new Date(anioReg, mesReg, 1);
-          if (fechaRegDate > INICIO) {
-            mesDesdeQueDebe = `${MESES[mesReg]} ${anioReg}`;
-          }
-        }
-      }
-    }
-    const idxInicio = mesesDesdeInicio.indexOf(mesDesdeQueDebe);
-    const mesesQueDebe = idxInicio >= 0 ? mesesDesdeInicio.slice(idxInicio) : mesesDesdeInicio;
-    const mesesImpagos = mesesQueDebe.filter(mes => {
-      const pagos = pagosPorMes[mes] || [];
-      return tel ? !pagos.includes(tel) : true;
-    });
-    if (mesesImpagos.length > 0 && mesesImpagos.length === mesesQueDebe.length) {
-      sinPago.push({ nro, nombre, lid, fechaReg, mesesImpagos });
-    }
+    if (fechaReg) { const partes=fechaReg.split('/'); if (partes.length>=3) { const mesReg=parseInt(partes[1])-1; const anioStr=partes[2]?partes[2].split(',')[0]:''; const anioReg=parseInt(anioStr); if (!isNaN(mesReg)&&!isNaN(anioReg)) { const fechaRegDate=new Date(anioReg,mesReg,1); if (fechaRegDate>INICIO) mesDesdeQueDebe=`${MESES[mesReg]} ${anioReg}`; } } }
+    const idxInicio=mesesDesdeInicio.indexOf(mesDesdeQueDebe); const mesesQueDebe=idxInicio>=0?mesesDesdeInicio.slice(idxInicio):mesesDesdeInicio;
+    const mesesImpagos=mesesQueDebe.filter(mes=>{ const pagos=pagosPorMes[mes]||[]; return tel?!pagos.includes(tel):true; });
+    if (mesesImpagos.length>0&&mesesImpagos.length===mesesQueDebe.length) sinPago.push({nro,nombre,lid,fechaReg,mesesImpagos});
   }
-  if (badge) badge.textContent = `${sinPago.length} socio${sinPago.length !== 1 ? 's' : ''}`;
-  if (sinPago.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Todos los socios tienen al menos un pago ✅</td></tr>';
-    return;
-  }
-  tbody.innerHTML = sinPago.map(s => `<tr>
-    <td><div class="td-nro">#${s.nro}</div></td>
-    <td class="td-name">${s.nombre}</td>
-    <td style="font-size:12px;color:var(--muted);word-break:break-all">${s.lid||'—'}</td>
-    <td class="td-fecha">${s.fechaReg||'—'}</td>
-    <td style="font-size:12px;font-weight:600;color:#f87171">${s.mesesImpagos.join(', ')}</td>
-  </tr>`).join('');
+  if (badge) badge.textContent=`${sinPago.length} socio${sinPago.length!==1?'s':''}`;
+  if (sinPago.length===0) { tbody.innerHTML='<tr><td colspan="5" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Todos los socios tienen al menos un pago ✅</td></tr>'; return; }
+  tbody.innerHTML=sinPago.map(s=>`<tr><td><div class="td-nro">#${s.nro}</div></td><td class="td-name">${s.nombre}</td><td style="font-size:12px;color:var(--muted);word-break:break-all">${s.lid||'—'}</td><td class="td-fecha">${s.fechaReg||'—'}</td><td style="font-size:12px;font-weight:600;color:#f87171">${s.mesesImpagos.join(', ')}</td></tr>`).join('');
 }
-
-function estaEnHorarioCliente() { return true; }
-
-function actualizarBotonesSaludar() {
-  document.querySelectorAll('.btn-saludar').forEach(btn=>{ btn.style.opacity='1'; btn.style.pointerEvents='auto'; btn.title=''; });
-}
-
+function actualizarBotonesSaludar() { document.querySelectorAll('.btn-saludar').forEach(btn=>{ btn.style.opacity='1'; btn.style.pointerEvents='auto'; btn.title=''; }); }
 function mostrarToast(msg,color) {
   let toast=document.getElementById('toast-saludo');
   if (!toast) { toast=document.createElement('div'); toast.id='toast-saludo'; toast.style.cssText='position:fixed;bottom:30px;right:30px;padding:14px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;'; document.body.appendChild(toast); }
   toast.textContent=msg; toast.style.background=color||'#22c55e'; toast.style.color='white'; toast.style.opacity='1';
   clearTimeout(toast._timer); toast._timer=setTimeout(()=>{toast.style.opacity='0';},3000);
 }
-
 function saludarSocio(rowIndex) {
   fetch('http://localhost:3001/saludar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rowIndex})})
     .then(r=>{if(!r.ok)throw new Error('Error'); mostrarToast('✅ Saludo enviado correctamente');
@@ -604,285 +495,146 @@ function saludarSocio(rowIndex) {
       const badge=document.getElementById('nuevos-count-badge'); if(badge){const c=parseInt(badge.textContent)-1;badge.textContent=`${c} pendiente${c!==1?'s':''}`;}
     }).catch(()=>mostrarToast('No se pudo conectar con el bot.','#ef4444'));
 }
-
 async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
-  const mesesValidos = hojas.filter(h => !HOJAS_EXCLUIDAS.has(h));
-  const telefonosEsteMes = new Set(datosMes.map(r=>String(r[4]||'').replace(/\D/g,'')));
-  const historial={}, nombrePorTel={};
-  for (const hoja of mesesValidos) {
-    const filas = hoja===mesActual ? datosMes : await fetchHoja(hoja);
-    for (const r of filas) {
-      const tel=String(r[4]||'').replace(/\D/g,''); if (!tel) continue;
-      if (!historial[tel]) historial[tel]={meses:new Set(),pagoTemprano:false};
-      historial[tel].meses.add(hoja);
-      if (!nombrePorTel[tel]) nombrePorTel[tel]=r[1]||'';
-    }
-  }
-  for (const r of datosMes) {
-    const tel=String(r[4]||'').replace(/\D/g,''); if (!tel||!historial[tel]) continue;
-    const match=(r[0]||'').match(/(\d+)\/(\d+)\/(\d+)/);
-    if (match&&parseInt(match[1])<=10) historial[tel].pagoTemprano=true;
-  }
-  const lista = Object.entries(historial)
-    .filter(([tel])=>telefonosEsteMes.has(tel))
-    .map(([tel,d])=>{ let puntos=d.meses.size; if(d.pagoTemprano) puntos+=2; const socio=mapaSocios[tel]; return {tel,puntos,nombre:nombrePorTel[tel]||'',nro:socio?socio.nro:'',meses:d.meses.size,pagoTemprano:d.pagoTemprano}; })
-    .sort((a,b)=>b.puntos-a.puntos).slice(0,20);
+  const mesesValidos=hojas.filter(h=>!HOJAS_EXCLUIDAS.has(h)); const telefonosEsteMes=new Set(datosMes.map(r=>String(r[4]||'').replace(/\D/g,''))); const historial={},nombrePorTel={};
+  for (const hoja of mesesValidos) { const filas=hoja===mesActual?datosMes:await fetchHoja(hoja); for (const r of filas) { const tel=String(r[4]||'').replace(/\D/g,''); if (!tel) continue; if (!historial[tel]) historial[tel]={meses:new Set(),pagoTemprano:false}; historial[tel].meses.add(hoja); if (!nombrePorTel[tel]) nombrePorTel[tel]=r[1]||''; } }
+  for (const r of datosMes) { const tel=String(r[4]||'').replace(/\D/g,''); if (!tel||!historial[tel]) continue; const match=(r[0]||'').match(/(\d+)\/(\d+)\/(\d+)/); if (match&&parseInt(match[1])<=10) historial[tel].pagoTemprano=true; }
+  const lista=Object.entries(historial).filter(([tel])=>telefonosEsteMes.has(tel)).map(([tel,d])=>{ let puntos=d.meses.size; if(d.pagoTemprano) puntos+=2; const socio=mapaSocios[tel]; return {tel,puntos,nombre:nombrePorTel[tel]||'',nro:socio?socio.nro:'',meses:d.meses.size,pagoTemprano:d.pagoTemprano}; }).sort((a,b)=>b.puntos-a.puntos).slice(0,20);
   const tSorteo=document.getElementById('tabla-sorteo');
   if (lista.length===0) { tSorteo.innerHTML='<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin participantes aun</td></tr>'; return; }
   tSorteo.innerHTML=lista.map((s,i)=>{ const rc=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''; return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${s.pagoTemprano?'<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ Pago antes del dia 10</div>':''}</td><td><div class="td-name" style="color:var(--blue)">${s.meses}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td></tr>`; }).join('');
 }
-
 function parseFechaStr(str) {
-  // Soporta "3/6/2026, 2:31:00" y "03/06/2026"
-  try {
-    const s = String(str||'').trim();
-    const partes = s.split(/[,\s]+/);
-    const fechaParte = partes[0];
-    const horaParte = partes[1]||'';
-    const fp = fechaParte.split('/');
-    if (fp.length===3) {
-      const d=parseInt(fp[0]),m=parseInt(fp[1])-1,y=parseInt(fp[2]);
-      if (horaParte) {
-        const hp=horaParte.split(':');
-        return new Date(y,m,d,parseInt(hp[0]||0),parseInt(hp[1]||0),parseInt(hp[2]||0));
-      }
-      return new Date(y,m,d);
-    }
-  } catch {}
-  return null;
+  try { const s=String(str||'').trim(); const partes=s.split(/[,\s]+/); const fp=partes[0].split('/'); if (fp.length===3) { const d=parseInt(fp[0]),m=parseInt(fp[1])-1,y=parseInt(fp[2]); const horaParte=partes[1]||''; if (horaParte) { const hp=horaParte.split(':'); return new Date(y,m,d,parseInt(hp[0]||0),parseInt(hp[1]||0),parseInt(hp[2]||0)); } return new Date(y,m,d); } } catch {} return null;
 }
-
 function matchScore(errorRow, socios) {
-  const nombreError = String(errorRow[2]||'').toLowerCase().trim();
-  const sinNombre = !nombreError || nombreError === '(sin nombre)';
-  const SIN_MATCH = { html: '<span style="color:#ef4444;font-size:12px;font-weight:600">🔴 No se encuentra en Socios</span>', score: 0 };
-
+  const nombreError=String(errorRow[2]||'').toLowerCase().trim(); const sinNombre=!nombreError||nombreError==='(sin nombre)';
+  const SIN_MATCH={html:'<span style="color:#ef4444;font-size:12px;font-weight:600">🔴 No se encuentra en Socios</span>',score:0};
   if (!sinNombre) {
-    // Buscar por nombre
-    const palabrasError = nombreError.split(/\s+/).filter(p=>p.length>2);
-    let mejorScore = 0;
-    let mejorSocio = null;
-    for (const s of socios) {
-      const nombreSocio = `${s[3]||''} ${s[2]||''}`.toLowerCase().trim();
-      let score = 0;
-      for (const p of palabrasError) { if (nombreSocio.includes(p)) score++; }
-      if (score > mejorScore) { mejorScore = score; mejorSocio = s; }
-    }
-    if (!mejorSocio || mejorScore < 1) return SIN_MATCH;
-    const nombre = `${mejorSocio[3]||''} ${mejorSocio[2]||''}`.trim();
-    return { html: `🟡 <span style="font-size:12px;font-weight:700;color:#f59e0b">Socio #${mejorSocio[0]||''} ${nombre}</span> <span style="font-size:11px;color:#f59e0b">— anotado como socio pero todavía no pagó</span>`, score: mejorScore };
+    const palabrasError=nombreError.split(/\s+/).filter(p=>p.length>2); let mejorScore=0,mejorSocio=null;
+    for (const s of socios) { const nombreSocio=`${s[3]||''} ${s[2]||''}`.toLowerCase().trim(); let score=0; for (const p of palabrasError) { if (nombreSocio.includes(p)) score++; } if (score>mejorScore) { mejorScore=score; mejorSocio=s; } }
+    if (!mejorSocio||mejorScore<1) return SIN_MATCH;
+    const nombre=`${mejorSocio[3]||''} ${mejorSocio[2]||''}`.trim();
+    return {html:`🟡 <span style="font-size:12px;font-weight:700;color:#f59e0b">Socio #${mejorSocio[0]||''} ${nombre}</span> <span style="font-size:11px;color:#f59e0b">— anotado como socio pero todavía no pagó</span>`,score:mejorScore};
   }
-
-  // Sin nombre: buscar por fecha cercana (±10 min)
-  const fechaError = parseFechaStr(errorRow[0]);
-  if (!fechaError) return SIN_MATCH;
-  let mejorDiff = Infinity;
-  let mejorSocio = null;
-  for (const s of socios) {
-    const fechaSocio = parseFechaStr(s[8]);
-    if (!fechaSocio) continue;
-    const diffMin = Math.abs(fechaError - fechaSocio) / 60000;
-    if (diffMin <= 10 && diffMin < mejorDiff) {
-      mejorDiff = diffMin;
-      mejorSocio = s;
-    }
-  }
+  const fechaError=parseFechaStr(errorRow[0]); if (!fechaError) return SIN_MATCH;
+  let mejorDiff=Infinity,mejorSocio=null;
+  for (const s of socios) { const fechaSocio=parseFechaStr(s[8]); if (!fechaSocio) continue; const diffMin=Math.abs(fechaError-fechaSocio)/60000; if (diffMin<=10&&diffMin<mejorDiff) { mejorDiff=diffMin; mejorSocio=s; } }
   if (!mejorSocio) return SIN_MATCH;
-  const nombre = `${mejorSocio[3]||''} ${mejorSocio[2]||''}`.trim();
-  return { html: `🟡 <span style="font-size:12px;font-weight:700;color:#f59e0b">Socio #${mejorSocio[0]||''} ${nombre}</span> <span style="font-size:11px;color:#f59e0b">— anotado como socio pero todavía no pagó</span> <span style="font-size:11px;color:var(--muted)">(~${Math.round(mejorDiff)}min)</span>`, score: 1 };
+  const nombre=`${mejorSocio[3]||''} ${mejorSocio[2]||''}`.trim();
+  return {html:`🟡 <span style="font-size:12px;font-weight:700;color:#f59e0b">Socio #${mejorSocio[0]||''} ${nombre}</span> <span style="font-size:11px;color:#f59e0b">— anotado como socio pero todavía no pagó</span> <span style="font-size:11px;color:var(--muted)">(~${Math.round(mejorDiff)}min)</span>`,score:1};
 }
-
 async function cargarErrores() {
-  const errores=await fetchHoja('Errores');
-  const socios=await fetchHoja('Socios');
-  const pendientes=errores;
-  const badge=document.getElementById('errores-count-badge');
-  const tabBtn=document.getElementById('btn-tab-errores');
-  const tbody=document.getElementById('tabla-errores'); if (!tbody) return;
+  const errores=await fetchHoja('Errores'); const socios=await fetchHoja('Socios'); const pendientes=errores;
+  const badge=document.getElementById('errores-count-badge'); const tabBtn=document.getElementById('btn-tab-errores'); const tbody=document.getElementById('tabla-errores'); if (!tbody) return;
   if (badge) badge.textContent=pendientes.length>0?`${pendientes.length} pendiente${pendientes.length!==1?'s':''}` :'Sin errores';
   if (tabBtn) tabBtn.textContent=pendientes.length>0?`⚠️ Errores (${pendientes.length})`:'⚠️ Errores';
   if (pendientes.length===0) { tbody.innerHTML='<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin errores pendientes ✅</td></tr>'; return; }
-  tbody.innerHTML=[...pendientes].reverse().map(r=>{
-    const match = matchScore(r, socios);
-    return `<tr><td class="td-fecha">${r[0]||'—'}</td><td style="font-size:12px;color:var(--muted);word-break:break-all">${r[1]||'—'}</td><td class="td-name">${r[2]||'(sin nombre)'}</td><td style="font-size:13px">${match.html}</td></tr>`;
-  }).join('');
+  tbody.innerHTML=[...pendientes].reverse().map(r=>{ const match=matchScore(r,socios); return `<tr><td class="td-fecha">${r[0]||'—'}</td><td style="font-size:12px;color:var(--muted);word-break:break-all">${r[1]||'—'}</td><td class="td-name">${r[2]||'(sin nombre)'}</td><td style="font-size:13px">${match.html}</td></tr>`; }).join('');
 }
-
 function renderBar(barId, legId, ingreso, egresoCats, totalBar) {
   const bar=document.getElementById(barId); const legend=document.getElementById(legId); if (!bar) return;
-  const tBar=totalBar||1;
-  const pctI=Math.round((ingreso/tBar)*100);
-  const totalEg=Object.values(egresoCats).reduce((a,b)=>a+b,0);
-  const gap=Math.max(0,100-Math.round((ingreso+totalEg)/tBar*100));
-  let barHTML=`<div style="width:${pctI}%;background:#22c55e;height:100%"></div>`;
-  if (gap>0) barHTML+=`<div style="width:${gap}%;background:rgba(255,255,255,0.05);height:100%"></div>`;
+  const tBar=totalBar||1; const pctI=Math.round((ingreso/tBar)*100); const totalEg=Object.values(egresoCats).reduce((a,b)=>a+b,0); const gap=Math.max(0,100-Math.round((ingreso+totalEg)/tBar*100));
+  let barHTML=`<div style="width:${pctI}%;background:#22c55e;height:100%"></div>`; if (gap>0) barHTML+=`<div style="width:${gap}%;background:rgba(255,255,255,0.05);height:100%"></div>`;
   Object.entries(egresoCats).forEach(([cat,monto],i)=>{ const pct=Math.round((monto/tBar)*100); barHTML+=`<div style="width:${pct}%;background:${COLORES_BAL[i%COLORES_BAL.length]};height:100%"></div>`; });
   bar.innerHTML=barHTML;
-  if (legend) {
-    const right=Object.entries(egresoCats).map(([cat,monto],i)=>`<div class="legend-item"><div class="legend-dot-bar" style="background:${COLORES_BAL[i%COLORES_BAL.length]}"></div>${cat}: <strong style="color:var(--text)">${formatMonto(monto)}</strong></div>`).join('');
-    legend.style.justifyContent='space-between';
-    legend.innerHTML=`<div class="legend-item"><div class="legend-dot-bar" style="background:#22c55e"></div>Ingresos: <strong style="color:var(--text)">${formatMonto(ingreso)}</strong></div><div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end">${right}</div>`;
-  }
+  if (legend) { const right=Object.entries(egresoCats).map(([cat,monto],i)=>`<div class="legend-item"><div class="legend-dot-bar" style="background:${COLORES_BAL[i%COLORES_BAL.length]}"></div>${cat}: <strong style="color:var(--text)">${formatMonto(monto)}</strong></div>`).join(''); legend.style.justifyContent='space-between'; legend.innerHTML=`<div class="legend-item"><div class="legend-dot-bar" style="background:#22c55e"></div>Ingresos: <strong style="color:var(--text)">${formatMonto(ingreso)}</strong></div><div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end">${right}</div>`; }
 }
+function egMesFilter(todosEgresos, hoja) { return todosEgresos.filter(r => { const partes=(r[0]||'').split('/'); if (partes.length===3) { const mes=parseInt(partes[1])-1; const anio=parseInt(partes[2]); return `${MESES[mes]} ${anio}`===hoja; } return false; }); }
 
-function egMesFilter(todosEgresos, hoja) {
-  return todosEgresos.filter(r => { const partes=(r[0]||'').split('/'); if (partes.length===3) { const mes=parseInt(partes[1])-1; const anio=parseInt(partes[2]); return `${MESES[mes]} ${anio}`===hoja; } return false; });
+// PAGINADO INGRESOS POR MES
+function renderIngresosRows(hojaKey, pagina) {
+  const datos = window._datosPorMes && window._datosPorMes[hojaKey];
+  if (!datos) return;
+  const filas = [...datos.filas].reverse();
+  const total = filas.length;
+  const totalPags = Math.ceil(total / POR_PAG_ING) || 1;
+  const inicio = pagina * POR_PAG_ING;
+  const slice = filas.slice(inicio, inicio + POR_PAG_ING);
+  const rows = slice.length===0
+    ? '<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin pagos</td></tr>'
+    : slice.map(r=>`<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td class="td-monto">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
+  const nav = totalPags > 1
+    ? `<tr><td colspan="3"><div class="pag-nav">${pagina>0?`<button class="pag-btn" onclick="renderIngresosRows('${hojaKey}',${pagina-1})">◀</button>`:'<span style="width:46px"></span>'}<span class="pag-info">${pagina+1} / ${totalPags}</span>${pagina<totalPags-1?`<button class="pag-btn" onclick="renderIngresosRows('${hojaKey}',${pagina+1})">▶</button>`:'<span style="width:46px"></span>'}</div></td></tr>`
+    : '';
+  const tbody = document.getElementById(`ing-tbody-${hojaKey}`);
+  if (tbody) tbody.innerHTML = rows + nav;
 }
-
 
 function renderSubtabsNav(pagina) {
-  const meses = window._mesesBalance || [];
-  const POR_PAG = 10;
-  const total = meses.length;
-  const totalPags = Math.ceil(total / POR_PAG);
-  const inicio = pagina * POR_PAG;
-  const fin = Math.min(inicio + POR_PAG, total);
-  const mesesPag = meses.slice(inicio, fin);
-  const subtabsNav = document.getElementById('balance-subtabs');
-  if (!subtabsNav) return;
-  let html = mesesPag.map((h,i)=>`<button class="subtab-btn ${i===0&&pagina===0?'active':''}" onclick="showSubtab('${h}',this)">${h}</button>`).join('');
-  if (totalPags > 1) {
-    html += `<div style="display:flex;align-items:center;gap:8px;margin-left:auto;padding:0 8px;flex-shrink:0">`;
-    if (pagina > 0) html += `<button onclick="cambiarPaginaBalance(${pagina-1})" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px">◀</button>`;
-    html += `<span style="font-size:12px;color:var(--muted)">${pagina+1}/${totalPags}</span>`;
-    if (pagina < totalPags-1) html += `<button onclick="cambiarPaginaBalance(${pagina+1})" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px">▶</button>`;
-    html += `</div>`;
-  }
-  subtabsNav.innerHTML = html;
-  // Activar primer subtab de la pagina
-  if (mesesPag.length > 0) {
-    setTimeout(() => {
-      const firstBtn = subtabsNav.querySelector('.subtab-btn');
-      if (firstBtn) showSubtab(mesesPag[0], firstBtn);
-    }, 0);
-  }
+  const meses=window._mesesBalance||[]; const POR_PAG=10; const totalPags=Math.ceil(meses.length/POR_PAG); const inicio=pagina*POR_PAG; const mesesPag=meses.slice(inicio, inicio+POR_PAG);
+  const subtabsNav=document.getElementById('balance-subtabs'); if (!subtabsNav) return;
+  let html=mesesPag.map((h,i)=>`<button class="subtab-btn ${i===0&&pagina===0?'active':''}" onclick="showSubtab('${h}',this)">${h}</button>`).join('');
+  if (totalPags>1) { html+=`<div style="display:flex;align-items:center;gap:8px;margin-left:auto;padding:0 8px;flex-shrink:0">`; if (pagina>0) html+=`<button onclick="cambiarPaginaBalance(${pagina-1})" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px">◀</button>`; html+=`<span style="font-size:12px;color:var(--muted)">${pagina+1}/${totalPags}</span>`; if (pagina<totalPags-1) html+=`<button onclick="cambiarPaginaBalance(${pagina+1})" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px">▶</button>`; html+=`</div>`; }
+  subtabsNav.innerHTML=html;
+  if (mesesPag.length>0) setTimeout(()=>{ const firstBtn=subtabsNav.querySelector('.subtab-btn'); if (firstBtn) showSubtab(mesesPag[0],firstBtn); },0);
 }
-
-function cambiarPaginaBalance(pagina) {
-  window._paginaBalance = pagina;
-  renderSubtabsNav(pagina);
-}
+function cambiarPaginaBalance(pagina) { window._paginaBalance=pagina; renderSubtabsNav(pagina); }
 
 async function cargarBalance(hojas, mesActual, datosMes) {
-  const mesesHojas = hojas.filter(h => !HOJAS_EXCLUIDAS.has(h));
-  const todosEgresos = await fetchHoja('Egresos');
-  let totalIngresosGlobal=0, totalEgresosGlobal=0;
-  const egresosGlobalCats={};
-  const datosPorMes={};
-  for (const hoja of mesesHojas) {
-    const filas = hoja===mesActual ? datosMes : await fetchHoja(hoja);
-    const ingreso = filas.reduce((acc,r)=>acc+(parseInt(r[2])||0),0);
-    totalIngresosGlobal+=ingreso;
-    datosPorMes[hoja]={filas,ingreso};
-  }
+  const mesesHojas=hojas.filter(h=>!HOJAS_EXCLUIDAS.has(h)); const todosEgresos=await fetchHoja('Egresos');
+  let totalIngresosGlobal=0,totalEgresosGlobal=0; const egresosGlobalCats={}; const datosPorMes={};
+  for (const hoja of mesesHojas) { const filas=hoja===mesActual?datosMes:await fetchHoja(hoja); const ingreso=filas.reduce((acc,r)=>acc+(parseInt(r[2])||0),0); totalIngresosGlobal+=ingreso; datosPorMes[hoja]={filas,ingreso}; }
   todosEgresos.forEach(r=>{ const cat=(r[3]||'Sin categoria').trim(); const monto=parseInt(r[2])||0; totalEgresosGlobal+=monto; egresosGlobalCats[cat]=(egresosGlobalCats[cat]||0)+monto; });
-  const subtabsNav=document.getElementById('balance-subtabs');
-  const subtabsContent=document.getElementById('balance-mes-content');
-  if (!subtabsNav||!subtabsContent) return;
-  // Paginado: mostrar de a 10, con el mes actual primero
-  const mesActualIdx = mesesHojas.indexOf(mesActual);
-  const mesesOrdenados = mesActualIdx !== -1
-    ? [mesesHojas[mesActualIdx], ...mesesHojas.filter(h=>h!==mesActual)]
-    : [...mesesHojas];
-  window._mesesBalance = mesesOrdenados;
-  window._paginaBalance = 0;
-  renderSubtabsNav(0);
+  window._datosPorMes = datosPorMes;
+  const subtabsContent=document.getElementById('balance-mes-content'); if (!subtabsContent) return;
+  const mesActualIdx=mesesHojas.indexOf(mesActual);
+  const mesesOrdenados=mesActualIdx!==-1?[mesesHojas[mesActualIdx],...mesesHojas.filter(h=>h!==mesActual)]:[...mesesHojas];
+  window._mesesBalance=mesesOrdenados; window._paginaBalance=0; renderSubtabsNav(0);
   subtabsContent.innerHTML=mesesOrdenados.map((hoja,i)=>{
-    const {filas,ingreso}=datosPorMes[hoja];
-    const egMes=egMesFilter(todosEgresos,hoja);
-    const egresoMes=egMes.reduce((a,r)=>a+(parseInt(r[2])||0),0);
+    const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+(parseInt(r[2])||0),0);
     const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0);});
-    const resultado=ingreso-egresoMes;
-    const barId=`minibar-${hoja.replace(/\s/g,'_')}`;
-    const legId=`minileg-${hoja.replace(/\s/g,'_')}`;
-    const ingresosRows=filas.length===0?'<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin pagos</td></tr>':filas.map(r=>`<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td class="td-monto">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
+    const resultado=ingreso-egresoMes; const hojaKey=hoja.replace(/\s/g,'_');
+    const barId=`minibar-${hojaKey}`; const legId=`minileg-${hojaKey}`;
     const egresosRows=egMes.length===0?'<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin egresos</td></tr>':egMes.map(r=>`<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td style="font-weight:700;color:#ef4444">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
-    return `<div class="subtab-panel ${i===0?'active':''}" id="subtab-${hoja.replace(/\s/g,'_')}">
-      <div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Ingresos — ${hoja}</div><span class="card-badge badge-green">${formatMonto(ingreso)}</span></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Socio</th><th>Monto</th></tr></thead><tbody>${ingresosRows}</tbody></table></div></div>
+    return `<div class="subtab-panel ${i===0?'active':''}" id="subtab-${hojaKey}">
+      <div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Ingresos — ${hoja}</div><span class="card-badge badge-green">${formatMonto(ingreso)}</span></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Socio</th><th>Monto</th></tr></thead><tbody id="ing-tbody-${hojaKey}"><tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Cargando...</td></tr></tbody></table></div></div>
       <div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Egresos — ${hoja}</div><span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171">${formatMonto(egresoMes)}</span></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Descripcion</th><th>Monto</th></tr></thead><tbody>${egresosRows}</tbody></table></div></div>
       <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Balance ${hoja}</div></div><div style="padding:16px 28px 8px"><div class="mini-bar" id="${barId}" style="margin-bottom:10px"></div><div class="stacked-bar-legend" id="${legId}" style="margin-bottom:12px"></div></div><div style="padding:0 28px 20px"><div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Resultado del mes</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${resultado>=0?'var(--green)':'#ef4444'}">${resultado>=0?'+':''}${formatMonto(Math.abs(resultado))}</div></div></div>
     </div>`;
   }).join('');
-  mesesOrdenados.forEach(hoja=>{ const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+(parseInt(r[2])||0),0); const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0);}); renderBar(`minibar-${hoja.replace(/\s/g,'_')}`,`minileg-${hoja.replace(/\s/g,'_')}`,ingreso,egCats,Math.max(ingreso,egresoMes)||1); });
+  // Render ingresos paginados y mini bars
+  mesesOrdenados.forEach(hoja=>{ renderIngresosRows(hoja.replace(/\s/g,'_'), 0); const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+(parseInt(r[2])||0),0); const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0);}); renderBar(`minibar-${hoja.replace(/\s/g,'_')}`,`minileg-${hoja.replace(/\s/g,'_')}`,ingreso,egCats,Math.max(ingreso,egresoMes)||1); });
   document.getElementById('balance-ingresos-total').textContent=formatMonto(totalIngresosGlobal);
   document.getElementById('balance-egresos-total').textContent=formatMonto(totalEgresosGlobal);
-  const resultado=totalIngresosGlobal-totalEgresosGlobal;
-  const elBR=document.getElementById('balance-resultado');
+  const resultado=totalIngresosGlobal-totalEgresosGlobal; const elBR=document.getElementById('balance-resultado');
   if (elBR) { elBR.textContent=(resultado>=0?'+':'')+formatMonto(Math.abs(resultado)); elBR.style.color=resultado>=0?'var(--green)':'#ef4444'; }
   renderBar('stacked-bar','stacked-legend',totalIngresosGlobal,egresosGlobalCats,Math.max(totalIngresosGlobal,totalEgresosGlobal)||1);
   window._balanceData={mesesHojas,datosPorMes,todosEgresos,totalIngresosGlobal,totalEgresosGlobal,resultado};
 }
-
 function exportarExcel() {
-  const data=window._balanceData;
-  if (!data) { alert('Cargando datos, intenta en unos segundos.'); return; }
-  let csv='INGRESOS\nMes,Pagos,Total\n';
-  data.mesesHojas.forEach(h=>{ const d=data.datosPorMes[h]; csv+=`${h},${d.filas.length},${d.ingreso}\n`; });
-  csv+=`\nTOTAL INGRESOS,,${data.totalIngresosGlobal}\n\nEGRESOS\nFecha,Descripcion,Monto,Categoria\n`;
-  data.todosEgresos.forEach(r=>{ csv+=`${r[0]||''},${r[1]||''},${r[2]||''},${r[3]||''}\n`; });
+  const data=window._balanceData; if (!data) { alert('Cargando datos, intenta en unos segundos.'); return; }
+  let csv='INGRESOS\nMes,Pagos,Total\n'; data.mesesHojas.forEach(h=>{ const d=data.datosPorMes[h]; csv+=`${h},${d.filas.length},${d.ingreso}\n`; });
+  csv+=`\nTOTAL INGRESOS,,${data.totalIngresosGlobal}\n\nEGRESOS\nFecha,Descripcion,Monto,Categoria\n`; data.todosEgresos.forEach(r=>{ csv+=`${r[0]||''},${r[1]||''},${r[2]||''},${r[3]||''}\n`; });
   csv+=`\nTOTAL EGRESOS,,${data.totalEgresosGlobal}\n\nRESULTADO,,${data.resultado}\n`;
-  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download='balance_urquibasquet.csv'; a.click();
-  URL.revokeObjectURL(url);
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='balance_urquibasquet.csv'; a.click(); URL.revokeObjectURL(url);
 }
 
 async function cargarDatos() {
-  const mesActual=getMesActual();
-  document.getElementById('hero-month').textContent=mesActual;
-  const hojas=await fetchSheetNames();
-  const datosMes=await fetchHoja(mesActual);
-  const socios=await fetchHoja('Socios');
+  const mesActual=getMesActual(); document.getElementById('hero-month').textContent=mesActual;
+  const hojas=await fetchSheetNames(); const datosMes=await fetchHoja(mesActual); const socios=await fetchHoja('Socios');
   document.getElementById('hero-socios').textContent=socios.length||'0';
-  procesarGraficos(socios);
-  cargarCitas(socios);
-  cargarNuevosSocios(socios);
-  actualizarBotonesSaludar();
-  cargarErrores();
-  cargarSinPago(socios, hojas);
-
+  procesarGraficos(socios); cargarCitas(socios); cargarNuevosSocios(socios); actualizarBotonesSaludar(); cargarErrores(); cargarSinPago(socios,hojas);
   const mapaSocios={};
   for (const s of socios) { const wa=String(s[5]||'').replace(/\D/g,''); if (wa) mapaSocios[wa]={nro:s[0],nombre:`${s[3]} ${s[2]}`}; }
-
   const uniqueSocios=[...new Set(datosMes.map(r=>(r[1]||'').trim().toLowerCase()))].filter(Boolean);
   document.getElementById('hero-count').textContent=uniqueSocios.length||'0';
   document.getElementById('hero-sub').textContent=`${datosMes.length} pago${datosMes.length!==1?'s':''} en ${mesActual}`;
   document.getElementById('pagos-count-badge').textContent=`${datosMes.length} pagos`;
-
   const hayAlertas=datosMes.some(r=>parseInt(r[2])!==MONTO_CUOTA);
   document.getElementById('alerta-monto').classList.toggle('visible',hayAlertas);
-
   const tPagos=document.getElementById('tabla-pagos');
-  if (datosMes.length===0) {
-    tPagos.innerHTML='<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin pagos este mes aun</td></tr>';
-  } else {
-    tPagos.innerHTML=[...datosMes].reverse().slice(0,10).map(r=>{
-      const monto=parseInt(r[2]); const esAlerta=monto!==MONTO_CUOTA;
-      const fecha=r[0]||(r[6]?r[6].split(',')[0]:'—');
-      const tel=String(r[4]||'').replace(/\D/g,''); const socio=mapaSocios[tel];
-      const nroDisplay=socio?`<div class="td-nro">#${socio.nro}</div>`:'<div class="td-nro" style="color:#334155">—</div>';
-      const esEfectivo=(r[3]||'').toUpperCase()==='EFECTIVO';
-      return `<tr><td>${nroDisplay}</td><td class="td-name">${r[1]||'—'}${esAlerta?'<span class="alerta-badge">MONTO DIFF</span>':''}</td><td class="${esAlerta?'td-monto-alerta':'td-monto'}">${formatMonto(r[2])}${esEfectivo?' <span style="font-size:11px;font-weight:600;color:var(--muted)">(efectivo)</span>':''}</td><td class="td-fecha">${fecha}</td></tr>`;
-    }).join('');
-  }
-
+  if (datosMes.length===0) { tPagos.innerHTML='<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin pagos este mes aun</td></tr>'; }
+  else { tPagos.innerHTML=[...datosMes].reverse().slice(0,10).map(r=>{ const monto=parseInt(r[2]); const esAlerta=monto!==MONTO_CUOTA; const fecha=r[0]||(r[6]?r[6].split(',')[0]:'—'); const tel=String(r[4]||'').replace(/\D/g,''); const socio=mapaSocios[tel]; const nroDisplay=socio?`<div class="td-nro">#${socio.nro}</div>`:'<div class="td-nro" style="color:#334155">—</div>'; const esEfectivo=(r[3]||'').toUpperCase()==='EFECTIVO'; return `<tr><td>${nroDisplay}</td><td class="td-name">${r[1]||'—'}${esAlerta?'<span class="alerta-badge">MONTO DIFF</span>':''}</td><td class="${esAlerta?'td-monto-alerta':'td-monto'}">${formatMonto(r[2])}${esEfectivo?' <span style="font-size:11px;font-weight:600;color:var(--muted)">(efectivo)</span>':''}</td><td class="td-fecha">${fecha}</td></tr>`; }).join(''); }
   const totalesMes=[];
-  for (const hoja of hojas) {
-    if (HOJAS_EXCLUIDAS.has(hoja)) continue;
-    const filas=hoja===mesActual?datosMes:await fetchHoja(hoja);
-    const total=filas.reduce((acc,r)=>acc+(parseInt(r[2])||0),0);
-    totalesMes.push({nombre:hoja,total,count:filas.length,actual:hoja===mesActual});
-  }
+  for (const hoja of hojas) { if (HOJAS_EXCLUIDAS.has(hoja)) continue; const filas=hoja===mesActual?datosMes:await fetchHoja(hoja); const total=filas.reduce((acc,r)=>acc+(parseInt(r[2])||0),0); totalesMes.push({nombre:hoja,total,count:filas.length,actual:hoja===mesActual}); }
   totalesMes.sort((a,b)=>a.actual?-1:b.actual?1:b.nombre.localeCompare(a.nombre));
   const listaMeses=document.getElementById('lista-meses');
   listaMeses.innerHTML=totalesMes.length===0?'<div class="loading" style="color:#64748b;font-style:italic;">Sin datos</div>':totalesMes.map(m=>`<div class="month-row ${m.actual?'current':''}"><div><div class="month-name">${m.nombre}${m.actual?'<span class="month-current-tag">Actual</span>':''}</div><div class="month-count">${m.count} pago${m.count!==1?'s':''}</div></div><div class="month-total">${formatMonto(m.total)}</div></div>`).join('');
-
   await calcularSorteo(hojas,mesActual,datosMes,mapaSocios);
   await cargarBalance(hojas,mesActual,datosMes);
-
-  const ahoraD=new Date();
-  const hh24=ahoraD.getHours(),hh12=hh24%12||12,ampm=hh24>=12?'PM':'AM';
-  const mm2=String(ahoraD.getMinutes()).padStart(2,'0'),ss2=String(ahoraD.getSeconds()).padStart(2,'0');
+  const ahoraD=new Date(); const hh24=ahoraD.getHours(),hh12=hh24%12||12,ampm=hh24>=12?'PM':'AM'; const mm2=String(ahoraD.getMinutes()).padStart(2,'0'),ss2=String(ahoraD.getSeconds()).padStart(2,'0');
   document.getElementById('last-time').textContent=`Ultima actualizacion: ${hh12}:${mm2}:${ss2} ${ampm}`;
 }
 
