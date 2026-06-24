@@ -544,7 +544,8 @@ function egMesFilter(todosEgresos, hoja) { return todosEgresos.filter(r => { con
 
 // PAGINADO INGRESOS POR MES
 function renderIngresosRows(hojaKey, pagina) {
-  const datos = window._datosPorMes && window._datosPorMes[hojaKey];
+  const hojaOriginal = hojaKey.replace(/_/g, ' ');
+  const datos = window._datosPorMes && (window._datosPorMes[hojaOriginal] || window._datosPorMes[hojaKey]);
   if (!datos) return;
   const filas = [...datos.filas].reverse();
   const total = filas.length;
