@@ -316,7 +316,7 @@
           <div style="font-size:11px;color:var(--muted);margin-top:2px">Ley 25.413 (0,6%)</div>
         </div>
       </div>
-      <button onclick="exportarExcel()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;white-space:nowrap;">📥 EXPORTAR CSV</button>
+      <button onclick="exportarExcel()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;white-space:nowrap;">🖨️ IMPRIMIR BALANCE</button>
     </div>
     <div class="subtabs-nav" id="balance-subtabs"><div class="loading" style="padding:10px">Cargando meses...</div></div>
     <div id="balance-mes-content"></div>
@@ -680,11 +680,40 @@ async function cargarBalance(hojas, mesActual, datosMes) {
 }
 function exportarExcel() {
   const data=window._balanceData; if (!data) { alert('Cargando datos, intenta en unos segundos.'); return; }
-  let csv='INGRESOS\nMes,Pagos,Total\n'; data.mesesHojas.forEach(h=>{ const d=data.datosPorMes[h]; csv+=`${h},${d.filas.length},${d.ingreso}\n`; });
-  csv+=`\nTOTAL INGRESOS,,${data.totalIngresosGlobal}\n\nEGRESOS\nFecha,Descripcion,Monto,Categoria\n`; data.todosEgresos.forEach(r=>{ csv+=`${r[0]||''},${r[1]||''},${r[2]||''},${r[3]||''}\n`; });
-  csv+=`\nTOTAL EGRESOS,,${data.totalEgresosGlobal}\n\nRESULTADO,,${data.resultado}\n`;
-  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download='balance_urquibasquet.csv'; a.click(); URL.revokeObjectURL(url);
+  // Construir contenido XLSX usando formato XML SpreadsheetML
+  const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const cell = (v, bold) => `<Cell><Data ss:Type="${isNaN(v)||v===''?'String':'Number'}">${esc(v)}</Data>${bold?'<NamedCell ss:Name="Print_Titles"/><Cell ss:StyleID="bold"/>':''}</Cell>`;
+  const row = (...cells) => `<Row>${cells.join('')}</Row>`;
+  const hdr = (...vals) => row(...vals.map(v=>`<Cell ss:StyleID="bold"><Data ss:Type="String">${esc(v)}</Data></Cell>`));
+
+  let xml = `<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles><Style ss:ID="bold"><Font ss:Bold="1"/></Style></Styles>`;
+
+  // Hoja Ingresos
+  xml += `<Worksheet ss:Name="Ingresos"><Table>`;
+  xml += hdr('Mes','Pagos','Total');
+  data.mesesHojas.forEach(h=>{ const d=data.datosPorMes[h]; xml+=row(`<Cell><Data ss:Type="String">${esc(h)}</Data></Cell><Cell><Data ss:Type="Number">${d.filas.length}</Data></Cell><Cell><Data ss:Type="Number">${d.ingreso}</Data></Cell>`); });
+  xml += row(`<Cell><Data ss:Type="String">TOTAL</Data></Cell><Cell/><Cell><Data ss:Type="Number">${data.totalIngresosGlobal}</Data></Cell>`);
+  xml += `</Table></Worksheet>`;
+
+  // Hoja Egresos
+  xml += `<Worksheet ss:Name="Egresos"><Table>`;
+  xml += hdr('Fecha','Descripcion','Monto','Categoria');
+  data.todosEgresos.forEach(r=>{ xml+=row(`<Cell><Data ss:Type="String">${esc(r[0])}</Data></Cell><Cell><Data ss:Type="String">${esc(r[1])}</Data></Cell><Cell><Data ss:Type="Number">${parseInt(r[2])||0}</Data></Cell><Cell><Data ss:Type="String">${esc(r[3])}</Data></Cell>`); });
+  xml += row(`<Cell><Data ss:Type="String">TOTAL</Data></Cell><Cell/><Cell><Data ss:Type="Number">${data.totalEgresosGlobal}</Data></Cell><Cell/>`);
+  xml += `</Table></Worksheet>`;
+
+  // Hoja Resumen
+  xml += `<Worksheet ss:Name="Resumen"><Table>`;
+  xml += hdr('Concepto','Monto');
+  xml += row(`<Cell><Data ss:Type="String">Total Ingresos</Data></Cell><Cell><Data ss:Type="Number">${data.totalIngresosGlobal}</Data></Cell>`);
+  xml += row(`<Cell><Data ss:Type="String">Total Egresos</Data></Cell><Cell><Data ss:Type="Number">${data.totalEgresosGlobal}</Data></Cell>`);
+  xml += row(`<Cell><Data ss:Type="String">Resultado</Data></Cell><Cell><Data ss:Type="Number">${data.resultado}</Data></Cell>`);
+  xml += `</Table></Worksheet>`;
+
+  xml += `</Workbook>`;
+  const blob=new Blob([xml],{type:'application/vnd.ms-excel;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='balance_urquibasquet.xls'; a.click(); URL.revokeObjectURL(url);
 }
 
 async function cargarDatos() {
