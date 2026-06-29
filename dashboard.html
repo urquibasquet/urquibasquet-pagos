@@ -320,18 +320,7 @@
     </div>
     <div class="subtabs-nav" id="balance-subtabs"><div class="loading" style="padding:10px">Cargando meses...</div></div>
     <div id="balance-mes-content"></div>
-    <div class="card" style="margin-top:8px;margin-bottom:20px">
-      <div class="card-header"><div class="card-title">Balance Total</div></div>
-      <div style="padding:20px 28px 12px">
-        <div class="stacked-bar" id="stacked-bar" style="margin-bottom:12px"></div>
-        <div class="stacked-bar-legend" id="stacked-legend" style="margin-bottom:16px"></div>
-      </div>
-      <div style="padding:0 28px 24px;display:flex;gap:40px;flex-wrap:wrap;">
-        <div><div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total Ingresos</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--green)" id="balance-ingresos-total">—</div></div>
-        <div><div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total Egresos</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#ef4444" id="balance-egresos-total">—</div></div>
-        <div><div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Resultado</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px" id="balance-resultado">—</div></div>
-      </div>
-    </div>
+
   </div>
 
   <!-- TAB 5: DATOS DE SOCIOS -->
@@ -581,16 +570,16 @@ function renderIngresosRows(hojaKey, pagina) {
   // Eliminar fechas duplicadas manteniendo orden
   const fechasUnicas = [...new Set(fechasOrden)];
 
-  // Construir filas expandidas: pagos del dia + impuesto al final del dia
+  // Construir filas expandidas: impuesto primero, luego pagos del dia
   const filasExpandidas = [];
   for (const fecha of fechasUnicas) {
     const pagosDelDia = porFecha[fecha];
     const totalDia = pagosDelDia.reduce((acc, r) => acc + (parseInt(r[2]) || 0), 0);
     const impuestoDia = Math.round(totalDia * ALICUOTA);
+    filasExpandidas.push({ tipo: 'impuesto', fecha, monto: impuestoDia });
     for (const r of pagosDelDia) {
       filasExpandidas.push({ tipo: 'pago', r });
     }
-    filasExpandidas.push({ tipo: 'impuesto', fecha, monto: impuestoDia });
   }
 
   const total = filasExpandidas.length;
@@ -660,7 +649,7 @@ function actualizarSaldoDisplay(saldo, impuesto, esManual) {
   const el = document.getElementById('saldo-banco-display');
   const tipo = document.getElementById('saldo-banco-tipo');
   const impEl = document.getElementById('saldo-impuesto');
-  if (el) { el.textContent = formatMonto(saldo); el.style.color = saldo >= 0 ? 'var(--green)' : '#ef4444'; }
+  if (el) { el.textContent = '$' + parseFloat(saldo).toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2}); el.style.color = saldo >= 0 ? 'var(--green)' : '#ef4444'; }
   if (tipo) tipo.textContent = esManual ? 'ingresado manualmente' : 'calculado automáticamente';
   if (impEl) impEl.textContent = formatMonto(impuesto);
 }
