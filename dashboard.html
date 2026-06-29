@@ -567,14 +567,47 @@ function renderIngresosRows(hojaKey, pagina) {
   const hojaOriginal = hojaKey.replace(/_/g, ' ');
   const datos = window._datosPorMes && (window._datosPorMes[hojaOriginal] || window._datosPorMes[hojaKey]);
   if (!datos) return;
+  const ALICUOTA = 0.006;
+
+  // Agrupar pagos por fecha (orden: mas reciente primero)
   const filas = [...datos.filas].reverse();
-  const total = filas.length;
+  const porFecha = {};
+  const fechasOrden = [];
+  for (const r of filas) {
+    const fecha = r[0] || '—';
+    if (!porFecha[fecha]) { porFecha[fecha] = []; fechasOrden.push(fecha); }
+    porFecha[fecha].push(r);
+  }
+  // Eliminar fechas duplicadas manteniendo orden
+  const fechasUnicas = [...new Set(fechasOrden)];
+
+  // Construir filas expandidas: pagos del dia + impuesto al final del dia
+  const filasExpandidas = [];
+  for (const fecha of fechasUnicas) {
+    const pagosDelDia = porFecha[fecha];
+    const totalDia = pagosDelDia.reduce((acc, r) => acc + (parseInt(r[2]) || 0), 0);
+    const impuestoDia = Math.round(totalDia * ALICUOTA);
+    for (const r of pagosDelDia) {
+      filasExpandidas.push({ tipo: 'pago', r });
+    }
+    filasExpandidas.push({ tipo: 'impuesto', fecha, monto: impuestoDia });
+  }
+
+  const total = filasExpandidas.length;
   const totalPags = Math.ceil(total / POR_PAG_ING) || 1;
   const inicio = pagina * POR_PAG_ING;
-  const slice = filas.slice(inicio, inicio + POR_PAG_ING);
-  const rows = slice.length===0
+  const slice = filasExpandidas.slice(inicio, inicio + POR_PAG_ING);
+
+  const rows = slice.length === 0
     ? '<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin pagos</td></tr>'
-    : slice.map(r=>`<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td class="td-monto">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
+    : slice.map(item => {
+        if (item.tipo === 'pago') {
+          return `<tr><td class="td-fecha">${item.r[0]||'—'}</td><td class="td-name">${item.r[1]||'—'}</td><td class="td-monto">${formatMonto(parseInt(item.r[2])||0)}</td></tr>`;
+        } else {
+          return `<tr style="background:rgba(239,68,68,0.05)"><td class="td-fecha">${item.fecha}</td><td style="font-size:13px;color:#f87171;font-style:italic">Impuesto Ley 25.413 (0,6%)</td><td style="font-weight:700;color:#f87171">-${formatMonto(item.monto)}</td></tr>`;
+        }
+      }).join('');
+
   const nav = totalPags > 1
     ? `<tr><td colspan="3"><div class="pag-nav">${pagina>0?`<button class="pag-btn" onclick="renderIngresosRows('${hojaKey}',${pagina-1})">◀</button>`:'<span style="width:46px"></span>'}<span class="pag-info">${pagina+1} / ${totalPags}</span>${pagina<totalPags-1?`<button class="pag-btn" onclick="renderIngresosRows('${hojaKey}',${pagina+1})">▶</button>`:'<span style="width:46px"></span>'}</div></td></tr>`
     : '';
