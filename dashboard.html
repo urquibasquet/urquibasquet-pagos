@@ -300,6 +300,24 @@
     </div>
     <div class="subtabs-nav" id="balance-subtabs"><div class="loading" style="padding:10px">Cargando meses...</div></div>
     <div id="balance-mes-content"></div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <div class="card-title">💰 Saldo en Banco</div>
+        <button onclick="editarSaldo()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;">✏️ Editar</button>
+      </div>
+      <div style="padding:20px 28px;display:flex;gap:40px;flex-wrap:wrap;align-items:flex-end">
+        <div>
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Saldo actual</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1" id="saldo-banco-display">—</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px" id="saldo-banco-tipo">calculado automáticamente</div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Impuesto estimado (0,6%)</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#f87171" id="saldo-impuesto">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Ley 25.413 sobre ingresos</div>
+        </div>
+      </div>
+    </div>
     <div class="card" style="margin-top:8px;margin-bottom:20px">
       <div class="card-header"><div class="card-title">Balance Total</div></div>
       <div style="padding:20px 28px 12px">
@@ -544,8 +562,7 @@ function egMesFilter(todosEgresos, hoja) { return todosEgresos.filter(r => { con
 
 // PAGINADO INGRESOS POR MES
 function renderIngresosRows(hojaKey, pagina) {
-  const hojaOriginal = hojaKey.replace(/_/g, ' ');
-  const datos = window._datosPorMes && (window._datosPorMes[hojaOriginal] || window._datosPorMes[hojaKey]);
+  const datos = window._datosPorMes && window._datosPorMes[hojaKey];
   if (!datos) return;
   const filas = [...datos.filas].reverse();
   const total = filas.length;
@@ -571,6 +588,46 @@ function renderSubtabsNav(pagina) {
   if (mesesPag.length>0) setTimeout(()=>{ const firstBtn=subtabsNav.querySelector('.subtab-btn'); if (firstBtn) showSubtab(mesesPag[0],firstBtn); },0);
 }
 function cambiarPaginaBalance(pagina) { window._paginaBalance=pagina; renderSubtabsNav(pagina); }
+
+
+async function fetchConfig() {
+  try {
+    const res = await fetch('http://localhost:3001/config');
+    if (!res.ok) return {};
+    return await res.json();
+  } catch { return {}; }
+}
+
+async function guardarConfig(variable, valor) {
+  try {
+    await fetch('http://localhost:3001/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ variable, valor })
+    });
+  } catch (e) { console.log('Error guardando config:', e); }
+}
+
+function editarSaldo() {
+  const actual = window._saldoManual || '';
+  const nuevo = prompt('Ingresá el saldo actual del banco (solo números):', actual);
+  if (nuevo === null) return;
+  const num = parseFloat(nuevo.replace(/[^0-9.,-]/g,'').replace(',','.'));
+  if (isNaN(num)) { alert('Valor inválido'); return; }
+  window._saldoManual = num;
+  guardarConfig('saldo_banco', num);
+  actualizarSaldoDisplay(num, window._impuestoEstimado || 0, true);
+  mostrarToast('✅ Saldo actualizado');
+}
+
+function actualizarSaldoDisplay(saldo, impuesto, esManual) {
+  const el = document.getElementById('saldo-banco-display');
+  const tipo = document.getElementById('saldo-banco-tipo');
+  const impEl = document.getElementById('saldo-impuesto');
+  if (el) { el.textContent = formatMonto(saldo); el.style.color = saldo >= 0 ? 'var(--green)' : '#ef4444'; }
+  if (tipo) tipo.textContent = esManual ? 'ingresado manualmente' : 'calculado automáticamente';
+  if (impEl) impEl.textContent = '- ' + formatMonto(impuesto);
+}
 
 async function cargarBalance(hojas, mesActual, datosMes) {
   const mesesHojas=hojas.filter(h=>!HOJAS_EXCLUIDAS.has(h)); const todosEgresos=await fetchHoja('Egresos');
@@ -601,6 +658,19 @@ async function cargarBalance(hojas, mesActual, datosMes) {
   const resultado=totalIngresosGlobal-totalEgresosGlobal; const elBR=document.getElementById('balance-resultado');
   if (elBR) { elBR.textContent=(resultado>=0?'+':'')+formatMonto(Math.abs(resultado)); elBR.style.color=resultado>=0?'var(--green)':'#ef4444'; }
   renderBar('stacked-bar','stacked-legend',totalIngresosGlobal,egresosGlobalCats,Math.max(totalIngresosGlobal,totalEgresosGlobal)||1);
+  // Saldo banco
+  const ALICUOTA = 0.006;
+  const impuesto = Math.round(totalIngresosGlobal * ALICUOTA);
+  window._impuestoEstimado = impuesto;
+  const config = await fetchConfig();
+  if (config.saldo_banco && !isNaN(parseFloat(config.saldo_banco))) {
+    const saldoManual = parseFloat(config.saldo_banco);
+    window._saldoManual = saldoManual;
+    actualizarSaldoDisplay(saldoManual, impuesto, true);
+  } else {
+    const saldoCalculado = totalIngresosGlobal - impuesto - totalEgresosGlobal;
+    actualizarSaldoDisplay(saldoCalculado, impuesto, false);
+  }
   window._balanceData={mesesHojas,datosPorMes,todosEgresos,totalIngresosGlobal,totalEgresosGlobal,resultado};
 }
 function exportarExcel() {
