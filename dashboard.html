@@ -366,7 +366,7 @@ const SHEET_ID = '1Od2GxIHYZFb78Vws14AkARmze15cU1LASA2805bggps';
 const API_KEY  = 'AIzaSyCnucz7KhvTzkmYkKx7tb9riZDHKYZVcIw';
 const MONTO_CUOTA = 5000;
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-const HOJAS_EXCLUIDAS = new Set(['Socios','Respuestas de formulario','Errores','Egresos']);
+const HOJAS_EXCLUIDAS = new Set(['Socios','Respuestas de formulario','Errores','Egresos','Config']);
 const COLORES_BAL = ['#f97316','#06b6d4','#a855f7','#f59e0b','#ec4899','#14b8a6','#ef4444','#84cc16'];
 const POR_PAG_ING = 10;
 
@@ -564,7 +564,8 @@ function egMesFilter(todosEgresos, hoja) { return todosEgresos.filter(r => { con
 
 // PAGINADO INGRESOS POR MES
 function renderIngresosRows(hojaKey, pagina) {
-  const datos = window._datosPorMes && window._datosPorMes[hojaKey];
+  const hojaOriginal = hojaKey.replace(/_/g, ' ');
+  const datos = window._datosPorMes && (window._datosPorMes[hojaOriginal] || window._datosPorMes[hojaKey]);
   if (!datos) return;
   const filas = [...datos.filas].reverse();
   const total = filas.length;
