@@ -669,25 +669,28 @@ async function cargarBalance(hojas, mesActual, datosMes) {
     const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0);});
     const resultado=ingreso-egresoMes; const hojaKey=hoja.replace(/\s/g,'_');
     const barId=`minibar-${hojaKey}`; const legId=`minileg-${hojaKey}`;
-    const egresosRows=egMes.length===0?'<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin egresos</td></tr>':egMes.map(r=>`<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td style="font-weight:700;color:#ef4444">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
+    const impuestoMes = Math.round(ingreso * 0.006);
+    const ingresoNeto = ingreso - impuestoMes;
+    const egresosRows=egMes.length===0
+      ?'<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin egresos</td></tr>'
+      :egMes.map(r=>`<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td style="font-weight:700;color:#ef4444">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
+    const impuestoRow=`<tr style="background:rgba(239,68,68,0.05)"><td class="td-fecha">—</td><td style="font-size:13px;color:#f87171;font-style:italic">Impuesto Ley 25.413 (0,6%) — acumulado del mes</td><td style="font-weight:700;color:#f87171">-${formatMonto(impuestoMes)}</td></tr>`;
     return `<div class="subtab-panel ${i===0?'active':''}" id="subtab-${hojaKey}">
-      <div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Ingresos — ${hoja}</div><span class="card-badge badge-green">${formatMonto(ingreso)}</span></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Socio</th><th>Monto</th></tr></thead><tbody id="ing-tbody-${hojaKey}"><tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Cargando...</td></tr></tbody></table></div></div>
-      <div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Egresos — ${hoja}</div><span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171">${formatMonto(egresoMes)}</span></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Descripcion</th><th>Monto</th></tr></thead><tbody>${egresosRows}</tbody></table></div></div>
+      <div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Ingresos — ${hoja}</div><span class="card-badge badge-green">${formatMonto(ingresoNeto)} <span style="font-size:10px;opacity:0.7">(neto)</span></span></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Socio</th><th>Monto</th></tr></thead><tbody id="ing-tbody-${hojaKey}"><tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Cargando...</td></tr></tbody></table></div></div>
+      <div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Egresos — ${hoja}</div><span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171">${formatMonto(egresoMes + impuestoMes)}</span></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Descripcion</th><th>Monto</th></tr></thead><tbody>${impuestoRow}${egresosRows}</tbody></table></div></div>
       <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Balance ${hoja}</div></div><div style="padding:16px 28px 8px"><div class="mini-bar" id="${barId}" style="margin-bottom:10px"></div><div class="stacked-bar-legend" id="${legId}" style="margin-bottom:12px"></div></div><div style="padding:0 28px 20px"><div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Resultado del mes</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${resultado>=0?'var(--green)':'#ef4444'}">${resultado>=0?'+':''}${formatMonto(Math.abs(resultado))}</div></div></div>
     </div>`;
   }).join('');
   // Render ingresos paginados y mini bars
   mesesOrdenados.forEach(hoja=>{ renderIngresosRows(hoja.replace(/\s/g,'_'), 0); const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+(parseInt(r[2])||0),0); const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0);}); renderBar(`minibar-${hoja.replace(/\s/g,'_')}`,`minileg-${hoja.replace(/\s/g,'_')}`,ingreso,egCats,Math.max(ingreso,egresoMes)||1); });
-  document.getElementById('balance-ingresos-total').textContent=formatMonto(totalIngresosGlobal);
-  document.getElementById('balance-egresos-total').textContent=formatMonto(totalEgresosGlobal);
-  const resultado=totalIngresosGlobal-totalEgresosGlobal; const elBR=document.getElementById('balance-resultado');
-  if (elBR) { elBR.textContent=(resultado>=0?'+':'')+formatMonto(Math.abs(resultado)); elBR.style.color=resultado>=0?'var(--green)':'#ef4444'; }
+  const impuestoTotal = Math.round(totalIngresosGlobal * 0.006);
+  const resultado=totalIngresosGlobal-totalEgresosGlobal-impuestoTotal;
   const elBRTop = document.getElementById('balance-resultado-top');
   if (elBRTop) { elBRTop.textContent=(resultado>=0?'+':'')+formatMonto(Math.abs(resultado)); elBRTop.style.color=resultado>=0?'var(--green)':'#ef4444'; }
   renderBar('stacked-bar','stacked-legend',totalIngresosGlobal,egresosGlobalCats,Math.max(totalIngresosGlobal,totalEgresosGlobal)||1);
   // Saldo banco
   const ALICUOTA = 0.006;
-  const impuesto = Math.round(totalIngresosGlobal * ALICUOTA);
+  const impuesto = impuestoTotal;
   window._impuestoEstimado = impuesto;
   const config = await fetchConfig();
   if (config.saldo_banco && !isNaN(parseFloat(config.saldo_banco))) {
