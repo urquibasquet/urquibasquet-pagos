@@ -667,7 +667,7 @@ async function cargarBalance(hojas, mesActual, datosMes) {
   subtabsContent.innerHTML=mesesOrdenados.map((hoja,i)=>{
     const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+(parseInt(r[2])||0),0);
     const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0);});
-    const resultado=ingreso-egresoMes; const hojaKey=hoja.replace(/\s/g,'_');
+    const resultado=ingreso-egresoMes-Math.round(ingreso*0.006); const hojaKey=hoja.replace(/\s/g,'_');
     const barId=`minibar-${hojaKey}`; const legId=`minileg-${hojaKey}`;
     const impuestoMes = Math.round(ingreso * 0.006);
     const ingresoNeto = ingreso - impuestoMes;
@@ -684,23 +684,26 @@ async function cargarBalance(hojas, mesActual, datosMes) {
   // Render ingresos paginados y mini bars
   mesesOrdenados.forEach(hoja=>{ renderIngresosRows(hoja.replace(/\s/g,'_'), 0); const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+(parseInt(r[2])||0),0); const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0);}); renderBar(`minibar-${hoja.replace(/\s/g,'_')}`,`minileg-${hoja.replace(/\s/g,'_')}`,ingreso,egCats,Math.max(ingreso,egresoMes)||1); });
   const impuestoTotal = Math.round(totalIngresosGlobal * 0.006);
-  const resultado=totalIngresosGlobal-totalEgresosGlobal-impuestoTotal;
+  const resultado = totalIngresosGlobal - totalEgresosGlobal - impuestoTotal;
+  window._impuestoEstimado = impuestoTotal;
+
+  // Actualizar balance total
   const elBRTop = document.getElementById('balance-resultado-top');
   if (elBRTop) { elBRTop.textContent=(resultado>=0?'+':'')+formatMonto(Math.abs(resultado)); elBRTop.style.color=resultado>=0?'var(--green)':'#ef4444'; }
-  renderBar('stacked-bar','stacked-legend',totalIngresosGlobal,egresosGlobalCats,Math.max(totalIngresosGlobal,totalEgresosGlobal)||1);
-  // Saldo banco
-  const ALICUOTA = 0.006;
-  const impuesto = impuestoTotal;
-  window._impuestoEstimado = impuesto;
-  const config = await fetchConfig();
-  if (config.saldo_banco && !isNaN(parseFloat(config.saldo_banco))) {
-    const saldoManual = parseFloat(config.saldo_banco);
-    window._saldoManual = saldoManual;
-    actualizarSaldoDisplay(saldoManual, impuesto, true);
-  } else {
-    const saldoCalculado = totalIngresosGlobal - impuesto - totalEgresosGlobal;
-    actualizarSaldoDisplay(saldoCalculado, impuesto, false);
-  }
+
+  // Mostrar saldo calculado inmediatamente (no esperar fetchConfig)
+  const saldoCalculado = totalIngresosGlobal - impuestoTotal - totalEgresosGlobal;
+  actualizarSaldoDisplay(saldoCalculado, impuestoTotal, false);
+
+  // Intentar obtener saldo manual del bot (si esta disponible)
+  fetchConfig().then(config => {
+    if (config && config.saldo_banco && !isNaN(parseFloat(config.saldo_banco))) {
+      const saldoManual = parseFloat(config.saldo_banco);
+      window._saldoManual = saldoManual;
+      actualizarSaldoDisplay(saldoManual, impuestoTotal, true);
+    }
+  }).catch(() => {});
+
   window._balanceData={mesesHojas,datosPorMes,todosEgresos,totalIngresosGlobal,totalEgresosGlobal,resultado};
 }
 function exportarExcel() {
