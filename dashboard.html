@@ -306,12 +306,7 @@
           <div style="font-size:11px;color:var(--muted);margin-top:2px" id="saldo-banco-tipo">calculado automáticamente</div>
         </div>
         <div class="card" style="padding:16px 24px;min-width:180px;">
-          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">📊 Balance Total</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1" id="balance-resultado-top">—</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px">ingresos − egresos</div>
-        </div>
-        <div class="card" style="padding:16px 24px;min-width:180px;">
-          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">🏦 Impuesto estimado</div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">🏦 Impuesto mes actual</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:#f87171" id="saldo-impuesto">—</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px">Ley 25.413 (0,6%)</div>
         </div>
@@ -361,6 +356,14 @@ const POR_PAG_ING = 10;
 
 function getMesActual() { const d = new Date(); return `${MESES[d.getMonth()]} ${d.getFullYear()}`; }
 function formatMonto(v) { const n = parseFloat(String(v).replace(/[^0-9.]/g,'')); if (isNaN(n)) return v; return '$' + n.toLocaleString('es-AR', {minimumFractionDigits:0, maximumFractionDigits:0}); }
+function parseMonto(v) {
+  // Maneja formato argentino: 1.234,56 -> 1234.56
+  const s = String(v||'').trim().replace(/\$/g,'').trim();
+  if (s.includes(',')) {
+    return parseFloat(s.replace(/\./g,'').replace(',','.')) || 0;
+  }
+  return parseFloat(s.replace(/[^0-9.]/g,'')) || 0;
+}
 
 async function fetchHoja(nombre) {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(nombre+'!A2:Z')}?key=${API_KEY}`;
@@ -658,22 +661,22 @@ async function cargarBalance(hojas, mesActual, datosMes) {
   const mesesHojas=hojas.filter(h=>!HOJAS_EXCLUIDAS.has(h)); const todosEgresos=await fetchHoja('Egresos');
   let totalIngresosGlobal=0,totalEgresosGlobal=0; const egresosGlobalCats={}; const datosPorMes={};
   for (const hoja of mesesHojas) { const filas=hoja===mesActual?datosMes:await fetchHoja(hoja); const ingreso=filas.reduce((acc,r)=>acc+(parseInt(r[2])||0),0); totalIngresosGlobal+=ingreso; datosPorMes[hoja]={filas,ingreso}; }
-  todosEgresos.forEach(r=>{ const cat=(r[3]||'Sin categoria').trim(); const monto=parseInt(r[2])||0; totalEgresosGlobal+=monto; egresosGlobalCats[cat]=(egresosGlobalCats[cat]||0)+monto; });
+  todosEgresos.forEach(r=>{ const cat=(r[3]||'Sin categoria').trim(); const monto=parseMonto(r[2]); totalEgresosGlobal+=monto; egresosGlobalCats[cat]=(egresosGlobalCats[cat]||0)+monto; });
   window._datosPorMes = datosPorMes;
   const subtabsContent=document.getElementById('balance-mes-content'); if (!subtabsContent) return;
   const mesActualIdx=mesesHojas.indexOf(mesActual);
   const mesesOrdenados=mesActualIdx!==-1?[mesesHojas[mesActualIdx],...mesesHojas.filter(h=>h!==mesActual)]:[...mesesHojas];
   window._mesesBalance=mesesOrdenados; window._paginaBalance=0; renderSubtabsNav(0);
   subtabsContent.innerHTML=mesesOrdenados.map((hoja,i)=>{
-    const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+(parseInt(r[2])||0),0);
-    const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0);});
+    const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+parseMonto(r[2]),0);
+    const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+parseMonto(r[2]);});
     const resultado=ingreso-egresoMes-Math.round(ingreso*0.006); const hojaKey=hoja.replace(/\s/g,'_');
     const barId=`minibar-${hojaKey}`; const legId=`minileg-${hojaKey}`;
     const impuestoMes = Math.round(ingreso * 0.006);
     const ingresoNeto = ingreso - impuestoMes;
     const egresosRows=egMes.length===0
       ?'<tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin egresos</td></tr>'
-      :egMes.map(r=>`<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td style="font-weight:700;color:#ef4444">${formatMonto(parseInt(r[2])||0)}</td></tr>`).join('');
+      :egMes.map(r=>`<tr><td class="td-fecha">${r[0]||'—'}</td><td class="td-name">${r[1]||'—'}</td><td style="font-weight:700;color:#ef4444">${formatMonto(parseMonto(r[2]))}</td></tr>`).join('');
     const impuestoRow=`<tr style="background:rgba(239,68,68,0.05)"><td class="td-fecha">—</td><td style="font-size:13px;color:#f87171;font-style:italic">Impuesto Ley 25.413 (0,6%) — acumulado del mes</td><td style="font-weight:700;color:#f87171">-${formatMonto(impuestoMes)}</td></tr>`;
     return `<div class="subtab-panel ${i===0?'active':''}" id="subtab-${hojaKey}">
       <div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Ingresos — ${hoja}</div><span class="card-badge badge-green">${formatMonto(ingresoNeto)} <span style="font-size:10px;opacity:0.7">(neto)</span></span></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Socio</th><th>Monto</th></tr></thead><tbody id="ing-tbody-${hojaKey}"><tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Cargando...</td></tr></tbody></table></div></div>
@@ -682,25 +685,24 @@ async function cargarBalance(hojas, mesActual, datosMes) {
     </div>`;
   }).join('');
   // Render ingresos paginados y mini bars
-  mesesOrdenados.forEach(hoja=>{ renderIngresosRows(hoja.replace(/\s/g,'_'), 0); const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+(parseInt(r[2])||0),0); const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+(parseInt(r[2])||0);}); renderBar(`minibar-${hoja.replace(/\s/g,'_')}`,`minileg-${hoja.replace(/\s/g,'_')}`,ingreso,egCats,Math.max(ingreso,egresoMes)||1); });
+  mesesOrdenados.forEach(hoja=>{ renderIngresosRows(hoja.replace(/\s/g,'_'), 0); const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+parseMonto(r[2]),0); const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+parseMonto(r[2]);}); renderBar(`minibar-${hoja.replace(/\s/g,'_')}`,`minileg-${hoja.replace(/\s/g,'_')}`,ingreso,egCats,Math.max(ingreso,egresoMes)||1); });
+  const ingresoseMesActual = datosPorMes[mesActual] ? datosPorMes[mesActual].ingreso : 0;
+  const impuestoMesActual = Math.round(ingresoseMesActual * 0.006);
   const impuestoTotal = Math.round(totalIngresosGlobal * 0.006);
   const resultado = totalIngresosGlobal - totalEgresosGlobal - impuestoTotal;
-  window._impuestoEstimado = impuestoTotal;
+  window._impuestoEstimado = impuestoMesActual;
 
   // Actualizar balance total
-  const elBRTop = document.getElementById('balance-resultado-top');
-  if (elBRTop) { elBRTop.textContent=(resultado>=0?'+':'')+formatMonto(Math.abs(resultado)); elBRTop.style.color=resultado>=0?'var(--green)':'#ef4444'; }
-
   // Mostrar saldo calculado inmediatamente (no esperar fetchConfig)
   const saldoCalculado = totalIngresosGlobal - impuestoTotal - totalEgresosGlobal;
-  actualizarSaldoDisplay(saldoCalculado, impuestoTotal, false);
+  actualizarSaldoDisplay(saldoCalculado, impuestoMesActual, false);
 
   // Intentar obtener saldo manual del bot (si esta disponible)
   fetchConfig().then(config => {
     if (config && config.saldo_banco && !isNaN(parseFloat(config.saldo_banco))) {
       const saldoManual = parseFloat(config.saldo_banco);
       window._saldoManual = saldoManual;
-      actualizarSaldoDisplay(saldoManual, impuestoTotal, true);
+      actualizarSaldoDisplay(saldoManual, impuestoMesActual, true);
     }
   }).catch(() => {});
 
@@ -726,7 +728,7 @@ function exportarExcel() {
   // Hoja Egresos
   xml += `<Worksheet ss:Name="Egresos"><Table>`;
   xml += hdr('Fecha','Descripcion','Monto','Categoria');
-  data.todosEgresos.forEach(r=>{ xml+=row(`<Cell><Data ss:Type="String">${esc(r[0])}</Data></Cell><Cell><Data ss:Type="String">${esc(r[1])}</Data></Cell><Cell><Data ss:Type="Number">${parseInt(r[2])||0}</Data></Cell><Cell><Data ss:Type="String">${esc(r[3])}</Data></Cell>`); });
+  data.todosEgresos.forEach(r=>{ xml+=row(`<Cell><Data ss:Type="String">${esc(r[0])}</Data></Cell><Cell><Data ss:Type="String">${esc(r[1])}</Data></Cell><Cell><Data ss:Type="Number">${parseMonto(r[2])}</Data></Cell><Cell><Data ss:Type="String">${esc(r[3])}</Data></Cell>`); });
   xml += row(`<Cell><Data ss:Type="String">TOTAL</Data></Cell><Cell/><Cell><Data ss:Type="Number">${data.totalEgresosGlobal}</Data></Cell><Cell/>`);
   xml += `</Table></Worksheet>`;
 
