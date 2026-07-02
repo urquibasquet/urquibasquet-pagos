@@ -305,11 +305,7 @@
           </div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px" id="saldo-banco-tipo">calculado automáticamente</div>
         </div>
-        <div class="card" style="padding:16px 24px;min-width:180px;">
-          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">🏦 Impuesto mes actual</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:#f87171" id="saldo-impuesto">—</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px">Ley 25.413 (0,6%)</div>
-        </div>
+
       </div>
       <button onclick="exportarExcel()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;white-space:nowrap;">🖨️ IMPRIMIR BALANCE</button>
     </div>
@@ -359,14 +355,11 @@ function formatMonto(v) { const n = parseFloat(String(v).replace(/[^0-9.]/g,''))
 function parseMonto(v) {
   const s = String(v||'').trim().replace(/\$/g,'').trim();
   if (s.includes(',') && s.includes('.')) {
-    // Formato 1.234,56 -> quitar puntos, reemplazar coma por punto
     return parseFloat(s.replace(/\./g,'').replace(',','.')) || 0;
   }
   if (s.includes(',') && !s.includes('.')) {
-    // Formato 1234,56 -> reemplazar coma por punto
     return parseFloat(s.replace(',','.')) || 0;
   }
-  // Formato 17608.59 o 17608 -> directo
   return parseFloat(s) || 0;
 }
 
@@ -656,10 +649,8 @@ function editarSaldo() {
 function actualizarSaldoDisplay(saldo, impuesto, esManual) {
   const el = document.getElementById('saldo-banco-display');
   const tipo = document.getElementById('saldo-banco-tipo');
-  const impEl = document.getElementById('saldo-impuesto');
   if (el) { el.textContent = '$' + parseFloat(saldo).toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2}); el.style.color = saldo >= 0 ? 'var(--green)' : '#ef4444'; }
   if (tipo) tipo.textContent = esManual ? 'ingresado manualmente' : 'calculado automáticamente';
-  if (impEl) impEl.textContent = formatMonto(impuesto);
 }
 
 async function cargarBalance(hojas, mesActual, datosMes) {
@@ -675,7 +666,8 @@ async function cargarBalance(hojas, mesActual, datosMes) {
   subtabsContent.innerHTML=mesesOrdenados.map((hoja,i)=>{
     const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+parseMonto(r[2]),0);
     const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+parseMonto(r[2]);});
-    const resultado=ingreso-egresoMes-Math.round(ingreso*0.006); const hojaKey=hoja.replace(/\s/g,'_');
+    const impuestoMes2=Math.round(ingreso*0.006);
+    const resultado=ingreso-egresoMes-impuestoMes2; const hojaKey=hoja.replace(/\s/g,'_');
     const barId=`minibar-${hojaKey}`; const legId=`minileg-${hojaKey}`;
     const impuestoMes = Math.round(ingreso * 0.006);
     const ingresoNeto = ingreso - impuestoMes;
@@ -686,11 +678,11 @@ async function cargarBalance(hojas, mesActual, datosMes) {
     return `<div class="subtab-panel ${i===0?'active':''}" id="subtab-${hojaKey}">
       <div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Ingresos — ${hoja}</div><span class="card-badge badge-green">${formatMonto(ingresoNeto)} <span style="font-size:10px;opacity:0.7">(neto)</span></span></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Socio</th><th>Monto</th></tr></thead><tbody id="ing-tbody-${hojaKey}"><tr><td colspan="3" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Cargando...</td></tr></tbody></table></div></div>
       <div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Egresos — ${hoja}</div><span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171">${formatMonto(egresoMes + impuestoMes)}</span></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Descripcion</th><th>Monto</th></tr></thead><tbody>${impuestoRow}${egresosRows}</tbody></table></div></div>
-      <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Balance ${hoja}</div></div><div style="padding:16px 28px 8px"><div class="mini-bar" id="${barId}" style="margin-bottom:10px"></div><div class="stacked-bar-legend" id="${legId}" style="margin-bottom:12px"></div></div><div style="padding:0 28px 20px"><div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Resultado del mes</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${resultado>=0?'var(--green)':'#ef4444'}">${resultado>=0?'+':''}${formatMonto(Math.abs(resultado))}</div></div></div>
+      <div class="card" style="margin-bottom:20px"><div class="card-header"><div class="card-title">Balance ${hoja}</div></div><div style="padding:16px 28px 8px"><div class="mini-bar" id="${barId}" style="margin-bottom:10px"></div><div class="stacked-bar-legend" id="${legId}" style="margin-bottom:12px"></div></div><div style="padding:0 28px 20px"><div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Resultado del mes</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${resultado>=0?'var(--green)':'#ef4444'}">${resultado>=0?'+':''}${formatMonto(Math.abs(resultado))} <span style="font-size:12px;opacity:0.6">(inc. imp.)</span></div></div></div>
     </div>`;
   }).join('');
   // Render ingresos paginados y mini bars
-  mesesOrdenados.forEach(hoja=>{ renderIngresosRows(hoja.replace(/\s/g,'_'), 0); const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+parseMonto(r[2]),0); const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+parseMonto(r[2]);}); renderBar(`minibar-${hoja.replace(/\s/g,'_')}`,`minileg-${hoja.replace(/\s/g,'_')}`,ingreso,egCats,Math.max(ingreso,egresoMes)||1); });
+  mesesOrdenados.forEach(hoja=>{ renderIngresosRows(hoja.replace(/\s/g,'_'), 0); const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+parseMonto(r[2]),0); const egCats={}; egMes.forEach(r=>{const c=(r[3]||'Sin categoria').trim();egCats[c]=(egCats[c]||0)+parseMonto(r[2]);}); const impMes=Math.round(ingreso*0.006); egCats['Impuesto Ley 25.413']=(egCats['Impuesto Ley 25.413']||0)+impMes; renderBar(`minibar-${hoja.replace(/\s/g,'_')}`,`minileg-${hoja.replace(/\s/g,'_')}`,ingreso,egCats,Math.max(ingreso,egresoMes+impMes)||1); });
   const ingresoseMesActual = datosPorMes[mesActual] ? datosPorMes[mesActual].ingreso : 0;
   const impuestoMesActual = Math.round(ingresoseMesActual * 0.006);
   const impuestoTotal = Math.round(totalIngresosGlobal * 0.006);
