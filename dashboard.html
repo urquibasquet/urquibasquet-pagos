@@ -357,12 +357,17 @@ const POR_PAG_ING = 10;
 function getMesActual() { const d = new Date(); return `${MESES[d.getMonth()]} ${d.getFullYear()}`; }
 function formatMonto(v) { const n = parseFloat(String(v).replace(/[^0-9.]/g,'')); if (isNaN(n)) return v; return '$' + n.toLocaleString('es-AR', {minimumFractionDigits:0, maximumFractionDigits:0}); }
 function parseMonto(v) {
-  // Maneja formato argentino: 1.234,56 -> 1234.56
   const s = String(v||'').trim().replace(/\$/g,'').trim();
-  if (s.includes(',')) {
+  if (s.includes(',') && s.includes('.')) {
+    // Formato 1.234,56 -> quitar puntos, reemplazar coma por punto
     return parseFloat(s.replace(/\./g,'').replace(',','.')) || 0;
   }
-  return parseFloat(s.replace(/[^0-9.]/g,'')) || 0;
+  if (s.includes(',') && !s.includes('.')) {
+    // Formato 1234,56 -> reemplazar coma por punto
+    return parseFloat(s.replace(',','.')) || 0;
+  }
+  // Formato 17608.59 o 17608 -> directo
+  return parseFloat(s) || 0;
 }
 
 async function fetchHoja(nombre) {
