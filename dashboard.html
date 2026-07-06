@@ -305,6 +305,11 @@
           </div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px" id="saldo-banco-tipo">calculado automáticamente</div>
         </div>
+        <div class="card" style="padding:16px 24px;min-width:180px;">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">💵 Efectivo</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:#22c55e" id="efectivo-display">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">cobrado en mano</div>
+        </div>
 
       </div>
       <button onclick="exportarExcel()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;white-space:nowrap;">🖨️ IMPRIMIR BALANCE</button>
@@ -690,6 +695,17 @@ async function cargarBalance(hojas, mesActual, datosMes) {
   window._impuestoEstimado = impuestoMesActual;
 
   // Actualizar balance total
+  // Calcular efectivo total (pagos donde nro_transaccion = 'efectivo')
+  let efectivoTotal = 0;
+  for (const hoja of mesesHojas) {
+    const filas = datosPorMes[hoja] ? datosPorMes[hoja].filas : [];
+    for (const r of filas) {
+      if ((r[3]||'').toUpperCase() === 'EFECTIVO') efectivoTotal += parseMonto(r[2]);
+    }
+  }
+  const elEfectivo = document.getElementById('efectivo-display');
+  if (elEfectivo) elEfectivo.textContent = formatMonto(efectivoTotal);
+
   // Mostrar saldo calculado inmediatamente (no esperar fetchConfig)
   const saldoCalculado = totalIngresosGlobal - impuestoTotal - totalEgresosGlobal;
   actualizarSaldoDisplay(saldoCalculado, impuestoMesActual, false);
