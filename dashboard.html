@@ -183,10 +183,9 @@
   </div>
   <div class="tabs-nav">
     <button class="tab-btn active" onclick="showTab('pagos',this)">💰 Pagos</button>
-    <button class="tab-btn" onclick="showTab('nuevos',this)">👥 Socios</button>
-    <button class="tab-btn" id="btn-tab-errores" onclick="showTab('errores',this)">⚠️ Errores</button>
-    <button class="tab-btn" onclick="showTab('camping',this)">🏕️ Viaje al Camping</button>
     <button class="tab-btn" onclick="showTab('balance',this)">📊 Balance</button>
+    <button class="tab-btn" id="btn-tab-errores" onclick="showTab('alertas',this)">🚨 Alertas</button>
+    <button class="tab-btn" onclick="showTab('camping',this)">🏕️ Viaje al Camping</button>
     <button class="tab-btn" onclick="showTab('socios',this)">👥 Datos de los Socios</button>
   </div>
 
@@ -212,25 +211,6 @@
       </div>
       <div id="lista-meses"><div class="loading"><div class="spinner"></div><br>Cargando...</div></div>
     </div>
-  </div>
-
-  <!-- TAB 2: SOCIOS -->
-  <div class="tab-panel" id="tab-nuevos">
-    <div class="card" style="margin-bottom:20px">
-      <div class="card-header">
-        <div class="card-title">Saludar Nuevos Socios</div>
-        <span class="card-badge badge-green" id="nuevos-count-badge">—</span>
-      </div>
-      <div style="padding:12px 22px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);">
-        Socios registrados que todavía no recibieron el mensaje de bienvenida.
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Socio</th><th>Fecha de registro</th><th>Acción</th></tr></thead>
-          <tbody id="tabla-nuevos"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
-        </table>
-      </div>
-    </div>
     <div class="card" style="margin-bottom:20px">
       <div class="card-header">
         <div class="card-title">Están debiendo cuotas</div>
@@ -245,8 +225,8 @@
     </div>
   </div>
 
-  <!-- TAB: ERRORES -->
-  <div class="tab-panel" id="tab-errores">
+  <!-- TAB: ALERTAS (Errores + Saludar) -->
+  <div class="tab-panel" id="tab-alertas">
     <div class="card" style="margin-bottom:20px">
       <div class="card-header">
         <div class="card-title">Comprobantes sin identificar</div>
@@ -259,6 +239,21 @@
         <table>
           <thead><tr><th>Fecha</th><th>LID</th><th>Nombre</th><th>Posible Socio</th></tr></thead>
           <tbody id="tabla-errores"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <div class="card-title">Saludar Nuevos Socios</div>
+        <span class="card-badge badge-green" id="nuevos-count-badge">—</span>
+      </div>
+      <div style="padding:12px 22px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);">
+        Socios registrados que todavía no recibieron el mensaje de bienvenida.
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Socio</th><th>Fecha de registro</th><th>Acción</th></tr></thead>
+          <tbody id="tabla-nuevos"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -490,7 +485,7 @@ async function cargarSinPago(socios, hojas) {
     if (fechaReg) { const partes=fechaReg.split('/'); if (partes.length>=3) { const mesReg=parseInt(partes[1])-1; const anioStr=partes[2]?partes[2].split(',')[0]:''; const anioReg=parseInt(anioStr); if (!isNaN(mesReg)&&!isNaN(anioReg)) { const fechaRegDate=new Date(anioReg,mesReg,1); if (fechaRegDate>INICIO) mesDesdeQueDebe=`${MESES[mesReg]} ${anioReg}`; } } }
     const idxInicio=mesesDesdeInicio.indexOf(mesDesdeQueDebe); const mesesQueDebe=idxInicio>=0?mesesDesdeInicio.slice(idxInicio):mesesDesdeInicio;
     const mesesImpagos=mesesQueDebe.filter(mes=>{ const pagos=pagosPorMes[mes]||[]; return tel?!pagos.includes(tel):true; });
-    if (mesesImpagos.length>0&&mesesImpagos.length===mesesQueDebe.length) sinPago.push({nro,nombre,lid,fechaReg,mesesImpagos});
+    if (mesesImpagos.length>0) sinPago.push({nro,nombre,lid,fechaReg,mesesImpagos});
   }
   if (badge) badge.textContent=`${sinPago.length} socio${sinPago.length!==1?'s':''}`;
   if (sinPago.length===0) { tbody.innerHTML='<tr><td colspan="5" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Todos los socios tienen al menos un pago ✅</td></tr>'; return; }
@@ -543,7 +538,7 @@ async function cargarErrores() {
   const errores=await fetchHoja('Errores'); const socios=await fetchHoja('Socios'); const pendientes=errores;
   const badge=document.getElementById('errores-count-badge'); const tabBtn=document.getElementById('btn-tab-errores'); const tbody=document.getElementById('tabla-errores'); if (!tbody) return;
   if (badge) badge.textContent=pendientes.length>0?`${pendientes.length} pendiente${pendientes.length!==1?'s':''}` :'Sin errores';
-  if (tabBtn) tabBtn.textContent=pendientes.length>0?`⚠️ Errores (${pendientes.length})`:'⚠️ Errores';
+  if (tabBtn) tabBtn.textContent=pendientes.length>0?`🚨 Alertas (${pendientes.length})`:'🚨 Alertas';
   if (pendientes.length===0) { tbody.innerHTML='<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin errores pendientes ✅</td></tr>'; return; }
   tbody.innerHTML=[...pendientes].reverse().map(r=>{ const match=matchScore(r,socios); return `<tr><td class="td-fecha">${r[0]||'—'}</td><td style="font-size:12px;color:var(--muted);word-break:break-all">${r[1]||'—'}</td><td class="td-name">${r[2]||'(sin nombre)'}</td><td style="font-size:13px">${match.html}</td></tr>`; }).join('');
 }
