@@ -617,7 +617,8 @@ async function fetchConfig() {
   try {
     const res = await fetch('http://localhost:3001/config');
     if (!res.ok) return {};
-    return await res.json();
+    const text = await res.text();
+    return JSON.parse(text) || {};
   } catch { return {}; }
 }
 
