@@ -706,11 +706,14 @@ async function cargarBalance(hojas, mesActual, datosMes) {
   actualizarSaldoDisplay(saldoCalculado, impuestoMesActual, false);
 
   // Intentar obtener saldo manual del bot (si esta disponible)
-  fetchConfig().then(config => {
+ fetchConfig().then(config => {
+    const diferencia = config && config.diferencia ? parseMonto(config.diferencia) : 0;
     if (config && config.saldo_banco && !isNaN(parseFloat(config.saldo_banco))) {
-      const saldoManual = parseFloat(config.saldo_banco);
+      const saldoManual = parseFloat(config.saldo_banco) + diferencia;
       window._saldoManual = saldoManual;
       actualizarSaldoDisplay(saldoManual, impuestoMesActual, true);
+    } else {
+      actualizarSaldoDisplay(saldoCalculado + diferencia, impuestoMesActual, false);
     }
   }).catch(() => {});
 
