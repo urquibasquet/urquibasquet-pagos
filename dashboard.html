@@ -214,7 +214,10 @@
     <div class="card" style="margin-bottom:20px">
       <div class="card-header">
         <div class="card-title">Están debiendo cuotas</div>
-        <span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171" id="sinpago-count-badge">—</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171" id="sinpago-count-badge">—</span>
+          <button onclick="enviarRecordatorio()" style="background:linear-gradient(135deg,var(--orange),#ea580c);color:white;border:none;border-radius:8px;padding:6px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">📣 ENVIAR RECORDATORIO</button>
+        </div>
       </div>
       <div class="table-wrap">
         <table>
@@ -613,12 +616,23 @@ function renderSubtabsNav(pagina) {
 function cambiarPaginaBalance(pagina) { window._paginaBalance=pagina; renderSubtabsNav(pagina); }
 
 
+
+async function enviarRecordatorio() {
+  if (!confirm('¿Enviar recordatorio de pago a todos los socios que deben?')) return;
+  try {
+    const res = await fetch('http://localhost:3001/recordatorio', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+    if (!res.ok) throw new Error('Error');
+    mostrarToast('✅ Recordatorios enviados correctamente');
+  } catch {
+    mostrarToast('No se pudo conectar con el bot.', '#ef4444');
+  }
+}
+
 async function fetchConfig() {
   try {
     const res = await fetch('http://localhost:3001/config');
     if (!res.ok) return {};
-    const text = await res.text();
-    return JSON.parse(text) || {};
+    return await res.json();
   } catch { return {}; }
 }
 
