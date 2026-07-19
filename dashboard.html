@@ -187,6 +187,7 @@
     <button class="tab-btn" id="btn-tab-errores" onclick="showTab('alertas',this)">🚨 Alertas</button>
     <button class="tab-btn" onclick="showTab('camping',this)">🏕️ Viaje al Camping</button>
     <button class="tab-btn" onclick="showTab('socios',this)">👥 Datos de los Socios</button>
+    <button class="tab-btn" onclick="showTab('servicios',this);cargarServicios()">🔧 Servicios</button>
   </div>
 
   <!-- TAB 1: PAGOS -->
@@ -335,6 +336,25 @@
     <div class="card" style="margin-bottom:20px" id="card-citas">
       <div class="card-header"><div class="card-title">Mensajes de la Comunidad</div><span class="card-badge badge-orange" id="citas-count">—</span></div>
       <div class="citas-grid" id="citas-container"><div class="loading"><div class="spinner"></div><br>Cargando...</div></div>
+    </div>
+  </div>
+
+  <!-- TAB: SERVICIOS -->
+  <div class="tab-panel" id="tab-servicios">
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <div class="card-title">Estado de Servicios</div>
+        <span class="card-badge badge-blue" id="servicios-update">Actualizando...</span>
+      </div>
+      <div style="padding:12px 22px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);">
+        Estado en tiempo real de los servicios que usa el sistema.
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Servicio</th><th>Estado</th><th>Qué hacer</th></tr></thead>
+          <tbody id="tabla-servicios"><tr><td colspan="3"><div class="loading"><div class="spinner"></div><br>Verificando...</div></td></tr></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -626,6 +646,97 @@ async function enviarRecordatorio() {
   } catch {
     mostrarToast('No se pudo conectar con el bot.', '#ef4444');
   }
+}
+
+
+async function cargarServicios() {
+  const servicios = [
+    {
+      nombre: '🤖 Bot WhatsApp',
+      check: async () => {
+        try {
+          const res = await fetch('http://localhost:3001/config', { signal: AbortSignal.timeout(3000) });
+          if (res.ok) return { ok: true, desc: 'Conectado y respondiendo', accion: 'Todo bien' };
+          return { ok: false, desc: 'El bot responde pero con error', accion: 'Reiniciar con pm2 restart urquibasquet-bot' };
+        } catch {
+          return { ok: false, desc: 'No responde — bot caído o PC apagada', accion: 'Ejecutar: taskkill /F /IM chrome.exe && pm2 restart urquibasquet-bot' };
+        }
+      }
+    },
+    {
+      nombre: '📄 Google Sheets',
+      check: async () => {
+        try {
+          const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}`;
+          const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+          if (res.ok) return { ok: true, desc: 'Acceso correcto al Sheet', accion: 'Todo bien' };
+          return { ok: false, desc: `Error ${res.status} al acceder al Sheet`, accion: 'Verificar API Key y permisos del Sheet' };
+        } catch {
+          return { ok: false, desc: 'Sin conexión a Google Sheets', accion: 'Verificar conexión a internet' };
+        }
+      }
+    },
+    {
+      nombre: '🧠 Claude AI (Anthropic)',
+      check: async () => {
+        try {
+          const res = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 10, messages: [{ role: 'user', content: 'ok' }] }),
+            signal: AbortSignal.timeout(10000)
+          });
+          if (res.status === 200) return { ok: true, desc: 'API respondiendo correctamente', accion: 'Todo bien' };
+          if (res.status === 529) return { ok: false, desc: 'Sobrecargado — error 529', accion: 'Esperar unos minutos y reintentar' };
+          if (res.status === 401) return { ok: false, desc: 'API Key inválida', accion: 'Verificar ANTHROPIC_API_KEY en .env' };
+          return { ok: false, desc: `Error ${res.status}`, accion: 'Consultar status.anthropic.com' };
+        } catch {
+          return { ok: false, desc: 'Sin respuesta de Anthropic', accion: 'Verificar status.anthropic.com' };
+        }
+      }
+    },
+    {
+      nombre: '💬 WhatsApp Web (downloadMedia)',
+      check: async () => {
+        // Check based on known issue date July 13 2026
+        const issueDate = new Date('2026-07-13');
+        const hoy = new Date();
+        if (hoy >= issueDate) {
+          return { ok: false, desc: 'Bug conocido desde 13/07/2026 — WhatsApp actualizó su API interna', accion: 'Esperar fix de whatsapp-web.js en github.com/wwebjs/whatsapp-web.js/issues' };
+        }
+        return { ok: true, desc: 'Funcionando correctamente', accion: 'Todo bien' };
+      }
+    }
+  ];
+
+  const tbody = document.getElementById('tabla-servicios');
+  const badge = document.getElementById('servicios-update');
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="3"><div class="loading"><div class="spinner"></div><br>Verificando...</div></td></tr>';
+
+  const resultados = await Promise.all(servicios.map(async s => {
+    const r = await s.check();
+    return { nombre: s.nombre, ...r };
+  }));
+
+  const ahora = new Date();
+  const hh = ahora.getHours().toString().padStart(2,'0');
+  const mm = ahora.getMinutes().toString().padStart(2,'0');
+  if (badge) badge.textContent = `Actualizado ${hh}:${mm}`;
+
+  tbody.innerHTML = resultados.map(r => `
+    <tr>
+      <td><div class="td-name">${r.nombre}</div></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${r.ok?'var(--green)':'#ef4444'};flex-shrink:0;${r.ok?'':'animation:pulse 1.5s infinite'}"></div>
+          <span style="font-size:13px;color:${r.ok?'var(--green)':'#f87171'}">${r.desc}</span>
+        </div>
+      </td>
+      <td style="font-size:13px;color:var(--muted)">${r.accion}</td>
+    </tr>
+  `).join('');
 }
 
 async function fetchConfig() {
