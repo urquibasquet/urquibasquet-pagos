@@ -188,6 +188,7 @@
     <button class="tab-btn" onclick="showTab('camping',this)">🏕️ Viaje al Camping</button>
     <button class="tab-btn" onclick="showTab('socios',this)">👥 Datos de los Socios</button>
     <button class="tab-btn" onclick="showTab('servicios',this);cargarServicios()">🔧 Servicios</button>
+    <button class="tab-btn" onclick="showTab('comunicar',this);cargarDestinatarios()">📣 Comunicar</button>
   </div>
 
   <!-- TAB 1: PAGOS -->
@@ -354,6 +355,62 @@
           <thead><tr><th>Servicio</th><th>Estado</th><th>Qué hacer</th></tr></thead>
           <tbody id="tabla-servicios"><tr><td colspan="3"><div class="loading"><div class="spinner"></div><br>Verificando...</div></td></tr></tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: COMUNICAR -->
+  <div class="tab-panel" id="tab-comunicar">
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <div class="card-title">📣 Envío Masivo</div>
+        <span class="card-badge badge-orange" id="comunicar-count">—</span>
+      </div>
+      <div style="padding:20px 28px;display:flex;flex-direction:column;gap:16px">
+
+        <!-- Mensaje -->
+        <div>
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Mensaje</div>
+          <textarea id="com-mensaje" placeholder="Escribí el mensaje acá..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;resize:vertical;min-height:100px;outline:none;line-height:1.6"></textarea>
+        </div>
+
+        <!-- Link -->
+        <div>
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Link (opcional)</div>
+          <input id="com-link" type="url" placeholder="https://..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none">
+        </div>
+
+        <!-- Imagen -->
+        <div>
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Imagen (opcional)</div>
+          <input id="com-imagen" type="file" accept="image/*" onchange="previewImagen(this)" style="display:none">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <button onclick="document.getElementById('com-imagen').click()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 18px;font-size:13px;cursor:pointer">📎 Subir imagen</button>
+            <div id="com-imagen-preview" style="font-size:13px;color:var(--muted)">Sin imagen</div>
+          </div>
+        </div>
+
+        <!-- Destinatarios -->
+        <div>
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Destinatarios</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+            <button onclick="filtrarDestinatarios('todos')" class="dest-btn active" id="dest-todos" style="background:rgba(249,115,22,0.15);border:1px solid var(--orange);color:var(--orange2);border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer">Todos</button>
+            <button onclick="filtrarDestinatarios('pagaron')" class="dest-btn" id="dest-pagaron" style="background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer">Pagaron este mes</button>
+            <button onclick="filtrarDestinatarios('deben')" class="dest-btn" id="dest-deben" style="background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer">Deben cuotas</button>
+          </div>
+          <div class="table-wrap" style="max-height:250px;overflow-y:auto;border:1px solid var(--border);border-radius:10px">
+            <table>
+              <thead><tr><th style="width:40px"><input type="checkbox" id="check-all" onchange="toggleTodos(this)" style="cursor:pointer"></th><th>#</th><th>Nombre</th><th>WhatsApp</th></tr></thead>
+              <tbody id="tabla-destinatarios"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Botón enviar -->
+        <div style="display:flex;justify-content:flex-end">
+          <button onclick="enviarComunicado()" id="btn-comunicar" style="background:linear-gradient(135deg,var(--orange),#ea580c);color:white;border:none;border-radius:10px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;cursor:pointer">📣 ENVIAR A SELECCIONADOS</button>
+        </div>
+        <div id="com-resultado" style="font-size:13px;color:var(--muted);text-align:right"></div>
       </div>
     </div>
   </div>
@@ -737,6 +794,108 @@ async function cargarServicios() {
       <td style="font-size:13px;color:var(--muted)">${r.accion}</td>
     </tr>
   `).join('');
+}
+
+
+let _sociosComunicar = [];
+let _filtroActivo = 'todos';
+let _imagenData = null;
+
+function previewImagen(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const base64 = e.target.result.split(',')[1];
+    const mime = file.type;
+    _imagenData = { data: base64, mimetype: mime, filename: file.name };
+    document.getElementById('com-imagen-preview').textContent = `✅ ${file.name}`;
+    document.getElementById('com-imagen-preview').style.color = 'var(--green)';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function cargarDestinatarios() {
+  const socios = await fetchHoja('Socios');
+  _sociosComunicar = socios.map(s => ({
+    nro: s[0]||'—',
+    nombre: `${s[3]||''} ${s[2]||''}`.trim(),
+    whatsapp: String(s[5]||'').replace(/\D/g,''),
+    lid: String(s[11]||'').trim()
+  })).filter(s => s.whatsapp || s.lid);
+  filtrarDestinatarios('todos');
+}
+
+async function filtrarDestinatarios(filtro) {
+  _filtroActivo = filtro;
+  document.querySelectorAll('.dest-btn').forEach(b => {
+    b.style.background = 'var(--bg3)';
+    b.style.borderColor = 'var(--border)';
+    b.style.color = 'var(--muted)';
+  });
+  const btn = document.getElementById(`dest-${filtro}`);
+  if (btn) { btn.style.background = 'rgba(249,115,22,0.15)'; btn.style.borderColor = 'var(--orange)'; btn.style.color = 'var(--orange2)'; }
+
+  let lista = _sociosComunicar;
+  if (filtro === 'pagaron' || filtro === 'deben') {
+    const mesActual = getMesActual();
+    const pagos = await fetchHoja(mesActual);
+    const pagaron = new Set(pagos.map(r => String(r[4]||'').replace(/\D/g,'')));
+    if (filtro === 'pagaron') lista = lista.filter(s => pagaron.has(s.whatsapp));
+    else lista = lista.filter(s => !pagaron.has(s.whatsapp));
+  }
+
+  const tbody = document.getElementById('tabla-destinatarios');
+  const badge = document.getElementById('comunicar-count');
+  if (badge) badge.textContent = `${lista.length} socios`;
+
+  if (lista.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin socios en este filtro</td></tr>'; return; }
+
+  tbody.innerHTML = lista.map(s => `<tr>
+    <td><input type="checkbox" class="dest-check" data-whatsapp="${s.whatsapp}" data-lid="${s.lid}" data-nombre="${s.nombre}" checked style="cursor:pointer"></td>
+    <td><div class="td-nro">#${s.nro}</div></td>
+    <td class="td-name">${s.nombre}</td>
+    <td style="font-size:12px;color:var(--muted)">${s.whatsapp||s.lid||'—'}</td>
+  </tr>`).join('');
+
+  document.getElementById('check-all').checked = true;
+}
+
+function toggleTodos(checkbox) {
+  document.querySelectorAll('.dest-check').forEach(c => c.checked = checkbox.checked);
+}
+
+async function enviarComunicado() {
+  const mensaje = document.getElementById('com-mensaje').value.trim();
+  const link = document.getElementById('com-link').value.trim();
+  if (!mensaje && !_imagenData) { mostrarToast('Escribí un mensaje o agregá una imagen', '#ef4444'); return; }
+
+  const checks = [...document.querySelectorAll('.dest-check:checked')];
+  if (checks.length === 0) { mostrarToast('Seleccioná al menos un destinatario', '#ef4444'); return; }
+
+  const destinatarios = checks.map(c => ({ whatsapp: c.dataset.whatsapp, lid: c.dataset.lid, nombre: c.dataset.nombre }));
+
+  if (!confirm(`¿Enviar a ${destinatarios.length} socios?`)) return;
+
+  const btn = document.getElementById('btn-comunicar');
+  btn.textContent = 'ENVIANDO...'; btn.disabled = true; btn.style.opacity = '0.6';
+  document.getElementById('com-resultado').textContent = 'Enviando mensajes...';
+
+  try {
+    const res = await fetch('http://localhost:3001/comunicar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mensaje, link, imagen: _imagenData, destinatarios })
+    });
+    const data = await res.json();
+    document.getElementById('com-resultado').textContent = `✅ Enviados: ${data.enviados} | ❌ Errores: ${data.errores}`;
+    mostrarToast(`✅ Enviados ${data.enviados} mensajes`);
+  } catch {
+    mostrarToast('No se pudo conectar con el bot', '#ef4444');
+    document.getElementById('com-resultado').textContent = 'Error de conexión con el bot';
+  }
+
+  btn.textContent = '📣 ENVIAR A SELECCIONADOS'; btn.disabled = false; btn.style.opacity = '1';
 }
 
 async function fetchConfig() {
