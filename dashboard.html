@@ -223,7 +223,7 @@
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>#</th><th>Nombre y Apellido</th><th>LID</th><th>Cuando se anotó</th><th>Debería meses</th></tr></thead>
+          <thead><tr><th>#</th><th>Nombre y Apellido</th><th>LID</th><th>Cuando se anotó</th><th>Debería meses</th><th>Recordatorio</th></tr></thead>
           <tbody id="tabla-sinpago"><tr><td colspan="5"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
         </table>
       </div>
@@ -896,6 +896,21 @@ async function enviarComunicado() {
   }
 
   btn.textContent = '📣 ENVIAR A SELECCIONADOS'; btn.disabled = false; btn.style.opacity = '1';
+}
+
+
+async function enviarRecordatorioIndividual(lid, whatsapp, nombre, meses) {
+  try {
+    const res = await fetch('http://localhost:3001/recordatorio-individual', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lid, whatsapp, nombre, meses })
+    });
+    if (!res.ok) throw new Error('Error');
+    mostrarToast(`✅ Recordatorio enviado a ${nombre}`);
+  } catch {
+    mostrarToast('No se pudo conectar con el bot.', '#ef4444');
+  }
 }
 
 async function fetchConfig() {
