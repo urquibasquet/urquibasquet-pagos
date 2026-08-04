@@ -563,23 +563,9 @@ async function cargarSinPago(socios, hojas) {
   }
   if (badge) badge.textContent=`${sinPago.length} socio${sinPago.length!==1?'s':''}`;
   if (sinPago.length===0) { tbody.innerHTML='<tr><td colspan="5" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Todos los socios tienen al menos un pago ✅</td></tr>'; return; }
-  // Verificar si es primer dia habil del mes
-  const hoyCheck = new Date();
-  const esPrimerDiaHabil = hoyCheck.getDate() <= 7 && hoyCheck.getDay() >= 1 && hoyCheck.getDay() <= 5;
-  let hayDiaHabilAnterior = false;
-  if (esPrimerDiaHabil) {
-    for (let d = 1; d < hoyCheck.getDate(); d++) {
-      const diaSemana = new Date(hoyCheck.getFullYear(), hoyCheck.getMonth(), d).getDay();
-      if (diaSemana >= 1 && diaSemana <= 5) { hayDiaHabilAnterior = true; break; }
-    }
-  }
-  const botonHabilitado = esPrimerDiaHabil && !hayDiaHabilAnterior;
-
   tbody.innerHTML=sinPago.map(s => {
     const mesesStr = s.mesesImpagos.join(', ');
-    const boton = botonHabilitado
-      ? `<button onclick="enviarRecordatorioIndividual('${s.lid||''}','${s.whatsapp||''}','${s.nombre.replace(/'/g,'')}','${mesesStr}')" style="background:linear-gradient(135deg,var(--orange),#ea580c);color:white;border:none;border-radius:8px;padding:7px 14px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;">📣 RECORDAR</button>`
-      : `<span style="font-size:11px;color:var(--muted)">Solo el 1er día hábil</span>`;
+    const boton = `<button onclick="enviarRecordatorioIndividual('${s.lid||''}','${s.whatsapp||''}','${s.nombre.replace(/'/g,'')}','${mesesStr}')" style="background:linear-gradient(135deg,var(--orange),#ea580c);color:white;border:none;border-radius:8px;padding:7px 14px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;">📣 RECORDAR</button>`;
     return `<tr id="sinpago-row-${s.nro}">
       <td><div class="td-nro">#${s.nro}</div></td>
       <td class="td-name">${s.nombre}</td>
