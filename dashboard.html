@@ -535,7 +535,7 @@ function cargarCitas(socios) {
   container.innerHTML = conMensaje.map(s=>`<div class="cita-card"><div class="cita-nombre">${(s[3]||'')} ${(s[2]||'')}</div><div class="cita-texto">${(s[10]||'').trim()}</div></div>`).join('');
 }
 async function cargarNuevosSocios(socios) {
-  const nuevos = socios.map((s,i)=>({rowIndex:i+2,nro:s[0],apellido:s[2],nombre:s[3],tel:s[5],fechaReg:s[8],saludado:s[9],lid:s[11]})).filter(s=>s.saludado!=='si');
+  const nuevos = socios.map((s,i)=>({rowIndex:i+2,nro:s[0],apellido:s[2],nombre:s[3],tel:s[5],fechaReg:s[8],saludado:s[9],lid:s[11],estado:s[12]})).filter(s=>s.saludado!=='si' && String(s.estado||'').trim().toLowerCase() !== 'b');
   const badge=document.getElementById('nuevos-count-badge');
   if (badge) badge.textContent=`${nuevos.length} pendiente${nuevos.length!==1?'s':''}`;
   const tbody=document.getElementById('tabla-nuevos'); if (!tbody) return;
@@ -554,12 +554,13 @@ async function cargarSinPago(socios, hojas) {
   const tbody = document.getElementById('tabla-sinpago'); const badge = document.getElementById('sinpago-count-badge'); if (!tbody) return;
   const sinPago = [];
   for (const s of socios) {
+    if (String(s[12]||'').trim().toLowerCase() === 'b') continue;
     const nro=s[0]||'—'; const nombre=`${s[3]||''} ${s[2]||''}`.trim(); const tel=String(s[5]||'').replace(/\D/g,''); const lid=String(s[11]||'').trim(); const fechaReg=s[8]||'';
     let mesDesdeQueDebe = mesesDesdeInicio[0];
     if (fechaReg) { const partes=fechaReg.split('/'); if (partes.length>=3) { const mesReg=parseInt(partes[1])-1; const anioStr=partes[2]?partes[2].split(',')[0]:''; const anioReg=parseInt(anioStr); if (!isNaN(mesReg)&&!isNaN(anioReg)) { const fechaRegDate=new Date(anioReg,mesReg,1); if (fechaRegDate>INICIO) mesDesdeQueDebe=`${MESES[mesReg]} ${anioReg}`; } } }
     const idxInicio=mesesDesdeInicio.indexOf(mesDesdeQueDebe); const mesesQueDebe=idxInicio>=0?mesesDesdeInicio.slice(idxInicio):mesesDesdeInicio;
     const mesesImpagos=mesesQueDebe.filter(mes=>{ const pagos=pagosPorMes[mes]||[]; return tel?!pagos.includes(tel):true; });
-    const estadoSocio = String(s[12]||'').trim().toLowerCase();     if (estadoSocio === 'b') continue;     if (mesesImpagos.length>0) sinPago.push({nro,nombre,lid,fechaReg,mesesImpagos,whatsapp:tel});
+    if (mesesImpagos.length>0) sinPago.push({nro,nombre,lid,fechaReg,mesesImpagos,whatsapp:tel});
   }
   if (badge) badge.textContent=`${sinPago.length} socio${sinPago.length!==1?'s':''}`;
   if (sinPago.length===0) { tbody.innerHTML='<tr><td colspan="5" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Todos los socios tienen al menos un pago ✅</td></tr>'; return; }
@@ -825,12 +826,13 @@ function previewImagen(input) {
 
 async function cargarDestinatarios() {
   const socios = await fetchHoja('Socios');
-  }).filter(s => (s.whatsapp || s.lid) && String(s.estado||'').trim().toLowerCase() !== 'b');
+  _sociosComunicar = socios.map(s => ({
     nro: s[0]||'—',
     nombre: `${s[3]||''} ${s[2]||''}`.trim(),
     whatsapp: String(s[5]||'').replace(/\D/g,''),
-    lid: String(s[11]||'').trim()
-  })).filter(s => s.whatsapp || s.lid);
+    lid: String(s[11]||'').trim(),
+    estado: String(s[12]||'').trim()
+  })).filter(s => (s.whatsapp || s.lid) && s.estado.toLowerCase() !== 'b');
   filtrarDestinatarios('todos');
 }
 
@@ -1064,7 +1066,8 @@ function exportarExcel() {
 async function cargarDatos() {
   const mesActual=getMesActual(); document.getElementById('hero-month').textContent=mesActual;
   const hojas=await fetchSheetNames(); const datosMes=await fetchHoja(mesActual); const socios=await fetchHoja('Socios');
-  document.getElementById('hero-socios').textContent=socios.length||'0';
+  const sociosActivos = socios.filter(s => String(s[12]||'').trim().toLowerCase() !== 'b');
+  document.getElementById('hero-socios').textContent=sociosActivos.length||'0';
   procesarGraficos(socios); cargarCitas(socios); cargarNuevosSocios(socios); actualizarBotonesSaludar(); cargarErrores(); cargarSinPago(socios,hojas);
   const mapaSocios={};
   for (const s of socios) { const wa=String(s[5]||'').replace(/\D/g,''); if (wa) mapaSocios[wa]={nro:s[0],nombre:`${s[3]} ${s[2]}`}; }
