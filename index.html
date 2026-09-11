@@ -1747,6 +1747,36 @@ function IconBtn({
     size: size
   }));
 }
+// Comprime una foto (la achica y la pasa a JPEG liviano) antes de guardarla,
+// para no pasarse del límite de 1MB por documento de Firestore.
+function compressImage(file, maxWidth = 320, quality = 0.6) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new window.Image();
+      img.onload = () => {
+        let {
+          width,
+          height
+        } = img;
+        if (width > maxWidth) {
+          height = Math.round(height * (maxWidth / width));
+          width = maxWidth;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 function DeleteRowBtn({
   onClick,
   size = 13
@@ -2079,15 +2109,18 @@ function KitItemRow({
   onDelete
 }) {
   const fileInputRef = useRef(null);
-  function handleFoto(e) {
+  async function handleFoto(e) {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => onChange({
-      ...item,
-      foto: reader.result
-    });
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file);
+      onChange({
+        ...item,
+        foto: compressed
+      });
+    } catch (err) {
+      console.error("Error al comprimir imagen:", err);
+    }
   }
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2194,15 +2227,18 @@ function InsumoRow({
 }) {
   const total = (Number(item.cantidad) || 0) * (Number(item.costo) || 0);
   const fileInputRef = useRef(null);
-  function handleFoto(e) {
+  async function handleFoto(e) {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => onChange({
-      ...item,
-      foto: reader.result
-    });
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file);
+      onChange({
+        ...item,
+        foto: compressed
+      });
+    } catch (err) {
+      console.error("Error al comprimir imagen:", err);
+    }
   }
   return /*#__PURE__*/React.createElement("div", {
     style: {
