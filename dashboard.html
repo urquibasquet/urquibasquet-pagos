@@ -275,7 +275,7 @@
         🎯 <span>¿Cómo funciona el sistema de puntos?</span><br>
         Cada mes que pagás la cuota sumás puntos. Más puntos = más arriba en el ranking = más chances de ir al viaje.<br>
         <span>+1 pto</span> por cada mes que pagaste la cuota &nbsp;·&nbsp;
-        <span>+2 ptos</span> si pagás antes del día 10 del mes<br><br>
+        <span>+2 ptos adicionales</span> por cada mes que pagás antes del día 10<br><br>
         Los <span>primeros 20 socios con la cuota al día</span> al <span>30 de noviembre</span> se ganan el viaje <span>+ 1 acompañante</span>.<br><br>
         🏕️ El viaje es desde el <span>Lunes 11 de Enero</span> (falta ver si 1 semana o 2).<br>
         📅 Fecha de cierre del ranking: <span>30 de noviembre</span><br>
@@ -594,8 +594,8 @@ function saludarSocio(rowIndex) {
 async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
   const mesesValidos=hojas.filter(h=>!HOJAS_EXCLUIDAS.has(h)); const telefonosEsteMes=new Set(datosMes.map(r=>String(r[4]||'').replace(/\D/g,''))); const historial={},nombrePorTel={};
   for (const hoja of mesesValidos) { const filas=hoja===mesActual?datosMes:await fetchHoja(hoja); for (const r of filas) { const tel=String(r[4]||'').replace(/\D/g,''); if (!tel) continue; if (!historial[tel]) historial[tel]={meses:new Set(),pagoTemprano:false}; historial[tel].meses.add(hoja); if (!nombrePorTel[tel]) nombrePorTel[tel]=r[1]||''; } }
-  for (const r of datosMes) { const tel=String(r[4]||'').replace(/\D/g,''); if (!tel||!historial[tel]) continue; const match=(r[0]||'').match(/(\d+)\/(\d+)\/(\d+)/); if (match&&parseInt(match[1])<=10) historial[tel].pagoTemprano=true; }
-  const lista=Object.entries(historial).filter(([tel])=>telefonosEsteMes.has(tel)).map(([tel,d])=>{ let puntos=d.meses.size; if(d.pagoTemprano) puntos+=2; const socio=mapaSocios[tel]; return {tel,puntos,nombre:nombrePorTel[tel]||'',nro:socio?socio.nro:'',meses:d.meses.size,pagoTemprano:d.pagoTemprano}; }).sort((a,b)=>b.puntos-a.puntos).slice(0,50);
+  for (const hoja of mesesValidos) {     const filasHoja = hoja===mesActual ? datosMes : await fetchHoja(hoja);     for (const r of filasHoja) {       const tel=String(r[4]||'').replace(/\D/g,'');       if (!tel||!historial[tel]) continue;       const match=(r[0]||'').match(/(\d+)\/(\d+)\/(\d+)/);       if (match&&parseInt(match[1])<=10) {         if (!historial[tel].pagosTemprano) historial[tel].pagosTemprano = 0;         historial[tel].pagosTemprano++;       }     }   }
+  const lista=Object.entries(historial).filter(([tel])=>telefonosEsteMes.has(tel)).map(([tel,d])=>{ let puntos=d.meses.size + (d.pagosTemprano||0)*2; const socio=mapaSocios[tel]; return {tel,puntos,nombre:nombrePorTel[tel]||'',nro:socio?socio.nro:'',meses:d.meses.size,pagoTemprano:d.pagoTemprano}; }).sort((a,b)=>b.puntos-a.puntos).slice(0,50);
   const tSorteo=document.getElementById('tabla-sorteo');
   if (lista.length===0) { tSorteo.innerHTML='<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin participantes aun</td></tr>'; return; }
   tSorteo.innerHTML=lista.map((s,i)=>{ const rc=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''; return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${s.pagoTemprano?'<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ Pago antes del dia 10</div>':''}</td><td><div class="td-name" style="color:var(--blue)">${s.meses}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td></tr>`; }).join('');
