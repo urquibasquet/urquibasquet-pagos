@@ -265,7 +265,7 @@
   <div class="tab-panel" id="tab-camping">
     <div class="card" style="margin-bottom:20px">
       <div class="card-header">
-        <div class="card-title">Viaje a Chapadmalal — Top 20</div>
+        <div class="card-title">Viaje a Chapadmalal — Top 50</div>
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <span id="dias-restantes" style="font-size:13px;color:var(--muted);"></span>
           <button id="btn-notificar" disabled style="background:linear-gradient(135deg,var(--orange),#ea580c);color:white;border:none;border-radius:10px;padding:10px 18px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:not-allowed;opacity:0.4;">🔔 NOTIFICAR GANADORES</button>
@@ -595,7 +595,7 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
   const mesesValidos=hojas.filter(h=>!HOJAS_EXCLUIDAS.has(h)); const telefonosEsteMes=new Set(datosMes.map(r=>String(r[4]||'').replace(/\D/g,''))); const historial={},nombrePorTel={};
   for (const hoja of mesesValidos) { const filas=hoja===mesActual?datosMes:await fetchHoja(hoja); for (const r of filas) { const tel=String(r[4]||'').replace(/\D/g,''); if (!tel) continue; if (!historial[tel]) historial[tel]={meses:new Set(),pagoTemprano:false}; historial[tel].meses.add(hoja); if (!nombrePorTel[tel]) nombrePorTel[tel]=r[1]||''; } }
   for (const r of datosMes) { const tel=String(r[4]||'').replace(/\D/g,''); if (!tel||!historial[tel]) continue; const match=(r[0]||'').match(/(\d+)\/(\d+)\/(\d+)/); if (match&&parseInt(match[1])<=10) historial[tel].pagoTemprano=true; }
-  const lista=Object.entries(historial).filter(([tel])=>telefonosEsteMes.has(tel)).map(([tel,d])=>{ let puntos=d.meses.size; if(d.pagoTemprano) puntos+=2; const socio=mapaSocios[tel]; return {tel,puntos,nombre:nombrePorTel[tel]||'',nro:socio?socio.nro:'',meses:d.meses.size,pagoTemprano:d.pagoTemprano}; }).sort((a,b)=>b.puntos-a.puntos).slice(0,20);
+  const lista=Object.entries(historial).filter(([tel])=>telefonosEsteMes.has(tel)).map(([tel,d])=>{ let puntos=d.meses.size; if(d.pagoTemprano) puntos+=2; const socio=mapaSocios[tel]; return {tel,puntos,nombre:nombrePorTel[tel]||'',nro:socio?socio.nro:'',meses:d.meses.size,pagoTemprano:d.pagoTemprano}; }).sort((a,b)=>b.puntos-a.puntos).slice(0,50);
   const tSorteo=document.getElementById('tabla-sorteo');
   if (lista.length===0) { tSorteo.innerHTML='<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin participantes aun</td></tr>'; return; }
   tSorteo.innerHTML=lista.map((s,i)=>{ const rc=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''; return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${s.pagoTemprano?'<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ Pago antes del dia 10</div>':''}</td><td><div class="td-name" style="color:var(--blue)">${s.meses}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td></tr>`; }).join('');
