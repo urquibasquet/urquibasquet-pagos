@@ -305,9 +305,9 @@
           <div style="font-size:11px;color:var(--muted);margin-top:2px">cobrado en mano</div>
         </div>
         <div class="card" style="padding:16px 24px;min-width:200px;">
-          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">🎯 Potencial al día</div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">🎯 Cuotas pendientes</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:#3b82f6" id="potencial-display">—</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px">si todos pagaran este mes</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">socios sin pagar × $5.000</div>
         </div>
         <div class="card" style="padding:16px 24px;min-width:160px;">
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">📊 Al día</div>
@@ -978,7 +978,8 @@ async function cargarBalance(hojas, mesActual, datosMes) {
   window._datosPorMes = datosPorMes;
   const subtabsContent=document.getElementById('balance-mes-content'); if (!subtabsContent) return;
   const mesActualIdx=mesesHojas.indexOf(mesActual);
-  const mesesOrdenados=mesActualIdx!==-1?[mesesHojas[mesActualIdx],...mesesHojas.filter(h=>h!==mesActual)]:[...mesesHojas];
+  const mesesSinActual = mesesHojas.filter(h=>h!==mesActual).reverse();
+  const mesesOrdenados=mesActualIdx!==-1?[mesesHojas[mesActualIdx],...mesesSinActual]:[...mesesHojas].reverse();
   window._mesesBalance=mesesOrdenados; window._paginaBalance=0; renderSubtabsNav(0);
   subtabsContent.innerHTML=mesesOrdenados.map((hoja,i)=>{
     const {ingreso}=datosPorMes[hoja]; const egMes=egMesFilter(todosEgresos,hoja); const egresoMes=egMes.reduce((a,r)=>a+parseMonto(r[2]),0);
@@ -1100,9 +1101,10 @@ async function cargarDatos() {
   await cargarBalance(hojas,mesActual,datosMes);
   // Potencial y porcentaje
   const MONTO_CUOTA_POT = 5000;
-  const potencial = totalSociosActivos * MONTO_CUOTA_POT;
   const sociosPagaron = new Set(datosMes.map(r => String(r[4]||'').replace(/\D/g,'')).filter(Boolean));
   const cantPagaron = sociosActivos.filter(s => sociosPagaron.has(String(s[5]||'').replace(/\D/g,''))).length;
+  const cantPendientes = totalSociosActivos - cantPagaron;
+  const potencial = cantPendientes * MONTO_CUOTA_POT;
   const pct = totalSociosActivos > 0 ? Math.round((cantPagaron / totalSociosActivos) * 100) : 0;
   const elPot = document.getElementById('potencial-display');
   const elPct = document.getElementById('porcentaje-display');
