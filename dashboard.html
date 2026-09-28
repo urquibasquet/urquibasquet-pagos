@@ -187,8 +187,6 @@
     <button class="tab-btn" id="btn-tab-errores" onclick="showTab('alertas',this)">🚨 Alertas</button>
     <button class="tab-btn" onclick="showTab('camping',this)">🏕️ Viaje al Camping</button>
     <button class="tab-btn" onclick="showTab('socios',this)">👥 Datos de los Socios</button>
-    <button class="tab-btn" onclick="showTab('servicios',this);cargarServicios()">🔧 Servicios</button>
-    <button class="tab-btn" onclick="showTab('comunicar',this);cargarDestinatarios()">📣 Comunicar</button>
   </div>
 
   <!-- TAB 1: PAGOS -->
@@ -346,82 +344,6 @@
       <div class="citas-grid" id="citas-container"><div class="loading"><div class="spinner"></div><br>Cargando...</div></div>
     </div>
   </div>
-
-  <!-- TAB: SERVICIOS -->
-  <div class="tab-panel" id="tab-servicios">
-    <div class="card" style="margin-bottom:20px">
-      <div class="card-header">
-        <div class="card-title">Estado de Servicios</div>
-        <span class="card-badge badge-blue" id="servicios-update">Actualizando...</span>
-      </div>
-      <div style="padding:12px 22px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);">
-        Estado en tiempo real de los servicios que usa el sistema.
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Servicio</th><th>Estado</th><th>Qué hacer</th></tr></thead>
-          <tbody id="tabla-servicios"><tr><td colspan="3"><div class="loading"><div class="spinner"></div><br>Verificando...</div></td></tr></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- TAB: COMUNICAR -->
-  <div class="tab-panel" id="tab-comunicar">
-    <div class="card" style="margin-bottom:20px">
-      <div class="card-header">
-        <div class="card-title">📣 Envío Masivo</div>
-        <span class="card-badge badge-orange" id="comunicar-count">—</span>
-      </div>
-      <div style="padding:20px 28px;display:flex;flex-direction:column;gap:16px">
-
-        <!-- Mensaje -->
-        <div>
-          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Mensaje</div>
-          <textarea id="com-mensaje" placeholder="Escribí el mensaje acá..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;resize:vertical;min-height:100px;outline:none;line-height:1.6"></textarea>
-        </div>
-
-        <!-- Link -->
-        <div>
-          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Link (opcional)</div>
-          <input id="com-link" type="url" placeholder="https://..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none">
-        </div>
-
-        <!-- Imagen -->
-        <div>
-          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Imagen (opcional)</div>
-          <input id="com-imagen" type="file" accept="image/*" onchange="previewImagen(this)" style="display:none">
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-            <button onclick="document.getElementById('com-imagen').click()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 18px;font-size:13px;cursor:pointer">📎 Subir imagen</button>
-            <div id="com-imagen-preview" style="font-size:13px;color:var(--muted)">Sin imagen</div>
-          </div>
-        </div>
-
-        <!-- Destinatarios -->
-        <div>
-          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Destinatarios</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-            <button onclick="filtrarDestinatarios('todos')" class="dest-btn active" id="dest-todos" style="background:rgba(249,115,22,0.15);border:1px solid var(--orange);color:var(--orange2);border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer">Todos</button>
-            <button onclick="filtrarDestinatarios('pagaron')" class="dest-btn" id="dest-pagaron" style="background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer">Pagaron este mes</button>
-            <button onclick="filtrarDestinatarios('deben')" class="dest-btn" id="dest-deben" style="background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer">Deben cuotas</button>
-          </div>
-          <div class="table-wrap" style="max-height:250px;overflow-y:auto;border:1px solid var(--border);border-radius:10px">
-            <table>
-              <thead><tr><th style="width:40px"><input type="checkbox" id="check-all" onchange="toggleTodos(this)" style="cursor:pointer"></th><th>#</th><th>Nombre</th><th>WhatsApp</th></tr></thead>
-              <tbody id="tabla-destinatarios"><tr><td colspan="4"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Botón enviar -->
-        <div style="display:flex;justify-content:flex-end">
-          <button onclick="enviarComunicado()" id="btn-comunicar" style="background:linear-gradient(135deg,var(--orange),#ea580c);color:white;border:none;border-radius:10px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;cursor:pointer">📣 ENVIAR A SELECCIONADOS</button>
-        </div>
-        <div id="com-resultado" style="font-size:13px;color:var(--muted);text-align:right"></div>
-      </div>
-    </div>
-  </div>
-
   <div class="last-update">Actualización automática cada 30 segundos · <span id="last-time">—</span></div>
 </div>
 
@@ -447,9 +369,43 @@ function parseMonto(v) {
   return parseFloat(s) || 0;
 }
 
-async function fetchHoja(nombre) {
+const _cache = {};
+const _cacheTTL = {};
+const CACHE_DURATION = 120000; // 2 minutos
+
+async function fetchHoja(nombre, forzar = false) {
+  const ahora = Date.now();
+  if (!forzar && _cache[nombre] && _cacheTTL[nombre] && (ahora - _cacheTTL[nombre]) < CACHE_DURATION) {
+    return _cache[nombre];
+  }
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(nombre+'!A2:Z')}?key=${API_KEY}`;
-  try { const res = await fetch(url); if (!res.ok) return []; const data = await res.json(); return data.values || []; } catch { return []; }
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return _cache[nombre] || [];
+    const data = await res.json();
+    _cache[nombre] = data.values || [];
+    _cacheTTL[nombre] = ahora;
+    return _cache[nombre];
+  } catch {
+    return _cache[nombre] || [];
+  }
+}
+
+async function fetchSheetNamesCache(forzar = false) {
+  const ahora = Date.now();
+  if (!forzar && _cache['__sheetNames'] && _cacheTTL['__sheetNames'] && (ahora - _cacheTTL['__sheetNames']) < CACHE_DURATION) {
+    return _cache['__sheetNames'];
+  }
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    _cache['__sheetNames'] = (data.sheets || []).map(s => s.properties.title);
+    _cacheTTL['__sheetNames'] = ahora;
+    return _cache['__sheetNames'];
+  } catch {
+    return _cache['__sheetNames'] || [];
+  }
 }
 async function fetchSheetNames() {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}`;
@@ -728,213 +684,7 @@ async function enviarRecordatorio() {
 }
 
 
-async function cargarServicios() {
-  const servicios = [
-    {
-      nombre: '🤖 Bot WhatsApp',
-      check: async () => {
-        try {
-          const res = await fetch('http://localhost:3001/config', { signal: AbortSignal.timeout(3000) });
-          if (res.ok) return { ok: true, desc: 'Conectado y respondiendo', accion: 'Todo bien' };
-          return { ok: false, desc: 'El bot responde pero con error', accion: 'Reiniciar con pm2 restart urquibasquet-bot' };
-        } catch {
-          return { ok: false, desc: 'No responde — bot caído o PC apagada', accion: 'Ejecutar: taskkill /F /IM chrome.exe && pm2 restart urquibasquet-bot' };
-        }
-      }
-    },
-    {
-      nombre: '📄 Google Sheets',
-      check: async () => {
-        try {
-          const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}`;
-          const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
-          if (res.ok) return { ok: true, desc: 'Acceso correcto al Sheet', accion: 'Todo bien' };
-          return { ok: false, desc: `Error ${res.status} al acceder al Sheet`, accion: 'Verificar API Key y permisos del Sheet' };
-        } catch {
-          return { ok: false, desc: 'Sin conexión a Google Sheets', accion: 'Verificar conexión a internet' };
-        }
-      }
-    },
-    {
-      nombre: '🧠 Claude AI (Anthropic)',
-      check: async () => {
-        try {
-          const res = await fetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 10, messages: [{ role: 'user', content: 'ok' }] }),
-            signal: AbortSignal.timeout(10000)
-          });
-          if (res.status === 200) return { ok: true, desc: 'API respondiendo correctamente', accion: 'Todo bien' };
-          if (res.status === 529) return { ok: false, desc: 'Sobrecargado — error 529', accion: 'Esperar unos minutos y reintentar' };
-          if (res.status === 401) return { ok: false, desc: 'API Key inválida', accion: 'Verificar ANTHROPIC_API_KEY en .env' };
-          return { ok: false, desc: `Error ${res.status}`, accion: 'Consultar status.anthropic.com' };
-        } catch {
-          return { ok: false, desc: 'Sin respuesta de Anthropic', accion: 'Verificar status.anthropic.com' };
-        }
-      }
-    },
-    {
-      nombre: '💬 WhatsApp Web (downloadMedia)',
-      check: async () => {
-        // Check based on known issue date July 13 2026
-        const issueDate = new Date('2026-07-13');
-        const hoy = new Date();
-        if (hoy >= issueDate) {
-          return { ok: false, desc: 'Bug conocido desde 13/07/2026 — WhatsApp actualizó su API interna', accion: 'Esperar fix de whatsapp-web.js en github.com/wwebjs/whatsapp-web.js/issues' };
-        }
-        return { ok: true, desc: 'Funcionando correctamente', accion: 'Todo bien' };
-      }
-    }
-  ];
 
-  const tbody = document.getElementById('tabla-servicios');
-  const badge = document.getElementById('servicios-update');
-  if (!tbody) return;
-
-  tbody.innerHTML = '<tr><td colspan="3"><div class="loading"><div class="spinner"></div><br>Verificando...</div></td></tr>';
-
-  const resultados = await Promise.all(servicios.map(async s => {
-    const r = await s.check();
-    return { nombre: s.nombre, ...r };
-  }));
-
-  const ahora = new Date();
-  const hh = ahora.getHours().toString().padStart(2,'0');
-  const mm = ahora.getMinutes().toString().padStart(2,'0');
-  if (badge) badge.textContent = `Actualizado ${hh}:${mm}`;
-
-  tbody.innerHTML = resultados.map(r => `
-    <tr>
-      <td><div class="td-name">${r.nombre}</div></td>
-      <td>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="width:10px;height:10px;border-radius:50%;background:${r.ok?'var(--green)':'#ef4444'};flex-shrink:0;${r.ok?'':'animation:pulse 1.5s infinite'}"></div>
-          <span style="font-size:13px;color:${r.ok?'var(--green)':'#f87171'}">${r.desc}</span>
-        </div>
-      </td>
-      <td style="font-size:13px;color:var(--muted)">${r.accion}</td>
-    </tr>
-  `).join('');
-}
-
-
-let _sociosComunicar = [];
-let _filtroActivo = 'todos';
-let _imagenData = null;
-
-function previewImagen(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const base64 = e.target.result.split(',')[1];
-    const mime = file.type;
-    _imagenData = { data: base64, mimetype: mime, filename: file.name };
-    document.getElementById('com-imagen-preview').textContent = `✅ ${file.name}`;
-    document.getElementById('com-imagen-preview').style.color = 'var(--green)';
-  };
-  reader.readAsDataURL(file);
-}
-
-async function cargarDestinatarios() {
-  const socios = await fetchHoja('Socios');
-  _sociosComunicar = socios.map(s => ({
-    nro: s[0]||'—',
-    nombre: `${s[3]||''} ${s[2]||''}`.trim(),
-    whatsapp: String(s[5]||'').replace(/\D/g,''),
-    lid: String(s[11]||'').trim(),
-    estado: String(s[12]||'').trim()
-  })).filter(s => (s.whatsapp || s.lid) && s.estado.toLowerCase() !== 'b');
-  filtrarDestinatarios('todos');
-}
-
-async function filtrarDestinatarios(filtro) {
-  _filtroActivo = filtro;
-  document.querySelectorAll('.dest-btn').forEach(b => {
-    b.style.background = 'var(--bg3)';
-    b.style.borderColor = 'var(--border)';
-    b.style.color = 'var(--muted)';
-  });
-  const btn = document.getElementById(`dest-${filtro}`);
-  if (btn) { btn.style.background = 'rgba(249,115,22,0.15)'; btn.style.borderColor = 'var(--orange)'; btn.style.color = 'var(--orange2)'; }
-
-  let lista = _sociosComunicar;
-  if (filtro === 'pagaron' || filtro === 'deben') {
-    const mesActual = getMesActual();
-    const pagos = await fetchHoja(mesActual);
-    const pagaron = new Set(pagos.map(r => String(r[4]||'').replace(/\D/g,'')));
-    if (filtro === 'pagaron') lista = lista.filter(s => pagaron.has(s.whatsapp));
-    else lista = lista.filter(s => !pagaron.has(s.whatsapp));
-  }
-
-  const tbody = document.getElementById('tabla-destinatarios');
-  const badge = document.getElementById('comunicar-count');
-  if (badge) badge.textContent = `${lista.length} socios`;
-
-  if (lista.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="padding:20px;text-align:center;color:#64748b;font-style:italic">Sin socios en este filtro</td></tr>'; return; }
-
-  tbody.innerHTML = lista.map(s => `<tr>
-    <td><input type="checkbox" class="dest-check" data-whatsapp="${s.whatsapp}" data-lid="${s.lid}" data-nombre="${s.nombre}" checked style="cursor:pointer"></td>
-    <td><div class="td-nro">#${s.nro}</div></td>
-    <td class="td-name">${s.nombre}</td>
-    <td style="font-size:12px;color:var(--muted)">${s.whatsapp||s.lid||'—'}</td>
-  </tr>`).join('');
-
-  document.getElementById('check-all').checked = true;
-}
-
-function toggleTodos(checkbox) {
-  document.querySelectorAll('.dest-check').forEach(c => c.checked = checkbox.checked);
-}
-
-async function enviarComunicado() {
-  const mensaje = document.getElementById('com-mensaje').value.trim();
-  const link = document.getElementById('com-link').value.trim();
-  if (!mensaje && !_imagenData) { mostrarToast('Escribí un mensaje o agregá una imagen', '#ef4444'); return; }
-
-  const checks = [...document.querySelectorAll('.dest-check:checked')];
-  if (checks.length === 0) { mostrarToast('Seleccioná al menos un destinatario', '#ef4444'); return; }
-
-  const destinatarios = checks.map(c => ({ whatsapp: c.dataset.whatsapp, lid: c.dataset.lid, nombre: c.dataset.nombre }));
-
-  if (!confirm(`¿Enviar a ${destinatarios.length} socios?`)) return;
-
-  const btn = document.getElementById('btn-comunicar');
-  btn.textContent = 'ENVIANDO...'; btn.disabled = true; btn.style.opacity = '0.6';
-  document.getElementById('com-resultado').textContent = 'Enviando mensajes...';
-
-  try {
-    const res = await fetch('http://localhost:3001/comunicar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mensaje, link, imagen: _imagenData, destinatarios })
-    });
-    const data = await res.json();
-    document.getElementById('com-resultado').textContent = `✅ Enviados: ${data.enviados} | ❌ Errores: ${data.errores}`;
-    mostrarToast(`✅ Enviados ${data.enviados} mensajes`);
-  } catch {
-    mostrarToast('No se pudo conectar con el bot', '#ef4444');
-    document.getElementById('com-resultado').textContent = 'Error de conexión con el bot';
-  }
-
-  btn.textContent = '📣 ENVIAR A SELECCIONADOS'; btn.disabled = false; btn.style.opacity = '1';
-}
-
-
-async function enviarRecordatorioIndividual(lid, whatsapp, nombre, meses) {
-  try {
-    const res = await fetch('http://localhost:3001/recordatorio-individual', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lid, whatsapp, nombre, meses })
-    });
-    if (!res.ok) throw new Error('Error');
-    mostrarToast(`✅ Recordatorio enviado a ${nombre}`);
-  } catch {
-    mostrarToast('No se pudo conectar con el bot.', '#ef4444');
-  }
-}
 
 async function fetchConfig() {
   try {
@@ -1077,9 +827,12 @@ function exportarExcel() {
   const a=document.createElement('a'); a.href=url; a.download='balance_urquibasquet.xls'; a.click(); URL.revokeObjectURL(url);
 }
 
+let _primeraVez = true;
 async function cargarDatos() {
+  const forzar = _primeraVez;
+  _primeraVez = false;
   const mesActual=getMesActual(); document.getElementById('hero-month').textContent=mesActual;
-  const hojas=await fetchSheetNames(); const datosMes=await fetchHoja(mesActual); const socios=await fetchHoja('Socios');
+  const hojas=await fetchSheetNamesCache(forzar); const datosMes=await fetchHoja(mesActual, forzar); const socios=await fetchHoja('Socios', forzar);
   const sociosActivos = socios.filter(s => String(s[12]||'').trim().toLowerCase() !== 'b');
   const totalSociosActivos = sociosActivos.length;
   document.getElementById('hero-socios').textContent=totalSociosActivos||'0';
