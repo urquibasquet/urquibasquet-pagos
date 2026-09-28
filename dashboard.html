@@ -307,7 +307,7 @@
         <div class="card" style="padding:16px 24px;min-width:200px;">
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">🎯 Cuotas pendientes</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:#3b82f6" id="potencial-display">—</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px">socios sin pagar × $5.000</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px" id="pendientes-sub">calculando...</div>
         </div>
         <div class="card" style="padding:16px 24px;min-width:160px;">
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">📊 Al día</div>
@@ -573,6 +573,9 @@ async function cargarSinPago(socios, hojas) {
     if (mesesImpagos.length>0) sinPago.push({nro,nombre,lid,fechaReg,mesesImpagos,whatsapp:tel});
   }
   if (badge) badge.textContent=`${sinPago.length} socio${sinPago.length!==1?'s':''}`;
+  // Calcular total de cuotas pendientes (meses × $5000)
+  const totalCuotasPendientes = sinPago.reduce((acc, s) => acc + s.mesesImpagos.length * 5000, 0);
+  window._totalCuotasPendientes = totalCuotasPendientes;
   if (sinPago.length===0) { tbody.innerHTML='<tr><td colspan="5" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Todos los socios tienen al menos un pago ✅</td></tr>'; return; }
   tbody.innerHTML=sinPago.map(s => {
     const mesesStr = s.mesesImpagos.join(', ');
@@ -1104,12 +1107,14 @@ async function cargarDatos() {
   const sociosPagaron = new Set(datosMes.map(r => String(r[4]||'').replace(/\D/g,'')).filter(Boolean));
   const cantPagaron = sociosActivos.filter(s => sociosPagaron.has(String(s[5]||'').replace(/\D/g,''))).length;
   const cantPendientes = totalSociosActivos - cantPagaron;
-  const potencial = cantPendientes * MONTO_CUOTA_POT;
+  const potencial = window._totalCuotasPendientes || (cantPendientes * MONTO_CUOTA_POT);
   const pct = totalSociosActivos > 0 ? Math.round((cantPagaron / totalSociosActivos) * 100) : 0;
   const elPot = document.getElementById('potencial-display');
   const elPct = document.getElementById('porcentaje-display');
   const elPctSub = document.getElementById('porcentaje-sub');
   if (elPot) elPot.textContent = '$' + potencial.toLocaleString('es-AR');
+  const elPendSub = document.getElementById('pendientes-sub');
+  if (elPendSub) elPendSub.textContent = cantPendientes + ' socios · ' + (window._totalCuotasPendientes ? Math.round(window._totalCuotasPendientes/5000) + ' cuotas' : '');
   if (elPct) { elPct.textContent = pct + '%'; elPct.style.color = pct >= 80 ? 'var(--green)' : pct >= 50 ? '#f97316' : '#ef4444'; }
   if (elPctSub) elPctSub.textContent = cantPagaron + ' de ' + totalSociosActivos + ' socios';
   const ahoraD=new Date(); const hh24=ahoraD.getHours(),hh12=hh24%12||12,ampm=hh24>=12?'PM':'AM'; const mm2=String(ahoraD.getMinutes()).padStart(2,'0'),ss2=String(ahoraD.getSeconds()).padStart(2,'0');
