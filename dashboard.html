@@ -535,7 +535,19 @@ async function cargarSinPago(socios, hojas) {
   if (sinPago.length===0) { tbody.innerHTML='<tr><td colspan="5" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Todos los socios tienen al menos un pago ✅</td></tr>'; return; }
   tbody.innerHTML=sinPago.map(s => {
     const mesesStr = s.mesesImpagos.join(', ');
-    const boton = `<button onclick="enviarRecordatorioIndividual('${s.lid||''}','${s.whatsapp||''}','${s.nombre.replace(/'/g,'')}','${mesesStr}')" style="background:linear-gradient(135deg,var(--orange),#ea580c);color:white;border:none;border-radius:8px;padding:7px 14px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;">📣 RECORDAR</button>`;
+    const nombreLimpio = s.nombre.replace(/'/g, '');
+    const mesActualStr = getMesActual();
+    const mesesArray = mesesStr.split(', ');
+    const debeActual = mesesArray.includes(mesActualStr);
+    const otrosMeses = mesesArray.filter(m => m !== mesActualStr);
+    const textoMeses = debeActual ? mesActualStr : mesesArray[0];
+    const textoDeuda = otrosMeses.length > 0 ? `%0A%0ATe recordamos que también debés las cuotas de: *${otrosMeses.join(', ')}*` : '';
+    const mensaje = `Hola ${nombreLimpio}! 🏀%0A%0ATe avisamos que ya podes abonar la cuota de *${textoMeses}*.%0ASi ya transferiste, por favor envianos el comprobante por este medio.%0A%0A*Datos para la transferencia:*%0A👤 Asoc Civil Urquibasquet%0A🔢 CUIT/CUIL: 30-71913330-0%0A🏦 Banco Credicoop%0A📋 Alias: elurqui.basquet%0A💰 Monto de la cuota: $5.000${textoDeuda}`;
+    const tel = s.whatsapp ? '549' + s.whatsapp : '';
+    const url = tel ? `https://wa.me/${tel}?text=${mensaje}` : '#';
+    const boton = tel
+      ? `<a href="${url}" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;border-radius:8px;padding:7px 14px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;text-decoration:none;">📣 RECORDAR</a>`
+      : `<span style="font-size:11px;color:var(--muted)">Sin número</span>`;
     return `<tr id="sinpago-row-${s.nro}">
       <td><div class="td-nro">#${s.nro}</div></td>
       <td class="td-name">${s.nombre}</td>
