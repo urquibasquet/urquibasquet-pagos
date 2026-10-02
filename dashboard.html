@@ -124,6 +124,12 @@
   .password-btn:hover { opacity: 0.9; }
   .password-error { font-size: 12px; color: #f87171; margin-top: 10px; min-height: 18px; }
   @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  .pin-dot { width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);background:transparent;transition:background 0.15s; }
+  .pin-dot.filled { background:white;border-color:white; }
+  .pin-dot.error { border-color:#ef4444;background:#ef4444; }
+  .pin-btn { background:rgba(255,255,255,0.12);border:none;border-radius:50%;width:76px;height:76px;font-family:'DM Sans',sans-serif;font-size:26px;font-weight:500;color:white;cursor:pointer;transition:background 0.15s;-webkit-tap-highlight-color:transparent; }
+  .pin-btn:active { background:rgba(255,255,255,0.3); }
+  .pin-delete { font-size:22px; }
   @media (max-width: 700px) {
     .graficos-grid { grid-template-columns: 1fr; }
     .citas-grid { grid-template-columns: 1fr; }
@@ -145,13 +151,32 @@
 </head>
 <body>
 <div class="password-overlay" id="password-overlay">
-  <div class="password-box">
-    <img src="https://urquibasquet.github.io/urquibasquet-pagos/Logo_Nuevo_Urqui.png" class="password-logo" alt="Urquibasquet">
-    <div class="password-title">URQUIBASQUET</div>
-    <div class="password-sub">Ingresá la contraseña para continuar</div>
-    <input type="password" class="password-input" id="password-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') verificarPassword()">
-    <button class="password-btn" onclick="verificarPassword()">INGRESAR</button>
-    <div class="password-error" id="password-error"></div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:32px;padding:40px 20px;width:100%;max-width:320px;margin:0 auto">
+    <img src="https://urquibasquet.github.io/urquibasquet-pagos/Logo_Nuevo_Urqui.png" style="width:72px;height:72px;border-radius:50%;object-fit:cover;box-shadow:0 0 30px rgba(30,80,200,0.5)" alt="Urquibasquet">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:var(--text)">URQUIBASQUET</div>
+    <!-- PIN dots -->
+    <div style="display:flex;gap:20px;align-items:center" id="pin-dots">
+      <div class="pin-dot" id="dot-0"></div>
+      <div class="pin-dot" id="dot-1"></div>
+      <div class="pin-dot" id="dot-2"></div>
+      <div class="pin-dot" id="dot-3"></div>
+    </div>
+    <div id="pin-error" style="font-size:13px;color:#f87171;min-height:18px;text-align:center"></div>
+    <!-- PIN pad -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%">
+      <button class="pin-btn" onclick="pinPress('1')">1</button>
+      <button class="pin-btn" onclick="pinPress('2')">2</button>
+      <button class="pin-btn" onclick="pinPress('3')">3</button>
+      <button class="pin-btn" onclick="pinPress('4')">4</button>
+      <button class="pin-btn" onclick="pinPress('5')">5</button>
+      <button class="pin-btn" onclick="pinPress('6')">6</button>
+      <button class="pin-btn" onclick="pinPress('7')">7</button>
+      <button class="pin-btn" onclick="pinPress('8')">8</button>
+      <button class="pin-btn" onclick="pinPress('9')">9</button>
+      <div></div>
+      <button class="pin-btn" onclick="pinPress('0')">0</button>
+      <button class="pin-btn pin-delete" onclick="pinDelete()">⌫</button>
+    </div>
   </div>
 </div>
 <div class="header">
@@ -412,24 +437,50 @@ async function fetchSheetNames() {
   try { const res = await fetch(url); const data = await res.json(); return (data.sheets || []).map(s => s.properties.title); } catch { return []; }
 }
 
-// PASSWORD
-const PASSWORD = 'urqui2026';
+// PIN
+const PIN_CORRECTO = '2026';
 const SESSION_KEY = 'urqui_auth';
-function verificarPassword() {
-  const input = document.getElementById('password-input');
-  const error = document.getElementById('password-error');
-  if (input.value === PASSWORD) {
+let _pinActual = '';
+
+function pinPress(digit) {
+  if (_pinActual.length >= 4) return;
+  _pinActual += digit;
+  actualizarDots();
+  if (_pinActual.length === 4) {
+    setTimeout(() => verificarPin(), 150);
+  }
+}
+
+function pinDelete() {
+  _pinActual = _pinActual.slice(0, -1);
+  actualizarDots();
+  document.getElementById('pin-error').textContent = '';
+}
+
+function actualizarDots() {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('dot-' + i);
+    dot.classList.remove('filled', 'error');
+    if (i < _pinActual.length) dot.classList.add('filled');
+  }
+}
+
+function verificarPin() {
+  if (_pinActual === PIN_CORRECTO) {
     sessionStorage.setItem(SESSION_KEY, '1');
     document.getElementById('password-overlay').style.display = 'none';
     cargarDatos();
   } else {
-    input.classList.add('error'); error.textContent = 'Contraseña incorrecta'; input.value = '';
-    setTimeout(() => input.classList.remove('error'), 400);
+    for (let i = 0; i < 4; i++) {
+      document.getElementById('dot-' + i).classList.add('error');
+    }
+    document.getElementById('pin-error').textContent = 'PIN incorrecto';
+    setTimeout(() => { _pinActual = ''; actualizarDots(); document.getElementById('pin-error').textContent = ''; }, 800);
   }
 }
+
 function initAuth() {
   if (sessionStorage.getItem(SESSION_KEY) === '1') { document.getElementById('password-overlay').style.display = 'none'; cargarDatos(); }
-  else { setTimeout(() => document.getElementById('password-input').focus(), 100); }
 }
 
 function showTab(name, btn) {
@@ -542,18 +593,7 @@ async function cargarSinPago(socios, hojas) {
     const otrosMeses = mesesArray.filter(m => m !== mesActualStr);
     const textoMeses = debeActual ? mesActualStr : mesesArray[0];
     const textoDeuda = otrosMeses.length > 0 ? `%0A%0ATe recordamos que también debés las cuotas de: *${otrosMeses.join(', ')}*` : '';
-    const msgTexto = `Hola ${nombreLimpio}! 🏀
-
-Te avisamos que ya podes abonar la cuota de *${textoMeses}*.
-Si ya transferiste, por favor envianos el comprobante por este medio.
-
-*Datos para la transferencia:*
-Asoc Civil Urquibasquet
-CUIT/CUIL: 30-71913330-0
-Banco Credicoop
-Alias: elurqui.basquet
-Monto de la cuota: $5.000${textoDeuda.replace(/%0A/g, '
-').replace(/%2A/g, '*')}`; const mensaje = encodeURIComponent(msgTexto);
+    const mensaje = `Hola ${nombreLimpio}! 🏀%0A%0ATe avisamos que ya podes abonar la cuota de *${textoMeses}*.%0ASi ya transferiste, por favor envianos el comprobante por este medio.%0A%0A*Datos para la transferencia:*%0A👤 Asoc Civil Urquibasquet%0A🔢 CUIT/CUIL: 30-71913330-0%0A🏦 Banco Credicoop%0A📋 Alias: elurqui.basquet%0A💰 Monto de la cuota: $5.000${textoDeuda}`;
     const tel = s.whatsapp ? '549' + s.whatsapp : '';
     const url = tel ? `https://wa.me/${tel}?text=${mensaje}` : '#';
     const boton = tel
