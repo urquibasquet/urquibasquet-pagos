@@ -288,7 +288,7 @@
   <div class="tab-panel" id="tab-camping">
     <div class="card" style="margin-bottom:20px">
       <div class="card-header">
-        <div class="card-title">Viaje a Chapadmalal — Top 20</div>
+        <div class="card-title">Viaje a Chapadmalal — Top 30</div>
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <span id="dias-restantes" style="font-size:13px;color:var(--muted);"></span>
           <button id="btn-notificar" disabled style="background:linear-gradient(135deg,var(--orange),#ea580c);color:white;border:none;border-radius:10px;padding:10px 18px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:not-allowed;opacity:0.4;">🔔 NOTIFICAR GANADORES</button>
@@ -298,7 +298,7 @@
         🎯 <span>¿Cómo funciona el sistema de puntos?</span><br>
         Cada mes que pagás la cuota sumás puntos. Más puntos = más arriba en el ranking = más chances de ir al viaje.<br>
         <span>+1 pto</span> por cada mes que pagaste la cuota &nbsp;·&nbsp;
-        <span>+2 ptos</span> si pagás antes del día 10 del mes<br><br>
+        <span>+2 ptos adicionales</span> por cada mes que pagás antes del día 10 (acumulativo)<br><br>
         Los <span>primeros 20 socios con la cuota al día</span> al <span>30 de noviembre</span> se ganan el viaje <span>+ 1 acompañante</span>.<br><br>
         🏕️ El viaje es desde el <span>Lunes 11 de Enero</span> (falta ver si 1 semana o 2).<br>
         📅 Fecha de cierre del ranking: <span>30 de noviembre</span><br>
@@ -641,13 +641,44 @@ function saludarSocio(rowIndex) {
     }).catch(()=>mostrarToast('No se pudo conectar con el bot.','#ef4444'));
 }
 async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
-  const mesesValidos=hojas.filter(h=>!HOJAS_EXCLUIDAS.has(h)); const telefonosEsteMes=new Set(datosMes.map(r=>String(r[4]||'').replace(/\D/g,''))); const historial={},nombrePorTel={};
-  for (const hoja of mesesValidos) { const filas=hoja===mesActual?datosMes:await fetchHoja(hoja); for (const r of filas) { const tel=String(r[4]||'').replace(/\D/g,''); if (!tel) continue; if (!historial[tel]) historial[tel]={meses:new Set(),pagoTemprano:false}; historial[tel].meses.add(hoja); if (!nombrePorTel[tel]) nombrePorTel[tel]=r[1]||''; } }
-  for (const r of datosMes) { const tel=String(r[4]||'').replace(/\D/g,''); if (!tel||!historial[tel]) continue; const match=(r[0]||'').match(/(\d+)\/(\d+)\/(\d+)/); if (match&&parseInt(match[1])<=10) historial[tel].pagoTemprano=true; }
-  const lista=Object.entries(historial).filter(([tel])=>telefonosEsteMes.has(tel)).map(([tel,d])=>{ let puntos=d.meses.size; if(d.pagoTemprano) puntos+=2; const socio=mapaSocios[tel]; return {tel,puntos,nombre:nombrePorTel[tel]||'',nro:socio?socio.nro:'',meses:d.meses.size,pagoTemprano:d.pagoTemprano}; }).sort((a,b)=>b.puntos-a.puntos).slice(0,20);
-  const tSorteo=document.getElementById('tabla-sorteo');
-  if (lista.length===0) { tSorteo.innerHTML='<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin participantes aun</td></tr>'; return; }
-  tSorteo.innerHTML=lista.map((s,i)=>{ const rc=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''; return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${s.pagoTemprano?'<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ Pago antes del dia 10</div>':''}</td><td><div class="td-name" style="color:var(--blue)">${s.meses}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td></tr>`; }).join('');
+  const mesesValidos = hojas.filter(h => !HOJAS_EXCLUIDAS.has(h));
+  const historial = {}, nombrePorTel = {};
+
+  // Recorrer TODOS los meses historicos acumulando puntos
+  for (const hoja of mesesValidos) {
+    const filas = hoja === mesActual ? datosMes : await fetchHoja(hoja);
+    for (const r of filas) {
+      const tel = String(r[4]||'').replace(/\D/g,'');
+      if (!tel) continue;
+      if (!historial[tel]) historial[tel] = { meses: new Set(), pagosTemprano: 0 };
+      historial[tel].meses.add(hoja);
+      if (!nombrePorTel[tel]) nombrePorTel[tel] = r[1]||'';
+      // Verificar si pago antes del dia 10 en este mes
+      const match = (r[0]||'').match(/(\d+)\/(\d+)\/(\d+)/);
+      if (match && parseInt(match[1]) <= 10) {
+        historial[tel].pagosTemprano++;
+      }
+    }
+  }
+
+  // Calcular puntos: +1 por mes pagado, +2 por cada mes pagado antes del dia 10
+  const lista = Object.entries(historial)
+    .map(([tel, d]) => {
+      const puntos = d.meses.size + (d.pagosTemprano * 2);
+      const socio = mapaSocios[tel];
+      return { tel, puntos, nombre: nombrePorTel[tel]||'', nro: socio ? socio.nro : '', meses: d.meses.size, pagosTemprano: d.pagosTemprano };
+    })
+    .filter(s => s.meses > 0)
+    .sort((a, b) => b.puntos - a.puntos)
+    .slice(0, 30);
+
+  const tSorteo = document.getElementById('tabla-sorteo');
+  if (lista.length === 0) { tSorteo.innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin participantes aun</td></tr>'; return; }
+  tSorteo.innerHTML = lista.map((s, i) => {
+    const rc = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+    const tempDesc = s.pagosTemprano > 0 ? `<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ ${s.pagosTemprano} mes${s.pagosTemprano>1?'es':''} antes del dia 10</div>` : '';
+    return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${tempDesc}</td><td><div class="td-name" style="color:var(--blue)">${s.meses}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td></tr>`;
+  }).join('');
 }
 function parseFechaStr(str) {
   try { const s=String(str||'').trim(); const partes=s.split(/[,\s]+/); const fp=partes[0].split('/'); if (fp.length===3) { const d=parseInt(fp[0]),m=parseInt(fp[1])-1,y=parseInt(fp[2]); const horaParte=partes[1]||''; if (horaParte) { const hp=horaParte.split(':'); return new Date(y,m,d,parseInt(hp[0]||0),parseInt(hp[1]||0),parseInt(hp[2]||0)); } return new Date(y,m,d); } } catch {} return null;
