@@ -178,11 +178,11 @@
     </div>
   </div>
   <!-- DESKTOP: password box -->
-  <div id="auth-desktop" class="password-box">
+  <div id="auth-desktop" class="password-box" onkeydown="if(event.key==='Enter') verificarPassword()">
     <img src="https://urquibasquet.github.io/urquibasquet-pagos/Logo_Nuevo_Urqui.png" class="password-logo" alt="Urquibasquet">
     <div class="password-title">URQUIBASQUET</div>
     <div class="password-sub">Ingresá la contraseña para continuar</div>
-    <input type="password" class="password-input" id="password-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') verificarPassword()">
+    <input type="password" class="password-input" id="password-input" placeholder="••••••••">
     <button class="password-btn" onclick="verificarPassword()">INGRESAR</button>
     <div class="password-error" id="password-error"></div>
   </div>
