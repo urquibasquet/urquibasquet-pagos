@@ -504,19 +504,7 @@ async function cargarSinPago(socios, hojas) {
     const debeActual = mesesArray.includes(mesActualStr);
     const otrosMeses = mesesArray.filter(m => m !== mesActualStr);
     const textoMeses = debeActual ? mesActualStr : mesesArray[0];
-    const msgTexto = `Hola ${nombreLimpio}!
-
-Te avisamos que ya podes abonar la cuota de *${textoMeses}*.
-Si ya transferiste, por favor envianos el comprobante por este medio.
-
-*Datos para la transferencia:*
-Asoc Civil Urquibasquet
-CUIT/CUIL: 30-71913330-0
-Banco Credicoop
-Alias: elurqui.basquet
-Monto de la cuota: $5.000${otrosMeses.length > 0 ? '
-
-Te recordamos que tambien debes las cuotas de: ' + otrosMeses.join(', ') : ''}`;
+    const msgTexto = `Hola ${nombreLimpio}!\n\nTe avisamos que ya podes abonar la cuota de *${textoMeses}*.\nSi ya transferiste, por favor envianos el comprobante por este medio.\n\n*Datos para la transferencia:*\nAsoc Civil Urquibasquet\nCUIT/CUIL: 30-71913330-0\nBanco Credicoop\nAlias: elurqui.basquet\nMonto de la cuota: $5.000${otrosMeses.length > 0 ? '\n\nTe recordamos que tambien debes las cuotas de: ' + otrosMeses.join(', ') : ''}`;
     const mensaje = encodeURIComponent(msgTexto);
     const tel = s.whatsapp ? '549' + s.whatsapp : '';
     const url = tel ? `https://wa.me/${tel}?text=${mensaje}` : '#';
