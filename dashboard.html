@@ -231,13 +231,6 @@
     </div>
     <div class="card" style="margin-bottom:20px">
       <div class="card-header">
-        <div class="card-title">Total Recaudado por Mes</div>
-        <span class="card-badge badge-blue">Histórico</span>
-      </div>
-      <div id="lista-meses"><div class="loading"><div class="spinner"></div><br>Cargando...</div></div>
-    </div>
-    <div class="card" style="margin-bottom:20px">
-      <div class="card-header">
         <div class="card-title">Están debiendo cuotas</div>
         <span class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171" id="sinpago-count-badge">—</span>
       </div>
@@ -247,6 +240,13 @@
           <tbody id="tabla-sinpago"><tr><td colspan="5"><div class="loading"><div class="spinner"></div><br>Cargando...</div></td></tr></tbody>
         </table>
       </div>
+    </div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <div class="card-title">Total Recaudado por Mes</div>
+        <span class="card-badge badge-blue">Histórico</span>
+      </div>
+      <div id="lista-meses"><div class="loading"><div class="spinner"></div><br>Cargando...</div></div>
     </div>
   </div>
 
@@ -579,6 +579,11 @@ async function cargarSinPago(socios, hojas) {
     const mesesImpagos=mesesQueDebe.filter(mes=>{ const pagos=pagosPorMes[mes]||[]; return tel?!pagos.includes(tel):true; });
     if (mesesImpagos.length>0) sinPago.push({nro,nombre,lid,fechaReg,mesesImpagos,whatsapp:tel});
   }
+  sinPago.sort((a, b) => {
+    const diff = a.mesesImpagos.length - b.mesesImpagos.length;
+    if (diff !== 0) return diff;
+    return parseInt(a.nro||'9999') - parseInt(b.nro||'9999');
+  });
   if (badge) badge.textContent=`${sinPago.length} socio${sinPago.length!==1?'s':''}`;
   // Calcular total de cuotas pendientes (meses × $5000)
   const totalCuotasPendientes = sinPago.reduce((acc, s) => acc + s.mesesImpagos.length * 5000, 0);
@@ -592,8 +597,20 @@ async function cargarSinPago(socios, hojas) {
     const debeActual = mesesArray.includes(mesActualStr);
     const otrosMeses = mesesArray.filter(m => m !== mesActualStr);
     const textoMeses = debeActual ? mesActualStr : mesesArray[0];
-    const textoDeuda = otrosMeses.length > 0 ? `%0A%0ATe recordamos que también debés las cuotas de: *${otrosMeses.join(', ')}*` : '';
-    const mensaje = `Hola ${nombreLimpio}! 🏀%0A%0ATe avisamos que ya podes abonar la cuota de *${textoMeses}*.%0ASi ya transferiste, por favor envianos el comprobante por este medio.%0A%0A*Datos para la transferencia:*%0A👤 Asoc Civil Urquibasquet%0A🔢 CUIT/CUIL: 30-71913330-0%0A🏦 Banco Credicoop%0A📋 Alias: elurqui.basquet%0A💰 Monto de la cuota: $5.000${textoDeuda}`;
+    const msgTexto = `Hola ${nombreLimpio}!
+
+Te avisamos que ya podes abonar la cuota de *${textoMeses}*.
+Si ya transferiste, por favor envianos el comprobante por este medio.
+
+*Datos para la transferencia:*
+Asoc Civil Urquibasquet
+CUIT/CUIL: 30-71913330-0
+Banco Credicoop
+Alias: elurqui.basquet
+Monto de la cuota: $5.000${otrosMeses.length > 0 ? '
+
+Te recordamos que tambien debes las cuotas de: ' + otrosMeses.join(', ') : ''}`;
+    const mensaje = encodeURIComponent(msgTexto);
     const tel = s.whatsapp ? '549' + s.whatsapp : '';
     const url = tel ? `https://wa.me/${tel}?text=${mensaje}` : '#';
     const boton = tel
