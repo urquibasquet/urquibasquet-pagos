@@ -151,10 +151,10 @@
 </head>
 <body>
 <div class="password-overlay" id="password-overlay">
-  <div style="display:flex;flex-direction:column;align-items:center;gap:32px;padding:40px 20px;width:100%;max-width:320px;margin:0 auto">
+  <!-- MOBILE: PIN pad -->
+  <div id="auth-mobile" style="display:none;flex-direction:column;align-items:center;gap:32px;padding:40px 20px;width:100%;max-width:320px;margin:0 auto">
     <img src="https://urquibasquet.github.io/urquibasquet-pagos/Logo_Nuevo_Urqui.png" style="width:72px;height:72px;border-radius:50%;object-fit:cover;box-shadow:0 0 30px rgba(30,80,200,0.5)" alt="Urquibasquet">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:var(--text)">URQUIBASQUET</div>
-    <!-- PIN dots -->
     <div style="display:flex;gap:20px;align-items:center" id="pin-dots">
       <div class="pin-dot" id="dot-0"></div>
       <div class="pin-dot" id="dot-1"></div>
@@ -162,7 +162,6 @@
       <div class="pin-dot" id="dot-3"></div>
     </div>
     <div id="pin-error" style="font-size:13px;color:#f87171;min-height:18px;text-align:center"></div>
-    <!-- PIN pad -->
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%">
       <button class="pin-btn" onclick="pinPress('1')">1</button>
       <button class="pin-btn" onclick="pinPress('2')">2</button>
@@ -175,8 +174,17 @@
       <button class="pin-btn" onclick="pinPress('9')">9</button>
       <div></div>
       <button class="pin-btn" onclick="pinPress('0')">0</button>
-      <button class="pin-btn pin-delete" onclick="pinDelete()">⌫</button>
+      <button class="pin-btn pin-delete" onclick="pinDelete()">&#x232B;</button>
     </div>
+  </div>
+  <!-- DESKTOP: password box -->
+  <div id="auth-desktop" class="password-box" style="display:none">
+    <img src="https://urquibasquet.github.io/urquibasquet-pagos/Logo_Nuevo_Urqui.png" class="password-logo" alt="Urquibasquet">
+    <div class="password-title">URQUIBASQUET</div>
+    <div class="password-sub">Ingresá la contraseña para continuar</div>
+    <input type="password" class="password-input" id="password-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') verificarPassword()">
+    <button class="password-btn" onclick="verificarPassword()">INGRESAR</button>
+    <div class="password-error" id="password-error"></div>
   </div>
 </div>
 <div class="header">
@@ -440,6 +448,21 @@ async function fetchSheetNames() {
 // PIN
 const PIN_CORRECTO = '2026';
 const SESSION_KEY = 'urqui_auth';
+// Desktop password
+const PASSWORD = 'urqui2026';
+function verificarPassword() {
+  const input = document.getElementById('password-input');
+  const error = document.getElementById('password-error');
+  if (input.value === PASSWORD) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    document.getElementById('password-overlay').style.display = 'none';
+    cargarDatos();
+  } else {
+    input.classList.add('error'); error.textContent = 'Contraseña incorrecta'; input.value = '';
+    setTimeout(() => input.classList.remove('error'), 400);
+  }
+}
+
 let _pinActual = '';
 
 function pinPress(digit) {
@@ -480,7 +503,26 @@ function verificarPin() {
 }
 
 function initAuth() {
-  if (sessionStorage.getItem(SESSION_KEY) === '1') { document.getElementById('password-overlay').style.display = 'none'; cargarDatos(); }
+  if (sessionStorage.getItem(SESSION_KEY) === '1') {
+    document.getElementById('password-overlay').style.display = 'none';
+    cargarDatos();
+    return;
+  }
+  // Show correct auth panel based on screen size
+  const isMobile = window.matchMedia('(max-width: 700px)').matches;
+  const mobile = document.getElementById('auth-mobile');
+  const desktop = document.getElementById('auth-desktop');
+  if (isMobile) {
+    if (mobile) mobile.style.display = 'flex';
+    if (desktop) desktop.style.display = 'none';
+  } else {
+    if (desktop) desktop.style.display = 'block';
+    if (mobile) mobile.style.display = 'none';
+    setTimeout(() => {
+      const inp = document.getElementById('password-input');
+      if (inp) inp.focus();
+    }, 100);
+  }
 }
 
 function showTab(name, btn) {
