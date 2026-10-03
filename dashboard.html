@@ -403,11 +403,6 @@ async function fetchSheetNames() {
   try { const res = await fetch(url); const data = await res.json(); return (data.sheets || []).map(s => s.properties.title); } catch { return []; }
 }
 
-    document.getElementById('pin-error').textContent = 'PIN incorrecto';
-    setTimeout(() => { _pinActual = ''; actualizarDots(); document.getElementById('pin-error').textContent = ''; }, 800);
-  }
-}
-
   const isMobile = window.matchMedia('(max-width: 700px)').matches;
   const mobile = document.getElementById('auth-mobile');
   const desktop = document.getElementById('auth-desktop');
