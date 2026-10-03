@@ -390,18 +390,6 @@ async function fetchSheetNames() {
   try { const res = await fetch(url); const data = await res.json(); return (data.sheets || []).map(s => s.properties.title); } catch { return []; }
 }
 
-  const isMobile = window.matchMedia('(max-width: 700px)').matches;
-  const mobile = document.getElementById('auth-mobile');
-  const desktop = document.getElementById('auth-desktop');
-  if (isMobile && mobile && desktop) {
-    mobile.style.display = 'flex';
-    desktop.style.display = 'none';
-  } else if (desktop) {
-    desktop.style.display = 'block';
-    setTimeout(() => { const inp = document.getElementById('password-input'); if (inp) inp.focus(); }, 200);
-  }
-}
-
 function showTab(name, btn) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
