@@ -680,6 +680,21 @@ async function enviarRecordatorio() {
 
 
 
+
+async function enviarRecordatorioIndividual(lid, whatsapp, nombre, meses) {
+  try {
+    const res = await fetch('http://localhost:3001/recordatorio-individual', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lid, whatsapp, nombre, meses })
+    });
+    if (!res.ok) throw new Error('Error');
+    mostrarToast(`✅ Recordatorio enviado a ${nombre}`);
+  } catch {
+    mostrarToast('No se pudo conectar con el bot.', '#ef4444');
+  }
+}
+
 async function fetchConfig() {
   try {
     const res = await fetch('http://localhost:3001/config');
