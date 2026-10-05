@@ -498,19 +498,7 @@ async function cargarSinPago(socios, hojas) {
   if (sinPago.length===0) { tbody.innerHTML='<tr><td colspan="5" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Todos los socios tienen al menos un pago ✅</td></tr>'; return; }
   tbody.innerHTML=sinPago.map(s => {
     const mesesStr = s.mesesImpagos.join(', ');
-    const nombreLimpio = s.nombre.replace(/'/g, '');
-    const mesActualStr = getMesActual();
-    const mesesArray = mesesStr.split(', ');
-    const debeActual = mesesArray.includes(mesActualStr);
-    const otrosMeses = mesesArray.filter(m => m !== mesActualStr);
-    const textoMeses = debeActual ? mesActualStr : mesesArray[0];
-    const msgTexto = `Hola ${nombreLimpio}!\n\nTe avisamos que ya podes abonar la cuota de *${textoMeses}*.\nSi ya transferiste, por favor envianos el comprobante por este medio.\n\n*Datos para la transferencia:*\nAsoc Civil Urquibasquet\nCUIT/CUIL: 30-71913330-0\nBanco Credicoop\nAlias: elurqui.basquet\nMonto de la cuota: $5.000${otrosMeses.length > 0 ? '\n\nTe recordamos que tambien debes las cuotas de: ' + otrosMeses.join(', ') : ''}`;
-    const mensaje = encodeURIComponent(msgTexto);
-    const tel = s.whatsapp ? '549' + s.whatsapp : '';
-    const url = tel ? `https://wa.me/${tel}?text=${mensaje}` : '#';
-    const boton = tel
-      ? `<a href="${url}" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;border-radius:8px;padding:7px 14px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;text-decoration:none;">📣 RECORDAR</a>`
-      : `<span style="font-size:11px;color:var(--muted)">Sin número</span>`;
+    const boton = `<button onclick="enviarRecordatorioIndividual('${s.lid||''}','${s.whatsapp||''}','${s.nombre.replace(/'/g,'')}','${mesesStr}')" style="background:linear-gradient(135deg,var(--orange),#ea580c);color:white;border:none;border-radius:8px;padding:7px 14px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;">📣 RECORDAR</button>`;
     return `<tr id="sinpago-row-${s.nro}">
       <td><div class="td-nro">#${s.nro}</div></td>
       <td class="td-name">${s.nombre}</td>
