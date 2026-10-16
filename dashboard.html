@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pagos de cuota</title>
-<link rel="apple-touch-icon" href="https://urquibasquet.github.io/urquibasquet-pagos/Logo_Nuevo_Urqui.png">
 <link rel="icon" type="image/png" href="https://urquibasquet.github.io/urquibasquet-pagos/Logo_Nuevo_Urqui.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -550,7 +549,7 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
     .map(([tel, d]) => {
       const puntos = d.meses.size + (d.pagosTemprano * 2);
       const socio = mapaSocios[tel];
-      return { tel, puntos, nombre: nombrePorTel[tel]||'', nro: socio ? socio.nro : '', meses: d.meses.size, pagosTemprano: d.pagosTemprano };
+      return { tel, puntos, nombre: nombrePorTel[tel]||'', nro: socio ? socio.nro : '', meses: d.meses.size, mesesPagados: d.meses, pagosTemprano: d.pagosTemprano };
     })
     .filter(s => s.meses > 0)
     .sort((a, b) => b.puntos - a.puntos)
@@ -561,7 +560,12 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
   tSorteo.innerHTML = lista.map((s, i) => {
     const rc = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
     const tempDesc = s.pagosTemprano > 0 ? `<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ ${s.pagosTemprano} mes${s.pagosTemprano>1?'es':''} antes del dia 10</div>` : '';
-    return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${tempDesc}</td><td><div class="td-name" style="color:var(--blue)">${s.meses}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td></tr>`;
+    const mesesBadges = mesesValidos.map(m => {
+      const abrev = m.split(' ')[0].substring(0,3).toUpperCase();
+      const pagado = s.mesesPagados.has(m);
+      return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:0.5px;background:${pagado?'rgba(34,197,94,0.2)':'rgba(239,68,68,0.15)'};color:${pagado?'#4ade80':'#f87171'};border:1px solid ${pagado?'rgba(34,197,94,0.35)':'rgba(239,68,68,0.3)'}">${abrev}</span>`;
+    }).join('');
+    return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${tempDesc}</td><td><div style="display:flex;flex-wrap:wrap;gap:3px;align-items:center">${mesesBadges}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td></tr>`;
   }).join('');
 }
 function parseFechaStr(str) {
