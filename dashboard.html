@@ -559,19 +559,19 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
   if (lista.length === 0) { tSorteo.innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#64748b;font-style:italic;">Sin participantes aun</td></tr>'; return; }
   tSorteo.innerHTML = lista.map((s, i) => {
     const rc = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
-    const tempDesc = s.pagosTemprano > 0 ? `<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ ${s.pagosTemprano} mes${s.pagosTemprano>1?'es':''} antes del dia 10</div>` : '';
+    const tempDesc = s.pagosTemprano > 0 ? `<div style="font-size:11px;color:#fb923c;margin-top:2px">⚡ ${s.pagosTemprano} mes${s.pagosTemprano>1?'es':''} antes del dia 10</div>` : '';
     const mesesBadges = mesesValidos.map(m => {
       const abrev = m.split(' ')[0].substring(0,3).toUpperCase();
       const temprano = s.mesesTemprano.has(m);
       const pagado = s.mesesPagados.has(m);
-      const pendiente = !pagado && m === mesActual;
+      const actual = m === mesActual;
       let bg, color, border, title;
       if (temprano) {
-        bg='rgba(52,211,153,0.2)'; color='#34d399'; border='rgba(52,211,153,0.45)'; title='Pagó antes del día 10 ⚡';
+        bg='rgba(251,146,60,0.2)'; color='#fb923c'; border='rgba(251,146,60,0.4)'; title='Pagó antes del día 10 ⚡';
       } else if (pagado) {
         bg='rgba(34,197,94,0.2)'; color='#4ade80'; border='rgba(34,197,94,0.35)'; title='Pagado';
-      } else if (pendiente) {
-        bg='rgba(251,146,60,0.2)'; color='#fb923c'; border='rgba(251,146,60,0.4)'; title='Pendiente de pago';
+      } else if (actual) {
+        bg='rgba(255,255,255,0.06)'; color='rgba(255,255,255,0.35)'; border='rgba(255,255,255,0.15)'; title='Mes en curso';
       } else {
         bg='rgba(239,68,68,0.15)'; color='#f87171'; border='rgba(239,68,68,0.3)'; title='No pagó';
       }
