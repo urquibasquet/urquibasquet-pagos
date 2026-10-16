@@ -533,13 +533,13 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
     for (const r of filas) {
       const tel = String(r[4]||'').replace(/\D/g,'');
       if (!tel) continue;
-      if (!historial[tel]) historial[tel] = { meses: new Set(), pagosTemprano: 0 };
+      if (!historial[tel]) historial[tel] = { meses: new Set(), mesesTemprano: new Set() };
       historial[tel].meses.add(hoja);
       if (!nombrePorTel[tel]) nombrePorTel[tel] = r[1]||'';
       // Verificar si pago antes del dia 10 en este mes
       const match = (r[0]||'').match(/(\d+)\/(\d+)\/(\d+)/);
       if (match && parseInt(match[1]) <= 10) {
-        historial[tel].pagosTemprano++;
+        historial[tel].mesesTemprano.add(hoja);
       }
     }
   }
@@ -547,9 +547,9 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
   // Calcular puntos: +1 por mes pagado, +2 por cada mes pagado antes del dia 10
   const lista = Object.entries(historial)
     .map(([tel, d]) => {
-      const puntos = d.meses.size + (d.pagosTemprano * 2);
+      const puntos = d.meses.size + (d.mesesTemprano.size * 2);
       const socio = mapaSocios[tel];
-      return { tel, puntos, nombre: nombrePorTel[tel]||'', nro: socio ? socio.nro : '', meses: d.meses.size, mesesPagados: d.meses, pagosTemprano: d.pagosTemprano };
+      return { tel, puntos, nombre: nombrePorTel[tel]||'', nro: socio ? socio.nro : '', meses: d.meses.size, mesesPagados: d.meses, mesesTemprano: d.mesesTemprano, pagosTemprano: d.mesesTemprano.size };
     })
     .filter(s => s.meses > 0)
     .sort((a, b) => b.puntos - a.puntos)
@@ -562,8 +562,13 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
     const tempDesc = s.pagosTemprano > 0 ? `<div style="font-size:11px;color:var(--green);margin-top:2px">⚡ ${s.pagosTemprano} mes${s.pagosTemprano>1?'es':''} antes del dia 10</div>` : '';
     const mesesBadges = mesesValidos.map(m => {
       const abrev = m.split(' ')[0].substring(0,3).toUpperCase();
+      const temprano = s.mesesTemprano.has(m);
       const pagado = s.mesesPagados.has(m);
-      return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:0.5px;background:${pagado?'rgba(34,197,94,0.2)':'rgba(239,68,68,0.15)'};color:${pagado?'#4ade80':'#f87171'};border:1px solid ${pagado?'rgba(34,197,94,0.35)':'rgba(239,68,68,0.3)'}">${abrev}</span>`;
+      const bg = temprano ? 'rgba(251,146,60,0.2)' : pagado ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.15)';
+      const color = temprano ? '#fb923c' : pagado ? '#4ade80' : '#f87171';
+      const border = temprano ? 'rgba(251,146,60,0.4)' : pagado ? 'rgba(34,197,94,0.35)' : 'rgba(239,68,68,0.3)';
+      const title = temprano ? 'Pagó antes del día 10 ⚡' : pagado ? 'Pagado' : 'Sin pagar';
+      return `<span title="${title}" style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:0.5px;background:${bg};color:${color};border:1px solid ${border};cursor:default">${abrev}</span>`;
     }).join('');
     return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${tempDesc}</td><td><div style="display:flex;flex-wrap:wrap;gap:3px;align-items:center">${mesesBadges}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td></tr>`;
   }).join('');
