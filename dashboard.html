@@ -564,10 +564,17 @@ async function calcularSorteo(hojas, mesActual, datosMes, mapaSocios) {
       const abrev = m.split(' ')[0].substring(0,3).toUpperCase();
       const temprano = s.mesesTemprano.has(m);
       const pagado = s.mesesPagados.has(m);
-      const bg = temprano ? 'rgba(251,146,60,0.2)' : pagado ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.15)';
-      const color = temprano ? '#fb923c' : pagado ? '#4ade80' : '#f87171';
-      const border = temprano ? 'rgba(251,146,60,0.4)' : pagado ? 'rgba(34,197,94,0.35)' : 'rgba(239,68,68,0.3)';
-      const title = temprano ? 'Pagó antes del día 10 ⚡' : pagado ? 'Pagado' : 'Sin pagar';
+      const pendiente = !pagado && m === mesActual;
+      let bg, color, border, title;
+      if (temprano) {
+        bg='rgba(52,211,153,0.2)'; color='#34d399'; border='rgba(52,211,153,0.45)'; title='Pagó antes del día 10 ⚡';
+      } else if (pagado) {
+        bg='rgba(34,197,94,0.2)'; color='#4ade80'; border='rgba(34,197,94,0.35)'; title='Pagado';
+      } else if (pendiente) {
+        bg='rgba(251,146,60,0.2)'; color='#fb923c'; border='rgba(251,146,60,0.4)'; title='Pendiente de pago';
+      } else {
+        bg='rgba(239,68,68,0.15)'; color='#f87171'; border='rgba(239,68,68,0.3)'; title='No pagó';
+      }
       return `<span title="${title}" style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:0.5px;background:${bg};color:${color};border:1px solid ${border};cursor:default">${abrev}</span>`;
     }).join('');
     return `<tr><td><div class="rank-num ${rc}">${i+1}</div></td><td>${s.nro?`<div class="td-nro" style="font-size:12px;margin-bottom:2px">#${s.nro}</div>`:''}<div class="td-name">${s.nombre}</div>${tempDesc}</td><td><div style="display:flex;flex-wrap:wrap;gap:3px;align-items:center">${mesesBadges}</div></td><td><div class="td-boletos">${s.puntos} 🎯</div></td></tr>`;
