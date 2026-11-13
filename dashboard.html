@@ -22,6 +22,7 @@
     --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { overflow-x: hidden; max-width: 100%; }
   body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 16px; }
   .header { background: linear-gradient(135deg, #0f1729 0%, #1a2540 100%); border-bottom: 1px solid var(--border); padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .header-left { display: flex; align-items: center; gap: 14px; }
@@ -38,6 +39,7 @@
   .hero-number { font-family: 'Bebas Neue', sans-serif; font-size: 96px; line-height: 1; color: white; letter-spacing: 2px; }
   .hero-sub { font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 4px; }
   .hero-center { text-align: center; }
+  .hero-compact-mobile { display: none; }
   .hero-month-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
   .hero-month-name { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: white; letter-spacing: 2px; }
   .hero-right { text-align: right; }
@@ -131,16 +133,10 @@
     .logo-img { width: 54px; height: 54px; }
     .header-left { gap: 10px; }
     .main { padding: 12px 10px 40px; }
-    /* Hero — flex column en mobile: mes arriba, dos stats abajo */
-    .hero { display:flex; flex-direction:column; padding:12px 14px; gap:6px; }
-    .hero-center { order:-1; display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:rgba(255,255,255,0.08); border-radius:10px; }
-    .hero-month-label { font-size:10px; letter-spacing:1px; color:rgba(255,255,255,0.5); }
-    .hero-month-name { font-size:20px; letter-spacing:1px; }
-    .hero > div:not(.hero-center) { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:rgba(255,255,255,0.05); border-radius:10px; }
-    .hero-label { font-size:10px; letter-spacing:0.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:55%; line-height:1.3; }
-    .hero-number { font-size:44px; line-height:1; }
-    .hero-sub { display:none; }
-    .hero-right { text-align:right; }
+    /* Hero en mobile: solo bloque compacto */
+    .hero { padding:16px 14px; justify-content:center; }
+    .hero > *:not(.hero-compact-mobile) { display:none !important; }
+    .hero-compact-mobile { display:flex !important; flex-direction:column; align-items:center; justify-content:center; width:100%; text-align:center; }
     /* Tabs */
     .tabs-nav { overflow-x: auto; padding-bottom: 2px; gap: 0; }
     .tab-btn { font-size: 11px; padding: 10px 10px; white-space: nowrap; letter-spacing: 0.5px; }
@@ -167,22 +163,30 @@
     .bal-card div:nth-child(3) { font-size: 10px !important; }
     /* Buscador socios */
     #socio-search-input { font-size: 14px; }
-    /* Gráfico torta */
-    .grafico-wrap { flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px 14px; }
-    .grafico-canvas-wrap { width: 90px; height: 90px; }
-    .grafico-canvas-wrap canvas { width: 90px !important; height: 90px !important; }
-    .leyenda-label { font-size: 11px; }
-    .leyenda-valor { font-size: 12px; }
+    .live-badge { font-size: 10px; padding: 5px 10px; }
+    .header { max-width: 100%; overflow: hidden; }
+    /* Gráfico torta: chart izq, leyenda der */
+    .grafico-wrap { flex-direction: row; align-items: center; gap: 10px; padding: 10px 12px; }
+    .grafico-canvas-wrap { width: 80px; height: 80px; flex-shrink: 0; }
+    .grafico-canvas-wrap canvas { width: 80px !important; height: 80px !important; }
+    .leyenda-label { font-size: 10px; }
+    .leyenda-valor { font-size: 11px; }
+    .leyenda-item { gap: 5px; }
     /* Tabla deuda: ocultar LID, Anotado, Recordatorio en mobile */
     .col-lid, .col-anotado, .col-recordatorio { display: none; }
     /* Tabla bienvenida: ocultar fecha registro y botón */
     #tabla-nuevos tr td:nth-child(3), #tabla-nuevos tr th:nth-child(3),
     #tabla-nuevos tr td:nth-child(4), #tabla-nuevos tr th:nth-child(4) { display: none; }
-    /* Tabla últimos pagos: ocultar fecha */
-    #tabla-pagos tr td:nth-child(4), #tabla-pagos tr th:nth-child(4) { display: none; }
+    /* Tabla últimos pagos: ocultar fecha, mostrar solo 5 */
+    #tabla-pagos td:nth-child(4), #tab-pagos table thead th:nth-child(4) { display: none; }
+    #tabla-pagos tr:nth-child(n+6) { display: none; }
     /* Sorteo badges mes */
     .subtabs-nav { gap: 0; }
     .subtab-btn { font-size: 12px; padding: 8px 10px; }
+    /* Balance: ocultar imprimir en mobile */
+    #btn-imprimir-balance { display: none; }
+    /* Main: sin overflow */
+    .main { padding: 12px 10px 40px; max-width: 100%; }
   }
 </style>
 </head>
@@ -213,6 +217,12 @@
       <div class="hero-label">Total de socios</div>
       <div class="hero-number" id="hero-socios">—</div>
       <div class="hero-sub">registrados</div>
+    </div>
+    <div class="hero-compact-mobile">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.5);margin-bottom:2px">MES ACTUAL</div>
+      <div id="hero-month-m" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:white;letter-spacing:2px;line-height:1.1;white-space:nowrap">—</div>
+      <div id="hero-ratio" style="font-family:'Bebas Neue',sans-serif;font-size:52px;color:white;line-height:1;margin-top:4px">—</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:1px;margin-top:2px">pagaron este mes</div>
     </div>
   </div>
   <div class="tabs-nav">
@@ -315,7 +325,7 @@
         </div>
 
       </div>
-      <button onclick="exportarExcel()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;white-space:nowrap;">🖨️ IMPRIMIR BALANCE</button>
+      <button id="btn-imprimir-balance" onclick="exportarExcel()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;white-space:nowrap;">🖨️ IMPRIMIR BALANCE</button>
     </div>
     <div class="subtabs-nav" id="balance-subtabs"><div class="loading" style="padding:10px">Cargando meses...</div></div>
     <div id="balance-mes-content"></div>
@@ -467,6 +477,7 @@ function showTab(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   if (btn) btn.classList.add('active');
+  try { localStorage.setItem('activeTab', name); } catch(e) {}
 }
 function showSubtab(name, btn) {
   document.querySelectorAll('.subtab-panel').forEach(p => p.classList.remove('active'));
@@ -485,6 +496,17 @@ function actualizarCountdown() {
   else { el.textContent='Ya podes notificar!'; el.style.color='var(--green)'; btn.disabled=false; btn.style.opacity='1'; btn.style.cursor='pointer'; }
 }
 actualizarCountdown();
+
+// Restaurar última pestaña
+(function() {
+  try {
+    const savedTab = localStorage.getItem('activeTab');
+    if (savedTab && document.getElementById('tab-' + savedTab)) {
+      const btn = document.querySelector('.tab-btn[onclick*="\'' + savedTab + '\'"]');
+      showTab(savedTab, btn);
+    }
+  } catch(e) {}
+})();
 
 const COLORES = ['#f97316','#3b82f6','#22c55e','#a855f7','#f59e0b','#ec4899','#14b8a6','#ef4444'];
 
@@ -945,6 +967,8 @@ async function cargarDatos() {
   const uniqueSocios=[...new Set(datosMes.map(r=>(r[1]||'').trim().toLowerCase()))].filter(Boolean);
   document.getElementById('hero-count').textContent=uniqueSocios.length||'0';
   document.getElementById('hero-sub').textContent=`${datosMes.length} pago${datosMes.length!==1?'s':''} en ${mesActual}`;
+  document.getElementById('hero-month-m').textContent=mesActual;
+  document.getElementById('hero-ratio').textContent=`${uniqueSocios.length||0} de ${totalSociosActivos||0}`;
   document.getElementById('pagos-count-badge').textContent=`${datosMes.length} pagos`;
   const hayAlertas=datosMes.some(r=>parseInt(r[2])!==MONTO_CUOTA);
   document.getElementById('alerta-monto').classList.toggle('visible',hayAlertas);
