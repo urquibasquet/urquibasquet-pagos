@@ -26,7 +26,7 @@
   .header { background: linear-gradient(135deg, #0f1729 0%, #1a2540 100%); border-bottom: 1px solid var(--border); padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .header-left { display: flex; align-items: center; gap: 14px; }
   .logo-img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 24px rgba(30,80,200,0.5); flex-shrink: 0; border: 2px solid rgba(255,255,255,0.12); background: white; padding: 2px; }
-  .header-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--text); line-height: 1; }
+  .header-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1.5px; color: var(--text); line-height: 1.1; }
   .header-sub { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
   .live-badge { display: flex; align-items: center; gap: 7px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: var(--green); }
   .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; }
@@ -122,21 +122,59 @@
   .pag-btn:hover { border-color: var(--orange2); color: var(--orange2); }
   .pag-info { font-size: 12px; color: var(--muted); } 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
   @media (max-width: 700px) {
+    /* Layout general */
     .graficos-grid { grid-template-columns: 1fr; }
     .citas-grid { grid-template-columns: 1fr; }
-    .hero { grid-template-columns: 1fr; padding: 20px 16px; gap: 0; }
-    .hero-center { order: -1; margin-bottom: 12px; }
-    .hero-month-name { font-size: 28px; }
-    .hero > div:not(.hero-center) { display: flex; flex-direction: row; align-items: center; gap: 16px; background: rgba(255,255,255,0.06); border-radius: 12px; padding: 14px 16px; margin-bottom: 8px; }
-    .hero > div:not(.hero-center) .hero-number { font-size: 64px; line-height: 1; flex-shrink: 0; }
-    .hero-right { text-align: left; }
-    .header { padding: 12px 16px; }
-    .main { padding: 16px 12px 40px; }
-    thead th, tbody td { padding: 10px 12px; }
-    .month-row { padding: 12px 14px; }
-    .card-header { padding: 14px 16px 12px; }
-    .tabs-nav { overflow-x: auto; padding-bottom: 2px; }
-    .tab-btn { font-size: 13px; padding: 10px 14px; white-space: nowrap; }
+    .header { padding: 10px 14px; }
+    .header-title { font-size: 18px; letter-spacing: 1px; }
+    .logo-img { width: 44px; height: 44px; }
+    .header-left { gap: 10px; }
+    .main { padding: 12px 10px 40px; }
+    /* Hero — compacto en mobile */
+    .hero { grid-template-columns: 1fr 1fr 1fr; padding: 12px 14px; gap: 8px; }
+    .hero-center { order: unset; margin-bottom: 0; }
+    .hero-label { font-size: 9px; letter-spacing: 0.5px; }
+    .hero-number { font-size: 36px; }
+    .hero-sub { font-size: 10px; }
+    .hero-month-label { font-size: 9px; }
+    .hero-month-name { font-size: 20px; }
+    .hero > div:not(.hero-center) { background: none; padding: 0; }
+    .hero-right { text-align: right; }
+    /* Tabs */
+    .tabs-nav { overflow-x: auto; padding-bottom: 2px; gap: 0; }
+    .tab-btn { font-size: 11px; padding: 10px 10px; white-space: nowrap; letter-spacing: 0.5px; }
+    /* Cards */
+    .card-header { padding: 12px 14px 10px; }
+    .card-title { font-size: 15px; }
+    /* Tablas */
+    thead th { padding: 8px 10px; font-size: 10px; }
+    tbody td { padding: 10px 10px; font-size: 12px; }
+    .td-nro { font-size: 13px; }
+    .td-name { font-size: 13px; }
+    .td-monto, .td-monto-alerta { font-size: 13px; }
+    .td-fecha { font-size: 11px; }
+    /* Month rows */
+    .month-row { padding: 10px 14px; }
+    .month-name { font-size: 13px; }
+    .month-total { font-size: 20px; }
+    /* Balance cards */
+    .bal-top-row { flex-direction: column; align-items: stretch; }
+    .bal-cards-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .bal-card { padding: 10px 12px !important; }
+    .bal-card div:nth-child(1) { font-size: 10px !important; }
+    .bal-card div:nth-child(2) { font-size: 20px !important; }
+    .bal-card div:nth-child(3) { font-size: 10px !important; }
+    /* Buscador socios */
+    #socio-search-input { font-size: 14px; }
+    /* Gráfico torta */
+    .grafico-wrap { flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px 14px; }
+    .grafico-canvas-wrap { width: 90px; height: 90px; }
+    .grafico-canvas-wrap canvas { width: 90px !important; height: 90px !important; }
+    .leyenda-label { font-size: 11px; }
+    .leyenda-valor { font-size: 12px; }
+    /* Sorteo badges mes */
+    .subtabs-nav { gap: 0; }
+    .subtab-btn { font-size: 12px; padding: 8px 10px; }
   }
 </style>
 </head>
@@ -146,11 +184,11 @@
   <div class="header-left">
     <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAAbvElEQVR42sVaZ1gUWda+1ZHUQJOaqEQREBCVYGZFxWEUQVlERUB9XBXTiDqoYx4jKgO4RkRRBxNKNLvISDCDwEqUnMRWYjcdq+t+P45by6Iz4+7s9333B1TXU3XrnHvSe957CYqi0H9vYIwpisIYw0+CIOAmQojBYGCMGQwGff+/Moj/igIURVEURRAEi8X6mudJkgSV/rgmf1QBlUpFEASTyYSfXV1dLS0txcXFRUVFtbW1IpGIw+GYmpra2Nj4+vq2tbVNmjRJX1+fzWYP1PyPaML6j10F/AGWvLa29ty5cyKRqK+v7+LFiwghd3d3R0dHPp9fVVX1yy+/IIS4XG5+fn5ubm5xcXFgYCCHw1m8eDGfzwenIkmSIAi4/t+1AMYYVh1ET0xMPHHixLBhwzo6Ovz8/GbOnHnnzp3g4OChQ4fSr0gkkoKCAicnJzMzs+7u7qamppKSkoyMDJIku7q6tmzZ4uzsbGlpiRBSKpUMBuPfUuPfUAAClPbyQ4cO3blzZ+bMmSwWKywsTF9ff5CXw5MY45aWlqKiIl9fX3V19YGuIhQKnz17lpKSUl9fHxIS4uXlNX78eHiX9smvjb/fHSRJgtu8ffv25MmT0dHRwcHBe/fuxf8YJEnK5XK4VigUIHdqaqpCoZg4cSJCSCaTNTc3L1q06NKlS0qlkqIopVIJz4tEotWrV48fP37VqlVv3ryBlfrK8VUKgEC9vb1Lly4dNWpURETE1q1bV69e7ejo6OnpWVpaSksjkUg6OzvhYtSoUQihtWvX7tu3T1dXF2P8+PFjhNCQIUNAPSsrK1NT08ePH9fV1YHaCxcutLS0vHr1qkqlUqlUoOcfVQCkf/bsmYODw549e/CA8f79ez09PWtr6/7+fpIkhUKhvb29trZ2Y2Pjs2fPEELnzp2Lj49PTk7W0dHBGF+4cIHP5wsEgr6+vvj4eH19/e3bt2/ZsmXo0KGVlZVg5Ldv35qZmX377be0Yf+QAiD9jRs3DA0Nc3JyOjo6Vq5cOVAHW1tbdXX1/v5+jPHmzZuHDx/u4eGxZs2aGzdu6OvrwzPXr18HC/zwww+zZ892d3fPz8/ftGnTlClTMMatra12dnYVFRVOTk6TJk3CGCuVyqSkJE9Pz/z8fLDMb0j4Kc6+mIZJkmSz2VevXg0LC8vPz/f09HR0dKysrOzp6YmIiJDJZIcPH25ubk5LS4PX792795e//MXY2Dg2NnbYsGFaWlpQ3Xg8HqSKtra2MWPGNDY2vnjxgiRJLperUqk4HI6ZmVl2draurq6amtqxY8cEAsGSJUtevXq1c+fOq1evGhoaqlSqX0tNrF8r7CB9VlbW/Pnzr1275unpeeTIkcrKSoIgrly5kpmZqa6uPmHChLS0tAsXLgQEBNy5c0cul5uYmJiYmIjFYpFIRCdELpcLCgiFwhEjRhgaGlZXV+vp6VEUBdmGy+XW1NRMmzZNIBC8fv16//79ubm5J0+ezMnJsbS0fPr0qYuLy6+lJsav1Vc2m/306dM5c+YEBwcHBwdLJJLY2Fg3N7elS5eyWKy0tLS2traMjIwDBw40NTVt375dW1tbIpGoq6tra2uDN8NfhBCHw8EYy+VykiS3b98eHx/f3t7O4XBkMhmUYQaDIZfLWSwWm80WiUS6uro3btyorq42MDDYsGHDiRMnPn78CN74VQpAsm9qapozZw6Dwdi5cyfG+Pnz5+/evQsLC9u9ezdJkoWFhVwut62trbCwcMGCBTt27PDw8BCLxUwmk8ViURSlpaWlVCrlcjkooFKp+vr63r9/f/r06fT09MbGRmNj46amJgaDAcVBQ0MD6qNMJrO3tzc3N7948VJUVNSePXtEItG0adPYbPYXdWB8ESN0d3fPmzevo6Nj0qRJjo6OBEH87W9/QwiNHTvW2Nh4yJAhaWlpGGNjY+OwsLDvvvsuKysLEJFCoQA5BAKBWCymvRGCta2tzcnJycfH582bNxDW7u7u8fHxra2thoaGr169evTokYmJiUAgWLRo0cWLF/T19VUqVWxsrLu7e0ZGBpPJ/IIRvph2zp8/D7EBy48x9vb2hlSIMd66dStBEO/evYOfixYtYjAYDQ31jo6OSUlJBQUFtra2VVVVCKGsrKzvv//+6NGjCKEjR46MHj26uroaY3z48OE3b95UVFRs3rw5Jydn06ZN1dXVY8eOHTJkSHZ2to2NTX19PUJo3LhxKpUKY1xZWYkQgnIxKLH+iwJQjG7fvr1r1y5dXV2AOvCOjY2NqanpuXPnoqKizM3NEUIPHjxobm5ub2/HGOvq6uzdu3fu3LmLFy8+fPjwmDFjMMZjxowBVJeXl3fu3Lne3l65XP769eu7d++2tbVhjGtra8+ePfvx48dXr16VlZX19fV9/Pixr6/v5s2bGOPo6OjFixdDVsUYp6SkREdHg4V/R4GoqKgTJ04IBAKE0MmTJ6HUA9hCCOnq6vr5+TEYjAMHDsTExMyfP7+3t1dXV3fz5s23bt2CZ5KTkzHG9fX1ycnJUJgxxqmpqTY2Nmw2m8vlgkH++te/IoSys7NdXV2tra3hQ87Ozjdv3oyOjk5NTa2urn7z5g0ILZPJWCzWhQsXBlUGNEj6HTt2+Pn5qVQqMzMzhNCGDRsAF+jp6X3zzTctLS0ymQxj7Ozs7OnpmZOTgxCC7Pb06VOM8Y8//vjTTz8NxEUURalUqsuXLyOErKysKioq7t69q66uvmnTppqaml27dr179+67776zsLCgKKqxsREcb/ny5Tdu3Fi8eDGPx5NKpSDh3bt3t23b1tfXB0BjsAIkSapUqqioqOvXr2OM/fz8CIIYMWIEPG1sbLxu3TqMsUwmI0kyJCQEhE5ISIiIiMjNzaUx3KAB03p4eBAEcefOHXAJ8ObY2FiEUF5eXmZmJkEQGOMrV64YGxv39PRoaWndvn177dq1Dg4OdGRijAUCQUJCwkAjMOhEwWQyDx48+PLlyz//+c8IoYiICIxxeXn5zz//zGAwjI2NAbRBH+Pq6rpy5UpDQ8M1a9YEBATU19dTFMVmsz98+JCYmBgeHh4YGLhy5cqsrCxoHaVSKYPBAOdhsVjW1tYIIWjNNDU1J0yYgDHOzc29dOmSv7+/jo6OXC4XCARyuVxPT48gCDab3dfXJ5FIzpw5I5VKVSrVP4vaQLS8e/fu+Ph4gIFKpRLQuZGRUUNDQ1pa2rfffqtUKhUKBQ2te3p6goODp0yZ0tDQgDFOTEzU19fn8XjLli3bvn27u7s7ZJKurq7ExESE0PDhwwsLC9vb2y9dupSRkXHs2DGE0JUrV8AnQZ6qqqra2lqE0MOHD/38/BBCnp6eo0ePtre3r6mpIUlSU1MzKysLLPnJhUCgvLy8UaNG0UidoqiGhgZYKjMzs19++WWgY9TU1GzYsMHCwmL9+vVw58KFCwghOzu7jo4O+jF/f3+E0MaNGzHGCQkJlpaWLBaLz+dzudykpKSMjIwFCxakpaVRFJWZmbl8+fK4uDiYfNu2bcXFxadPn46NjT179uzVq1efP38Oc+7YsSM1NZXOp4gO36ysrAULFtDxQVefefPmwdrY2dkFBAT4+/s7OTkZGRkFBATApBRFdXd3m5iYEATx8OFDjLFUKhWLxRjjjRs3IoRWr14NvkeSZE1NTXl5uUwma2hoKCwshDRPm1SlUnV2dra0tMDrGONr165t2rRp8uTJBQUFKSkpcXFxxcXFbm5uEokEnkeQJSiKgnaWNs3ALqysrOzYsWNLlixZsmTJpk2bkpOTS0pKhEIhyIoxvnfvHkJo6NChEOIQc42NjVwu19jYuK6ujqIouVwOasjl8tDQUIAPGhoasOokSd69e1dHR8fExITD4WzZsgUEAD/U0tJqbW2FdayurjYyMiopKYG3EEivUCh8fX0LCgpo00Ak0F+FcfHixX379i1atMjGxgayLShw5MgRgiD8/PzoJ9PT083MzGbNmgUeBbmcJEmpVDphwgRw/Q8fPkRERCCEILFIpVLwWIRQZmYmzLNixQoWixUYGAjWyM7OxhjHx8eDqUmSZEFWKS4u5vF4Xl5eID3GmMViARiWyWRnzpzh8XjBwcEHDx6sqKiAb0RGRgLZBjgZY2xgYIAxfv369YULF2Qy2fnz50eMGNHZ2UlRlImJiUKh4HA4P/30U0FBwZo1ayARA/TYuHHjjBkz7OzsvL29GxoamEwmrQmTySRJ0tnZWSwWDx8+/N69e8bGxlVVVZcvX546dSpFUZ8kgBoOWJLD4bBYLIxxSUnJ7t27R44cuW7dOgj/AwcOMJlMNTU1giAgb0AvAagT7puams6ePXvUqFE7duwwNzd3cnJycnKKiYnhcDjd3d2HDx9mMpkREREURUFuXbp0qUKhOH78OELI3NwcY6ylpaWnp0cDe4SQm5tbcnKyq6trdHS0lpZWUFCQt7c3JGgWSKBSqUJDQ8Vi8f79+xFClZWVT548EQqFMIu9vT106CNHjlRTU+vv72exWEOGDKEVUCgUkOCVSmVMTExqampra2tkZGRsbOz9+/d3794dHR0dFBRUXl4uFArt7OxGjBgB2R1jPGXKFIRQWlpaXFyciYkJQkhTU1NLSwv6RKlUihAyNTWVSqUEQVhaWtrZ2ZEk+ezZM4lEoqGhwYKicPr0aZIk/fz8cnNznz17pqmp6evra21tPWnSJDs7OysrK6hBRkZGhoaG/f39WlpafD5/EH0L3UlKSopQKNTX14+JidHU1Bw7dmxWVlZpaWlpaWlhYSFBEK6urhwOhyRJYBSHDRumr6/f0tLS0tJiZGSEENLW1tbQ0IB+rb+/n76DMTYzM2MymRRFdXR0yOVyDQ2NT44eEhLCZrP19fWfPn0KzfXJkycRQqmpqXK5nMvlQqnmcrna2tqQFtTV1f9Jj/3DDkwmMyAgIDEx0djYmM1mA2EIeYLH4xUXF2OMhw8fTjfiGGNdXV0rK6uurq6ysjKAwFwul8ViAQEMFtDV1QUjg9ktLCwCAwM/McQgwcuXL9++fQu+BGVYIpFIpdJVq1Y9efKEboVoRpHL5XI4nM+bIYQQn8/HGBsZGbFYLBaL9fr16/LycktLSwcHB4D1gMZpHACGxRg3NTXB6gzs3yG6uFwuXBgaGiKERCLRwYMHP378iBD6FMS1tbUwO5PJ1NHRSUlJMTExqaiosLKy0tfXJwgCsjItJYvFAjQy0IU+9XgMBkKIx+MxGIy+vr7ly5erVKq4uDgWi/XhwwfQcJDOPB4PmG2w6sDmHeTW0NCA/g5MxOPx9u7dC4D/E3GwcuXKuXPnwjtisdjLy+vMmTNDhw7t7e2FdeJyuTQn/jm1P/BaJpPBJ8vKyqZOnVpeXn7o0KHZs2e3tLRASoFwGjjAmFKpdKBVabckCILL5YpEIvrd1tbWhIQEcCoGTJqXlweNHxho7Nix8+bNMzAwkMlkWlpaDAbj73//e1pa2m/TrLAW8KWMjAxXV9eXL1/Onz//+++/h/imU/sgncGR2Gz250yzTCaDhYNoBgdms9kTJ07U0tL6pwWmTJkybdo00FgsFldVVRUVFd2/f18kEh0/fjwwMNDd3f3EiRODvGXQatGFDyFka2u7YsUKPp+fnJy8ZcsWBoOhpqYGC6xUKgfNA8Lx+XxY1IFzQgqho5l2eGNjYyDOPnnCsGHDcnJyZDJZRUVFb29venr6mDFjZsyY0dXVdefOnYyMDLlcDu4IbgqJZZAasLRg0ilTppw8eTIpKYkgiLi4uPfv31tYWICvg7g0iEQIdXZ2EgRhYWEBn6DtSVEUcE3wDB0SL168KC4u/sQAgQJaWlqdnZ1CodDZ2RnguEgkksvlCoUCajOHw4EAgtBRKpVA3YEEIDTYVyKRgCVJkvT39x8+fHhlZWV+fn5QUJC5uTl8BWNMR0J/f39jYyO0BFA6AaISBCGRSLq7u83MzDDG7e3twBpBXfvxxx8/ZUXI0wKBYNWqVdnZ2Q8ePADUoKurq6+vb2BgYGhoaGRkxOPx5HK5ubn5kCFDCIIQiURisZguBZAiNDU16Rig9bG3t6+qqiorK5s7d66bm1tZWVlFRQVBEMXFxbm5uRMmTDAxMWlraxMIBNbW1pAZOzo6pFKphoZGR0eHWCx2dnYmCKK+vh5jXFdXp1QqV61alZ6e/skC8I/JZBYVFZWWloaGhpaUlLS1tb148aKpqWmQk7x8+dLHxychIaGnp6e9vd3AwAAM2NHRAWQWrQC4LL0bUF1dDXA1OTn5zZs35eXlQL0wGIwZM2ZQFDVt2jQmkykQCDgcjlAozMnJmTVr1okTJzDGCxcufPv2bXV1NYPB6O/v7+vrCwsLGzdu3CenpXF/ZWXlIPpfJBI1NjZmZGSsX78ecPncuXNFIhHk+FOnTgFOlkgkpqamCKH79+9jjO3s7BBCs2bNgkmgc3d0dFQqlSKRyMzMjMvl3r9/Py8v7+DBg2pqapBzi4qKlEqlSqWCbK6hoTFixAiE0MSJE0mSfPHiRUJCQnl5uUQi2bx5M7R4/2wpAf3Dt48ePapUKoHJUCgU165dKyoq6u3txRgLhcLz588rlcrt27cDsINtgZSUFAaDoaur29PT09XVxefzmUymjY0NEDBPnz6FxPfixQuM8alTpxBCCxcupEk+yD/QVatUKmBgwVejo6PhscePH9P87qxZs6B/+BcF4MexY8egP1L+Yyxfvhwyj42NTVRUFHQnUqk0MDAQcldERAQkRyAhU1NTaX+7d+8eTAXmDggIAAkiIyMRQn5+fuvWreNwOK6urjweT1NTEzrdQaOwsNDf33/q1KltbW0kSebl5a1fv/4LvBD8ViqV9vb28GFoC2UyGeCnyMjI6dOnEwRx6NAh6IMTExPd3d01NDSsrKyAsqYo6tSpU5GRkSkpKTk5Oc3NzWDY0tJSCwsLhNCf/vSn27dvKxSKn3/+ecqUKe7u7kePHgUUBO2/iYlJcHDwxo0bo6KiZs6cqa+vz2QyV69eTW8HLliwIDg4eCAv9C/MnEqlWrZsWWxsLG0EjHF4eDiw0xjjXbt2IYTOnDmDvzQGNp/0HfrbycnJS5Ys2bt3L2gFQyKRvH79uqioSKFQvHv37siRI9OmTXNxcXFycvL19Y2Nje3u7oY2WqlUVlVVrVu3rrOzE7rTwQrQRhk3blxGRga4CkVRBw4cQAjFxcXBLEZGRjY2NqDehw8fFi5cuH79+piYGHgYNtT8/f3DwsIKCwvhTnl5+ZkzZ7q6ukDo58+fX758+f37948fP9bS0tq/f//06dP19PSWLVsGTblIJJLJZCKRqLKycufOnT4+PsBBBAcHh4SE/Co3SkfC2rVrgRKFhj0pKQkhFBMTAzutOjo6AoEApiBJEnwDCCmM8d27dxFC0BAOGzYMnFhdXd3KykpTU7O4uFgsFhsYGAAgy83NRQjl5+fPnDnT1tZ2+vTpEyZMAEjG5/PpHfXw8HCKop48ebJ8+XKhUAhc5ZcVgGYAYzxv3jxIVRRFAWNlbm4eFhbm4eHB4/GOHTsG0pMk6eTkxGQymUwm0ARBQUEcDqezs7OhoQGYbTc3Nzc3N4yxg4PD5MmTMcajRo1SU1OjKOrZs2cEQVRXV0+YMCEsLAyWrKmpKSsry8bGRiAQPHz48O3bt8ATjxw58vDhw59vWjI+x2QY45CQkJKSEoAocNPU1FSpVJaWllpZWS1evBj2Y3p6ehoaGkJDQxFC5eXl9JkNDodjaWm5YsWK9vb2169fAwERHBz8+PFjoDs1NDQAF2CMYQ8TvqKmpjZkyJBZs2bZ29vb2NhMnTrV1taWw+EcPHgwMDAwKirq860+xueATKVSBQQEbNmyxcHBobW1FUCLh4fH5cuX6+rqNDU1R48eDa1Jc3OzRCJZsmSJQCAAuiUgIEAul0PxUqlUVVVVBEE4OTlhjJ2cnBBCDQ0NPB4PMi8gMxaLpampmZOT4+3tDQlepVJJJBI2mw24tbq6OiEhITQ0FJqQQXuqX9jkAypm4sSJEydOzMnJAcm6u7tJkjQzM7t9+3Z9fT3Uh7KyMoIgRo8ebWFhARAwJCRk3LhxO3fufPDgAZPJBAAjEAiAbkEItbe303sc9LEniqL6+/v5fD7QQUwmUyqVAlisqamZOXNmTk6OtbX1F3eLGb/WmjAYjJs3bxoZGe3evRteYzAYEomEz+fPmTMnPT0dPMrc3FxTU3PkyJF1dXXQMaWkpOjp6YWHh0ulUsD3GhoadDMFcBIQBABy4ItgzpkzZ9IAWygUNjc3Hz9+fMOGDQ4ODsBifO0+MVgKNiZCQ0Mpinr//j1N8EPr3dLSUllZ2dLSsmrVqqampp6eHmDuLS0tz54929HRcfLkSR0dnc+bHvrkHCgA94G4hwd6e3u1tbVjYmKWLVtmbm6+YsUKpVL5qwdwfuMYAl1xNm/eDGBBLBbX1dVZWFioq6uXlpbq6elNmjTJy8uLIAg1NTXAM1DC3dzcbG1t4fQWkNgFBQUIoYKCgqCgIAcHB4wxnFGQSqUuLi7Lli0D5AcI9Pr16+PGjYPq+dtnJX7nsAfUPHrjVUdHB4iN+fPnnz59GiH06tUrEAXA9vnz59vb21Uq1b59+wiCAAWys7OVSuXVq1cRQk1NTXPnzh02bBhJkpcvX+ZwOAqFwsPDY8SIERMnTmQwGI8ePUpOTp46dSrsFP7uiZvfOdwF59hIkoyIiCgvL3d0dPzw4YOTk1N8fHxZWRnwHCqVysXFhclkNjY2Xr9+va6ujsFgQG9gbm7OZrMrKipYLFZpaSmTybSwsGCz2V1dXUwms7W1VVtbm8VitbW1vXnzxsDA4O7du7W1tYmJiTExMeHh4V91dOsrD0aBY8BW4alTp7y8vAoLCwsLC6HKQAT/8MMPc+bM8fX17evrCwoKQgj19vZOnjzZwcHh/PnzlpaWM2bMwBjv2bMHIRQbG2toaBgaGgr4NDs7+/nz515eXlu3bgW//ZrTTl97YmvgNiYcRDh16tTChQvHjx//6NEjoVDY09MTEBAwd+7czMxMupmElJKfnw8/tbW1m5qaSJJsbGx0cXFBCE2fPl0ikbS1tT1//tzb2zssLKy5uRnqwO+ec/pPFBi4nYwxFovFly9fXrNmzdChQ5OSkq5du/by5UuQeMWKFdu2baP3Rqurqzdt2sRisWA/DwZsGJ84ccLNzW316tVlZWX/1sLT4z85+Dro+GJlZeWrV6+OHz9uYGAgEokiIyN7e3t9fHy6urosLCxkMhmfzxeLxUuXLr1///7YsWNdXFyampq8vb1LSkpcXV0XL14MATMwq/5fnNwFNZhMJv1JoVBYWlr67t27nJwcc3PznJwcHx+fe/fuffPNN7du3UpPT79161ZmZiaXy/Xx8QkPD6dPatLbz/8/Z6fpGT7PGAqFQiaTwYktLpc7SMQ/fu7431Dg187VfW4TuADLDHwF9uRowDvQdP//p9d/Q6UvMtj/xfE/LMs3VPzdfc0AAAAASUVORK5CYII=" alt="Urquibasquet" class="logo-img">
     <div>
-      <div class="header-title">URQUIBASQUET</div>
+      <div class="header-sup" style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);line-height:1;margin-bottom:1px">ASOCIACIÓN CIVIL</div>
+      <div class="header-title">EL URQUI BASQUET</div>
       <div class="header-sub">Pagos de cuota societaria</div>
     </div>
   </div>
-  <div class="live-badge"><div class="live-dot"></div>En vivo</div>
 </div>
 <div class="main">
   <div class="hero">
@@ -249,20 +287,20 @@
 
   <!-- TAB 4: BALANCE -->
   <div class="tab-panel" id="tab-balance">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:16px;flex-wrap:wrap;">
-      <div style="display:flex;gap:16px;flex-wrap:wrap;">
-        <div class="card" style="padding:16px 24px;min-width:220px;">
+    <div class="bal-top-row">
+      <div class="bal-cards-row">
+        <div class="card bal-card">
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">💰 Saldo en Banco</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1" id="saldo-banco-display">—</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px">calculado automáticamente</div>
         </div>
 
-        <div class="card" style="padding:16px 24px;min-width:200px;">
+        <div class="card bal-card">
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">🎯 Cuotas pendientes</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:#3b82f6" id="potencial-display">—</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px" id="pendientes-sub">calculando...</div>
         </div>
-        <div class="card" style="padding:16px 24px;min-width:160px;">
+        <div class="card bal-card">
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">📊 Al día</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:#f97316" id="porcentaje-display">—</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px" id="porcentaje-sub">socios pagaron este mes</div>
@@ -281,11 +319,11 @@
     <!-- BUSCADOR DE SOCIOS -->
     <div class="card" style="margin-bottom:20px">
       <div class="card-header"><div class="card-title">Buscar Socio</div></div>
-      <div style="padding:16px 22px;display:flex;gap:12px;flex-wrap:wrap">
+      <div style="padding:16px 22px;display:flex;gap:10px;align-items:center">
         <input id="socio-search-input" type="text" placeholder="Nombre, apellido o nro de socio..."
-          style="flex:1;min-width:200px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 16px;font-size:14px;font-family:inherit"
+          style="flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 14px;font-size:14px;font-family:inherit"
           onkeydown="if(event.key==='Enter')buscarSocio()">
-        <button onclick="buscarSocio()" style="background:linear-gradient(135deg,var(--blue),#2563eb);color:white;border:none;border-radius:10px;padding:10px 24px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;">🔍 BUSCAR</button>
+        <button onclick="buscarSocio()" style="flex-shrink:0;background:linear-gradient(135deg,var(--blue),#2563eb);color:white;border:none;border-radius:10px;padding:10px 18px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;">🔍 BUSCAR</button>
       </div>
       <div id="socio-search-result" style="padding:0 22px 16px"></div>
     </div>
