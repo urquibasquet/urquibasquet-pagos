@@ -120,7 +120,8 @@
   .pag-nav { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 12px; }
   .pag-btn { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 6px 14px; cursor: pointer; font-size: 13px; }
   .pag-btn:hover { border-color: var(--orange2); color: var(--orange2); }
-  .pag-info { font-size: 12px; color: var(--muted); } 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  .pag-info { font-size: 12px; color: var(--muted); }
+  @keyframes shake { 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
   @media (max-width: 700px) {
     /* Layout general */
     .graficos-grid { grid-template-columns: 1fr; }
@@ -130,16 +131,16 @@
     .logo-img { width: 54px; height: 54px; }
     .header-left { gap: 10px; }
     .main { padding: 12px 10px 40px; }
-    /* Hero — 2 filas: mes arriba full-width, stats abajo 2 cols */
-    .hero { grid-template-columns: 1fr 1fr; padding: 12px 14px; gap: 8px; }
-    .hero-center { grid-column: 1 / -1; order: -1; display:flex; align-items:center; justify-content:center; gap:10px; padding:8px 0 10px; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:2px; }
-    .hero-month-label { font-size: 11px; }
-    .hero-month-name { font-size: 24px; letter-spacing:1px; }
-    .hero > div:not(.hero-center) { background:rgba(255,255,255,0.06); border-radius:10px; padding:10px 12px; }
-    .hero-label { font-size: 8px; letter-spacing: 0.5px; margin-bottom:4px; }
-    .hero-number { font-size: 48px; line-height:1; }
-    .hero-sub { font-size: 10px; }
-    .hero-right { text-align: right; }
+    /* Hero — flex column en mobile: mes arriba, dos stats abajo */
+    .hero { display:flex; flex-direction:column; padding:12px 14px; gap:6px; }
+    .hero-center { order:-1; display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:rgba(255,255,255,0.08); border-radius:10px; }
+    .hero-month-label { font-size:10px; letter-spacing:1px; color:rgba(255,255,255,0.5); }
+    .hero-month-name { font-size:20px; letter-spacing:1px; }
+    .hero > div:not(.hero-center) { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:rgba(255,255,255,0.05); border-radius:10px; }
+    .hero-label { font-size:10px; letter-spacing:0.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:55%; line-height:1.3; }
+    .hero-number { font-size:44px; line-height:1; }
+    .hero-sub { display:none; }
+    .hero-right { text-align:right; }
     /* Tabs */
     .tabs-nav { overflow-x: auto; padding-bottom: 2px; gap: 0; }
     .tab-btn { font-size: 11px; padding: 10px 10px; white-space: nowrap; letter-spacing: 0.5px; }
